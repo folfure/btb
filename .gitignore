@@ -1,0 +1,9 @@
+# local tooling
+.claude/
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+# never commit Strava / API secrets
+.env
+.dev.vars

@@ -1,0 +1,287 @@
+[
+ {
+  "id": "c-openers-45",
+  "name": "Pre-Test Openers",
+  "cat": "Endurance",
+  "desc": "A short session for the day before a test or event. A few short efforts wake the legs up without leaving any fatigue behind. Keep everything outside the efforts very easy.",
+  "src": "Classic pre-race opener routine (Friel / common coaching practice)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Endurance"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.5,
+      "c": 110,
+      "lbl": "Sprint"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.5,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.6,
+    "lbl": "Endurance"
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "c-tempo-intro-45",
+  "name": "Tempo Intro 3x5",
+  "cat": "Tempo",
+  "desc": "A gentle first taste of structured intervals for newer riders. Three five-minute tempo blocks at a comfortably hard effort, with plenty of easy riding between them.",
+  "src": "Coggan Zone 3 tempo, beginner progression",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 0.6,
+    "lbl": "Endurance"
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "c-sweet-spot-intro-45",
+  "name": "Sweet Spot Intro 3x6",
+  "cat": "Sweet Spot",
+  "desc": "Short sweet spot intervals for riders new to structured training. Ride three six-minute blocks just below threshold, hard but controlled, with three minutes easy between them.",
+  "src": "Sweet-spot training (Coggan/Allen), beginner volume",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.6,
+    "lbl": "Endurance"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 360,
+      "p": 0.86,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "c-time-crunch-ss-55",
+  "name": "Time-Crunched Sweet Spot 2x15",
+  "cat": "Sweet Spot",
+  "desc": "Two fifteen-minute sweet spot blocks in under an hour, for days when time is short. Settle into a steady rhythm and hold it.",
+  "src": "Time-crunched training (Carmichael), sweet-spot focus",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 900,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "c-time-crunch-thr-55",
+  "name": "Time-Crunched Threshold 4x6",
+  "cat": "Threshold",
+  "desc": "Four six-minute efforts at FTP that fit into a lunch hour. Short openers prepare the legs before the main set.",
+  "src": "Time-crunched training (Carmichael), threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 360,
+      "p": 1,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ }
+]

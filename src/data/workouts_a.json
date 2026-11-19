@@ -1,0 +1,3884 @@
+[
+ {
+  "id": "a-recovery-spin-30",
+  "name": "Recovery Spin 30",
+  "cat": "Recovery",
+  "desc": "Thirty minutes of very easy pedalling to promote blood flow without adding training stress. Keep it conversational and spin light at 85-95 rpm; it should feel easier than you think it should.",
+  "src": "Classic Coggan active recovery (Zone 1)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.4,
+    "p1": 0.5,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 960,
+    "p": 0.5,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.5,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-recovery-spin-45",
+  "name": "Recovery Spin 45",
+  "cat": "Recovery",
+  "desc": "A slightly longer active recovery ride with a few gentle cadence pickups to keep the legs supple. All efforts stay well inside Zone 1 so you recover for the next quality day.",
+  "src": "Classic Coggan active recovery (Zone 1) with cadence pickups",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.4,
+    "p1": 0.52,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.52,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "c": 105,
+      "lbl": "Light cadence pickup"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.5,
+      "c": 90,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 0.5,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.5,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-recovery-flush-60",
+  "name": "Recovery Flush 60",
+  "cat": "Recovery",
+  "desc": "An hour at the top of the recovery zone for riders who want time on the bike on a rest day. Smooth, steady pedalling at 0.50-0.55 with relaxed upper body; no surges.",
+  "src": "Recovery ride / flush ride convention used in pro team plans",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.4,
+    "p1": 0.52,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.53,
+    "c": 90,
+    "lbl": "Smooth spin"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.5,
+    "c": 95,
+    "lbl": "Easy"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.55,
+    "c": 88,
+    "lbl": "Smooth spin"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.52,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-45",
+  "name": "Endurance 45",
+  "cat": "Endurance",
+  "desc": "A short aerobic base ride in Zone 2. Ride steady at 65-70% FTP with smooth pedalling; builds mitochondrial density and fat oxidation with minimal fatigue.",
+  "src": "Classic Coggan Zone 2 endurance",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 1680,
+    "p": 0.68,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-60",
+  "name": "Endurance 60",
+  "cat": "Endurance",
+  "desc": "One hour of steady Zone 2 with a gentle progression from low to mid endurance. Keep breathing easy and nasal if possible; the goal is aerobic volume, not intensity.",
+  "src": "Classic Coggan Zone 2 endurance",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2 low"
+   },
+   {
+    "t": "s",
+    "d": 1320,
+    "p": 0.7,
+    "c": 90,
+    "lbl": "Zone 2 mid"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-90",
+  "name": "Endurance 90",
+  "cat": "Endurance",
+  "desc": "A 90-minute aerobic ride with brief cadence changes every 15 minutes to break up the monotony. Stay at 65-72% FTP; this is the bread-and-butter session for base building.",
+  "src": "Polarized / base training long Zone 2 (Seiler)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 720,
+      "p": 0.68,
+      "c": 90,
+      "lbl": "Zone 2"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.7,
+      "c": 100,
+      "lbl": "Zone 2 high cadence"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.7,
+      "c": 75,
+      "lbl": "Zone 2 low cadence"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 0.66,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-120",
+  "name": "Endurance 2h",
+  "cat": "Endurance",
+  "desc": "Two hours of steady aerobic riding for long-ride durability. Hold 65-72% FTP, fuel every 20-30 minutes and stand for 30 seconds every so often to stay comfortable.",
+  "src": "Long slow distance / Zone 2 base (Seiler polarized model)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 5,
+    "s": [
+     {
+      "t": "s",
+      "d": 1080,
+      "p": 0.7,
+      "c": 90,
+      "lbl": "Zone 2"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.7,
+      "c": 70,
+      "lbl": "Stand & stretch"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.66,
+      "c": 90,
+      "lbl": "Zone 2"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.66,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-180",
+  "name": "Endurance 3h",
+  "cat": "Endurance",
+  "desc": "A long indoor base ride for building aerobic endurance and fatigue resistance. Ride steady in Zone 2, finishing the last 20 minutes at the top of the zone; fuel and hydrate as for an outdoor long ride.",
+  "src": "Long slow distance / Zone 2 base (Seiler polarized model)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 900,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 6,
+    "s": [
+     {
+      "t": "s",
+      "d": 1380,
+      "p": 0.68,
+      "c": 90,
+      "lbl": "Zone 2"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.68,
+      "c": 70,
+      "lbl": "Stand & stretch"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.62,
+      "c": 90,
+      "lbl": "Easy, eat & drink"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.62,
+    "lbl": "Easy"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.74,
+    "c": 90,
+    "lbl": "Zone 2 high"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-endurance-progressive-75",
+  "name": "Progressive Endurance 75",
+  "cat": "Endurance",
+  "desc": "A Zone 2 ride that steps up gently every 15 minutes, finishing near the top of endurance. Teaches pacing and builds aerobic durability as fatigue accumulates.",
+  "src": "Progressive endurance / negative-split base ride",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.62,
+    "c": 90,
+    "lbl": "Zone 2 low"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.67,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.71,
+    "c": 90,
+    "lbl": "Zone 2 mid"
+   },
+   {
+    "t": "s",
+    "d": 720,
+    "p": 0.75,
+    "c": 90,
+    "lbl": "Zone 2 high"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-cadence-pyramid-60",
+  "name": "Cadence Pyramid",
+  "cat": "Endurance",
+  "desc": "An endurance ride with cadence pyramids at constant Zone 2 power. Climb from 85 to 115 rpm and back while keeping hips stable and no bouncing; improves pedalling economy and neuromuscular coordination.",
+  "src": "Classic cadence pyramid drill (base-period skill work)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 85,
+      "lbl": "Cadence 85"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 95,
+      "lbl": "Cadence 95"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 105,
+      "lbl": "Cadence 105"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 115,
+      "lbl": "Cadence 115"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 105,
+      "lbl": "Cadence 105"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.65,
+      "c": 95,
+      "lbl": "Cadence 95"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.65,
+      "c": 88,
+      "lbl": "Recover at self-selected cadence"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.68,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-high-cadence-spin-ups",
+  "name": "High-Cadence Spin-Ups",
+  "cat": "Endurance",
+  "desc": "Zone 2 ride with progressive spin-ups to 120+ rpm at light load. Increase cadence over each effort while staying smooth in the saddle; trains neuromuscular speed and smooth stroke.",
+  "src": "Classic spin-up drill (Friel base period skills)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 8,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.6,
+      "c": 110,
+      "lbl": "Spin-up 110 rpm"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.6,
+      "c": 122,
+      "lbl": "Spin-up 120+ rpm"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.65,
+      "c": 90,
+      "lbl": "Zone 2"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.68,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-isolated-leg-cadence",
+  "name": "Isolated-Leg Focus",
+  "cat": "Endurance",
+  "desc": "Endurance ride with alternating single-leg-focus blocks: put emphasis on one leg (other leg just along for the ride) at high cadence, then the other, then both. Clean pull-through at the bottom and over the top; ERG holds low power so the drill stays technical.",
+  "src": "Single-leg drill adapted for smart trainers (Friel / Carmichael pedalling drills)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 5,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.5,
+      "c": 100,
+      "lbl": "Left-leg focus, high cadence"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.5,
+      "c": 100,
+      "lbl": "Right-leg focus, high cadence"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "c": 105,
+      "lbl": "Both legs, smooth circles"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.66,
+      "c": 90,
+      "lbl": "Zone 2"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.68,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-low-cadence-strength-endurance",
+  "name": "Low-Cadence Strength Endurance",
+  "cat": "Endurance",
+  "desc": "Aerobic ride with seated low-cadence blocks at upper Zone 2 / low tempo. Stay seated, quiet upper body and drive through the whole stroke; builds muscular endurance with low cardiovascular cost.",
+  "src": "Torque / strength-endurance intervals (Rønnestad low-cadence work, Spanish \"fuerza\" blocks)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 360,
+      "p": 0.75,
+      "c": 60,
+      "lbl": "Seated low cadence 60 rpm"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.62,
+      "c": 92,
+      "lbl": "Zone 2 easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-3x10",
+  "name": "Tempo 3x10",
+  "cat": "Tempo",
+  "desc": "Introductory tempo session: three 10-minute blocks at 80% FTP. Comfortably hard, controlled breathing; builds aerobic power and muscular endurance.",
+  "src": "Classic Coggan Zone 3 tempo",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.8,
+      "c": 88,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-2x20",
+  "name": "Tempo 2x20",
+  "cat": "Tempo",
+  "desc": "Two 20-minute tempo blocks at 80-83% FTP. Settle in, stay seated and hold steady cadence; a staple for building aerobic engine and fatigue resistance.",
+  "src": "Classic Coggan Zone 3 tempo",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.81,
+    "c": 90,
+    "lbl": "Tempo"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.83,
+    "c": 90,
+    "lbl": "Tempo"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-60",
+  "name": "Tempo Hour",
+  "cat": "Tempo",
+  "desc": "A long sustained tempo block within an endurance ride: 45 continuous minutes at 78-82% FTP with cadence variation every 15 minutes. Excellent for gran fondo and time-trial preparation.",
+  "src": "Classic sustained tempo (\"sub-threshold\") ride",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.68,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.78,
+    "c": 90,
+    "lbl": "Tempo 90 rpm"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.8,
+    "c": 80,
+    "lbl": "Tempo 80 rpm"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.82,
+    "c": 95,
+    "lbl": "Tempo 95 rpm"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.62,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-bursts-3x12",
+  "name": "Tempo with Bursts",
+  "cat": "Tempo",
+  "desc": "Three 12-minute tempo blocks with a 15-second hard surge every 2 minutes. Surge out of the saddle, then settle straight back to tempo; simulates race surges and teaches lactate clearance at moderate intensity.",
+  "src": "Tempo-with-surges (race-simulation tempo, common coach structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 105,
+      "p": 0.8,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-surges-2x20",
+  "name": "Tempo Surges 2x20",
+  "cat": "Tempo",
+  "desc": "Two 20-minute tempo blocks with a 30-second surge to 120% every 4 minutes. The surges spike lactate; the tempo that follows forces you to clear it while still working.",
+  "src": "Tempo-with-surges / \"stochastic tempo\" coach structure",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 210,
+      "p": 0.82,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 210,
+      "p": 0.82,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 210,
+      "p": 0.82,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 210,
+      "p": 0.82,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 210,
+      "p": 0.82,
+      "c": 90,
+      "lbl": "Tempo"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-tempo-low-cadence-4x10",
+  "name": "Low-Cadence Tempo 4x10",
+  "cat": "Tempo",
+  "desc": "Four 10-minute seated tempo blocks at 65 rpm. Builds torque and muscular endurance useful for climbing and time-trialling; keep the core quiet and avoid rocking.",
+  "src": "Muscular endurance tempo (Friel ME intervals)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.8,
+      "c": 65,
+      "lbl": "Seated tempo 65 rpm"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.55,
+      "c": 95,
+      "lbl": "Recovery spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-4x8",
+  "name": "Sweet Spot 4x8",
+  "cat": "Sweet Spot",
+  "desc": "Entry-level sweet spot: four 8-minute efforts at 88% FTP. Strong but sustainable; builds FTP with less fatigue than threshold work. A good first step before longer sweet spot intervals.",
+  "src": "Sweet spot training concept (Coggan / Sweet Spot \"88-94%\")",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 480,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-3x10",
+  "name": "Sweet Spot 3x10",
+  "cat": "Sweet Spot",
+  "desc": "Three 10-minute sweet spot efforts at 88-90% FTP. Settle into a rhythm and hold steady cadence; a bridge between introductory and classic sweet spot sessions.",
+  "src": "Sweet spot training concept (Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.89,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-4x12",
+  "name": "Sweet Spot 4x12",
+  "cat": "Sweet Spot",
+  "desc": "Four 12-minute efforts at 90% FTP with short recoveries. Accumulates 48 minutes of time-in-zone to raise FTP and muscular endurance.",
+  "src": "Sweet spot training concept (Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 720,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-3x15",
+  "name": "Sweet Spot 3x15",
+  "cat": "Sweet Spot",
+  "desc": "Three 15-minute efforts at 90% FTP. Stay seated and relaxed, fuel before the session; a classic mid-progression sweet spot workout.",
+  "src": "Sweet spot training concept (Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 900,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-2x20",
+  "name": "Sweet Spot 2x20",
+  "cat": "Sweet Spot",
+  "desc": "The classic sweet spot session: two 20-minute efforts at 88-90% FTP. Builds sustainable power and muscular endurance; aim for even pacing and steady cadence throughout.",
+  "src": "Classic 2x20 sweet spot (Coggan / Allen & Coggan \"Training and Racing with a Power Meter\")",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.88,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.9,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-3x20",
+  "name": "Sweet Spot 3x20",
+  "cat": "Sweet Spot",
+  "desc": "Three 20-minute efforts at 90% FTP: an hour of quality sweet spot work. A demanding session for experienced riders building towards longer events; fuel during the recoveries.",
+  "src": "Classic sweet spot progression (Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 1200,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-2x30",
+  "name": "Sweet Spot 2x30",
+  "cat": "Sweet Spot",
+  "desc": "Two 30-minute efforts at 88% FTP. Long intervals develop fatigue resistance and mental focus; pace the first 10 minutes conservatively and stay fuelled.",
+  "src": "Extended sweet spot (Coggan sweet spot progression)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 1800,
+    "p": 0.88,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 1800,
+    "p": 0.88,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-1x45",
+  "name": "Sweet Spot 45",
+  "cat": "Sweet Spot",
+  "desc": "A single 45-minute sweet spot block at 87-89% FTP. Simulates a sustained climb or time-trial effort; split it mentally into thirds and vary cadence slightly in each.",
+  "src": "Long sweet spot block (Coggan sweet spot progression)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.87,
+    "c": 90,
+    "lbl": "Sweet spot 90 rpm"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.88,
+    "c": 85,
+    "lbl": "Sweet spot 85 rpm"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.89,
+    "c": 95,
+    "lbl": "Sweet spot 95 rpm"
+   },
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-progression",
+  "name": "Sweet Spot Progression",
+  "cat": "Sweet Spot",
+  "desc": "Three 15-minute efforts, each stepping up through the sweet spot range: 86% to 90% to 94%. Builds pacing discipline and pushes the top end of sweet spot as fatigue rises.",
+  "src": "Sweet spot step progression (common coach structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "r",
+    "d": 900,
+    "p0": 0.85,
+    "p1": 0.89,
+    "lbl": "Sweet spot progression"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "r",
+    "d": 900,
+    "p0": 0.87,
+    "p1": 0.91,
+    "lbl": "Sweet spot progression"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "r",
+    "d": 900,
+    "p0": 0.89,
+    "p1": 0.94,
+    "lbl": "Sweet spot progression"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-bursts-3x12",
+  "name": "Sweet Spot with Bursts",
+  "cat": "Sweet Spot",
+  "desc": "Three 12-minute sweet spot intervals with a 15-second kick at 150% every 3 minutes. The bursts recruit fast-twitch fibres and add lactate that must be cleared at sweet spot; very race-specific.",
+  "src": "Sweet spot with surges (race-simulation structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 165,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.5,
+      "c": 105,
+      "lbl": "Kick"
+     },
+     {
+      "t": "s",
+      "d": 165,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.5,
+      "c": 105,
+      "lbl": "Kick"
+     },
+     {
+      "t": "s",
+      "d": 165,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.5,
+      "c": 105,
+      "lbl": "Kick"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-sweet-spot-tempo-combo",
+  "name": "Sweet Spot Tempo Blend",
+  "cat": "Sweet Spot",
+  "desc": "Alternating 10-minute sweet spot and 5-minute tempo blocks for 60 minutes without full recovery. Keeps intensity high without going over threshold; builds big aerobic volume.",
+  "src": "Tempo / sweet spot \"float\" structure (endurance-sport coaching)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.78,
+      "c": 92,
+      "lbl": "Tempo float"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-5x6",
+  "name": "Threshold 5x6",
+  "cat": "Threshold",
+  "desc": "Five 6-minute efforts at 98-100% FTP with equal-ish recovery. A gentle entry into threshold work; focus on smooth, even power and controlled breathing.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.75,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 5,
+    "s": [
+     {
+      "t": "s",
+      "d": 360,
+      "p": 0.98,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-5x8",
+  "name": "Threshold 5x8",
+  "cat": "Threshold",
+  "desc": "Five 8-minute efforts at 100% FTP. Builds lactate threshold and the ability to sustain hard efforts; ride just at threshold, not over it.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 5,
+    "s": [
+     {
+      "t": "s",
+      "d": 480,
+      "p": 1,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-3x10",
+  "name": "Threshold 3x10",
+  "cat": "Threshold",
+  "desc": "Three 10-minute efforts at FTP. A staple threshold session that develops the ability to hold race pace on climbs and breakaways.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 1,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-4x10",
+  "name": "Threshold 4x10",
+  "cat": "Threshold",
+  "desc": "Four 10-minute efforts at 98-100% FTP with 4 minutes recovery. Forty minutes of time at threshold for raising FTP; stay seated and steady.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.99,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-3x12",
+  "name": "Threshold 3x12",
+  "cat": "Threshold",
+  "desc": "Three 12-minute efforts at 98-100% FTP. A step up in interval length; aim to finish the last one strong without fading.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 720,
+      "p": 0.99,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-2x15",
+  "name": "Threshold 2x15",
+  "cat": "Threshold",
+  "desc": "Two 15-minute efforts at FTP. Bridges between 10-minute intervals and the classic 2x20; requires pacing discipline and mental focus.",
+  "src": "Classic Coggan Zone 4 threshold intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 1,
+    "c": 92,
+    "lbl": "Threshold"
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 1,
+    "c": 92,
+    "lbl": "Threshold"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-2x20",
+  "name": "Threshold 2x20",
+  "cat": "Threshold",
+  "desc": "The benchmark FTP session: two 20-minute efforts at 95-100% FTP. Raises lactate threshold and sustainable power; the gold standard for time-trial and climbing fitness.",
+  "src": "Classic 2x20 at FTP (Allen & Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.97,
+    "c": 92,
+    "lbl": "Threshold"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.97,
+    "c": 92,
+    "lbl": "Threshold"
+   },
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-1x40",
+  "name": "Threshold 40",
+  "cat": "Threshold",
+  "desc": "A single 40-minute effort at 95% FTP: time-trial simulation. Start controlled, settle in, and hold even power to the end; trains sustainable power and pacing.",
+  "src": "Long threshold block / 40 km TT simulation (Coggan)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.6,
+    "lbl": "Easy"
+   },
+   {
+    "t": "s",
+    "d": 2400,
+    "p": 0.95,
+    "c": 92,
+    "lbl": "Sustained threshold"
+   },
+   {
+    "t": "r",
+    "d": 600,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-6x5",
+  "name": "Threshold 6x5",
+  "cat": "Threshold",
+  "desc": "Six 5-minute efforts at 102% FTP with 2.5-minute recoveries. Slightly above FTP with short rest; builds tolerance to threshold-level effort.",
+  "src": "Short threshold repeats (classic coach structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 6,
+    "s": [
+     {
+      "t": "s",
+      "d": 300,
+      "p": 1.02,
+      "c": 93,
+      "lbl": "Threshold+"
+     },
+     {
+      "t": "s",
+      "d": 150,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-ladder",
+  "name": "Threshold Ladder",
+  "cat": "Threshold",
+  "desc": "A ladder of threshold efforts: 4, 6, 8, 10, 8, 6, 4 minutes at 98-102% FTP. Longer efforts sit slightly below FTP and shorter ones slightly above; builds pacing across durations.",
+  "src": "Threshold pyramid / ladder (common coach structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 1.02,
+    "c": 93,
+    "lbl": "Threshold 4 min"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 1,
+    "c": 92,
+    "lbl": "Threshold 6 min"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.99,
+    "c": 92,
+    "lbl": "Threshold 8 min"
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.98,
+    "c": 92,
+    "lbl": "Threshold 10 min"
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.99,
+    "c": 92,
+    "lbl": "Threshold 8 min"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 360,
+    "p": 1,
+    "c": 92,
+    "lbl": "Threshold 6 min"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Recovery"
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 1.02,
+    "c": 93,
+    "lbl": "Threshold 4 min"
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-threshold-progressive-3x12",
+  "name": "Progressive Threshold 3x12",
+  "cat": "Threshold",
+  "desc": "Three 12-minute efforts each built in three 4-minute steps: 95%, 100%, 105% FTP. Teaches negative-split pacing and finishing hard when fatigued.",
+  "src": "Progressive threshold intervals (negative-split coaching structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.95,
+      "c": 92,
+      "lbl": "Threshold low"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 1,
+      "c": 92,
+      "lbl": "Threshold"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 1.05,
+      "c": 94,
+      "lbl": "Threshold high"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-over-under-95-105-3x9",
+  "name": "Over-Unders 3x9",
+  "cat": "Over-Under",
+  "desc": "Three 9-minute blocks alternating 2 minutes at 95% and 1 minute at 105% FTP. The overs generate lactate; the unders teach the body to process it while still working near threshold.",
+  "src": "Classic over-under intervals (Carmichael / CTS)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-over-under-95-105-4x10",
+  "name": "Over-Unders 4x10",
+  "cat": "Over-Under",
+  "desc": "Four 10-minute blocks of 2 min at 95% / 1 min at 105% FTP, finishing each with an extra minute under. Progresses the 3x9 session with more time at and around threshold.",
+  "src": "Classic over-under intervals (Carmichael / CTS)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-over-under-90-110-3x12",
+  "name": "Over-Unders 90/110",
+  "cat": "Over-Under",
+  "desc": "Three 12-minute blocks alternating 2 minutes at 90% and 1 minute at 110% FTP. Bigger swings than 95/105: the overs push well past threshold and the unders recover only partially.",
+  "src": "Over-under intervals, wide-band variant (Carmichael / CTS)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.1,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.1,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.1,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.9,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.1,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-over-under-short-surge",
+  "name": "Over-Unders with Surges",
+  "cat": "Over-Under",
+  "desc": "Three 10-minute blocks at 92% FTP with a 30-second surge to 120% every 2 minutes. Mimics attacks on a climb; the surges are short and sharp, the floor stays high.",
+  "src": "Surge-style over-unders (race-simulation; Carmichael / CTS variant)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-criss-cross-2x20",
+  "name": "Criss-Cross 2x20",
+  "cat": "Over-Under",
+  "desc": "Two 20-minute efforts at 88% FTP with a 1-minute rise to 105% every 4 minutes. A sweet spot base with threshold-crossing surges; builds the ability to respond to pace changes and recover on the go.",
+  "src": "Criss-cross intervals (classic US coaching structure)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Cross over"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Cross over"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Cross over"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Cross over"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.88,
+      "c": 90,
+      "lbl": "Sweet spot"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Cross over"
+     },
+     {
+      "t": "s",
+      "d": 360,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "a-over-under-ramp-unders",
+  "name": "Over-Under Progression",
+  "cat": "Over-Under",
+  "desc": "Four 8-minute blocks where each 1-minute over at 108% is followed by a 1-minute under at 92-96%, with the unders rising across the set. Fatigue builds steadily, ending as an advanced lactate-tolerance session.",
+  "src": "Progressive over-unders (coach structure building on Carmichael over-unders)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 720,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.8,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 100,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.08,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.92,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.08,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.94,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.08,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.08,
+      "c": 96,
+      "lbl": "Over"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.96,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.55,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ }
+]

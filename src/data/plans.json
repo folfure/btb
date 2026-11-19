@@ -1,0 +1,722 @@
+[
+ {
+  "id": "ftp-builder-6wk",
+  "name": "FTP Builder",
+  "level": "Intermediate",
+  "goal": "Raise FTP in 6 weeks",
+  "desc": "Opens with a 20-minute FTP test and builds from sweet spot to threshold and over-unders, with a VO2max touch near the end. Week 4 is a recovery week, and the plan ends with a re-test so you can see the gain. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Sweet-spot to threshold progression (Coggan/Allen), 3:1 load/recovery",
+  "weeks": [
+   {
+    "focus": "Test + base",
+    "days": [
+     "b-test-ftp-20",
+     "a-endurance-60",
+     "a-sweet-spot-3x10",
+     "a-tempo-2x20",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Build 1",
+    "days": [
+     "a-sweet-spot-3x15",
+     "a-endurance-60",
+     "a-threshold-3x10",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Build 2",
+    "days": [
+     "a-sweet-spot-2x20",
+     "a-endurance-60",
+     "a-threshold-4x10",
+     "a-endurance-120",
+     "b-vo2-30-30-intro"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "a-endurance-60",
+     "a-sweet-spot-4x8",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Build 3",
+    "days": [
+     "a-over-under-95-105-3x9",
+     "a-endurance-60",
+     "a-threshold-2x20",
+     "a-endurance-120",
+     "b-vo2-5x5-115"
+    ]
+   },
+   {
+    "focus": "Taper + re-test",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-45",
+     "c-openers-45",
+     "b-test-ftp-20"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "sweet-spot-base-8wk",
+  "name": "Sweet Spot Base",
+  "level": "Intermediate",
+  "goal": "Build aerobic base efficiently",
+  "desc": "Builds aerobic power with progressively longer sweet spot intervals at 88-94% of FTP. Two 3-week load blocks each end in a recovery week, and the plan finishes with a ramp test to reset your zones. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Sweet-spot base (Coggan/Allen, popularised by TrainerRoad)",
+  "weeks": [
+   {
+    "focus": "Base week 1",
+    "days": [
+     "a-sweet-spot-3x10",
+     "a-endurance-60",
+     "a-sweet-spot-4x8",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Base week 2",
+    "days": [
+     "a-sweet-spot-3x15",
+     "a-endurance-60",
+     "a-sweet-spot-4x12",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Base week 3",
+    "days": [
+     "a-sweet-spot-2x20",
+     "a-endurance-60",
+     "a-sweet-spot-3x20",
+     "a-sweet-spot-tempo-combo",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "a-tempo-3x10",
+     "a-endurance-60",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Base week 5",
+    "days": [
+     "a-sweet-spot-2x30",
+     "a-endurance-60",
+     "a-sweet-spot-bursts-3x12",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Base week 6",
+    "days": [
+     "a-sweet-spot-1x45",
+     "a-endurance-60",
+     "a-threshold-3x12",
+     "a-sweet-spot-progression",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Base week 7",
+    "days": [
+     "a-sweet-spot-3x20",
+     "a-endurance-60",
+     "a-over-under-95-105-3x9",
+     "a-sweet-spot-2x30",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Recovery + test",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-60",
+     "c-openers-45",
+     "b-test-ramp"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "polarized-80-20-8wk",
+  "name": "Polarized 80/20",
+  "level": "Intermediate",
+  "goal": "Lift VO2max and endurance together",
+  "desc": "Most of your riding is easy Zone 2, plus two hard interval sessions a week: Seiler's 4x8-minute intervals and short-interval sets such as 30/15s. Very little time is spent in the middle zones, and every 4th week is lighter. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Polarized training (Seiler 80/20; Rønnestad 30/15s)",
+  "weeks": [
+   {
+    "focus": "Polarized week 1",
+    "days": [
+     "b-vo2-3x8-seiler",
+     "a-endurance-90",
+     "a-endurance-60",
+     "b-vo2-30-30-intro",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Polarized week 2",
+    "days": [
+     "b-vo2-4x8-seiler",
+     "a-endurance-90",
+     "a-endurance-60",
+     "b-vo2-30-15-2x13",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Polarized week 3",
+    "days": [
+     "b-vo2-4x8-seiler",
+     "a-endurance-90",
+     "a-endurance-60",
+     "b-vo2-30-30-3x12",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "b-vo2-3x8-seiler",
+     "a-endurance-60",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Polarized week 5",
+    "days": [
+     "b-vo2-4x8-seiler",
+     "a-endurance-90",
+     "a-high-cadence-spin-ups",
+     "b-vo2-30-15-3x13",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Polarized week 6",
+    "days": [
+     "b-vo2-5x5-115",
+     "a-endurance-90",
+     "a-endurance-60",
+     "b-vo2-4x8x30-30",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Polarized week 7",
+    "days": [
+     "b-vo2-4x8-seiler",
+     "a-endurance-90",
+     "a-endurance-60",
+     "b-vo2-40-20-hard",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Recovery + test",
+    "days": [
+     "a-recovery-spin-45",
+     "a-endurance-60",
+     "c-openers-45",
+     "b-test-ramp"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "climbing-6wk",
+  "name": "Climbing & Hills",
+  "level": "Intermediate",
+  "goal": "Climb longer and stronger",
+  "desc": "Low-cadence torque work and long seated climbs build climbing-specific strength. Later weeks add hill repeats, Belgian bergs and full alpine simulations. Week 4 is a recovery week. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Traditional base/build with muscular-endurance focus (Friel)",
+  "weeks": [
+   {
+    "focus": "Strength base",
+    "days": [
+     "b-hill-seated-65",
+     "a-endurance-60",
+     "b-hill-torque-sst",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Climbing build 1",
+    "days": [
+     "b-hill-seated-60-long",
+     "a-endurance-60",
+     "b-hill-repeats-8x3",
+     "b-hill-rolling"
+    ]
+   },
+   {
+    "focus": "Climbing build 2",
+    "days": [
+     "b-hill-steep-steady",
+     "a-endurance-60",
+     "b-hill-repeats-6x5",
+     "a-endurance-90",
+     "b-hill-alpine"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "a-low-cadence-strength-endurance",
+     "a-endurance-60",
+     "b-hill-rolling"
+    ]
+   },
+   {
+    "focus": "Climbing build 3",
+    "days": [
+     "b-hill-belgian",
+     "a-endurance-60",
+     "b-hill-climb-kicks",
+     "a-endurance-90",
+     "b-hill-alpine"
+    ]
+   },
+   {
+    "focus": "Peak climbing",
+    "days": [
+     "b-mix-long-climb-attacks",
+     "a-endurance-60",
+     "b-hill-repeats-6x5",
+     "b-hill-alpine-epic"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "vo2max-block-3wk",
+  "name": "VO2max Block",
+  "level": "Advanced",
+  "goal": "Short, sharp VO2max boost",
+  "desc": "Block periodization: week 1 packs five high-intensity sessions into seven days. The next two weeks drop to one VO2 session a week with plenty of endurance riding so the adaptation can settle in. Only start this block if you are well rested and already have a solid base. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Rønnestad block periodization (Rønnestad et al. 2014, 2020)",
+  "weeks": [
+   {
+    "focus": "HIT block (5 sessions)",
+    "days": [
+     "b-vo2-30-15-3x13",
+     "b-vo2-5x5-115",
+     "a-endurance-60",
+     "b-vo2-30-15-3x13",
+     "b-vo2-4x4",
+     "b-vo2-30-15-3x13"
+    ]
+   },
+   {
+    "focus": "Absorb",
+    "days": [
+     "a-recovery-spin-45",
+     "a-endurance-60",
+     "a-endurance-90",
+     "b-vo2-30-15-3x13",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Maintain + test",
+    "days": [
+     "a-endurance-60",
+     "b-vo2-4x8-seiler",
+     "a-endurance-90",
+     "c-openers-45",
+     "b-test-5min-map"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "beginner-get-fit-4wk",
+  "name": "Get Fit: Beginner",
+  "level": "Beginner",
+  "goal": "Build a fitness habit",
+  "desc": "Three or four sessions a week for riders new to indoor training. A ramp test sets your zones, and then you build gently from easy endurance and cadence drills to your first tempo and sweet spot intervals. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Traditional base (Coggan zones), beginner-friendly volume",
+  "weeks": [
+   {
+    "focus": "Find your FTP",
+    "days": [
+     "b-test-ramp",
+     "a-endurance-45",
+     "c-tempo-intro-45"
+    ]
+   },
+   {
+    "focus": "Get rolling",
+    "days": [
+     "a-endurance-45",
+     "c-tempo-intro-45",
+     "a-cadence-pyramid-60",
+     "a-endurance-60"
+    ]
+   },
+   {
+    "focus": "Step up",
+    "days": [
+     "a-endurance-60",
+     "c-sweet-spot-intro-45",
+     "a-high-cadence-spin-ups",
+     "a-endurance-progressive-75"
+    ]
+   },
+   {
+    "focus": "Easy week + check",
+    "days": [
+     "a-recovery-spin-30",
+     "c-sweet-spot-intro-45",
+     "a-endurance-45",
+     "b-test-ramp"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "time-trial-6wk",
+  "name": "Time Trial Threshold",
+  "level": "Advanced",
+  "goal": "Hold more power for 20-40 min",
+  "desc": "Builds threshold endurance with longer and longer intervals at FTP, over-unders to handle surges, and TT pacing simulations. Week 4 is a recovery week, and week 6 tapers into a full 40-minute TT effort. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Threshold/muscular-endurance build (Friel; Coggan)",
+  "weeks": [
+   {
+    "focus": "Threshold base",
+    "days": [
+     "a-threshold-3x10",
+     "a-endurance-60",
+     "a-sweet-spot-2x20",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Threshold build 1",
+    "days": [
+     "a-threshold-3x12",
+     "a-endurance-60",
+     "a-over-under-95-105-3x9",
+     "b-mix-tt-20",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Threshold build 2",
+    "days": [
+     "a-threshold-2x20",
+     "a-endurance-60",
+     "a-criss-cross-2x20",
+     "a-endurance-120",
+     "b-vo2-5x5-115"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "a-tempo-2x20",
+     "a-endurance-60",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Threshold peak",
+    "days": [
+     "a-threshold-1x40",
+     "a-endurance-60",
+     "a-over-under-95-105-4x10",
+     "a-endurance-120",
+     "b-mix-tt-40"
+    ]
+   },
+   {
+    "focus": "Taper + TT",
+    "days": [
+     "a-threshold-5x6",
+     "a-recovery-spin-30",
+     "c-openers-45",
+     "b-mix-tt-40"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "gran-fondo-8wk",
+  "name": "Gran Fondo Prep",
+  "level": "Intermediate",
+  "goal": "Ride a long sportive strong",
+  "desc": "Long endurance rides, tempo and sweet spot build the durability for 4-6 hour events. Climbing sessions and full gran fondo pacing rehearsals come in the later weeks. Week 4 is a recovery week, and week 8 is a taper. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Traditional base/build periodization (Friel), 3:1 loading",
+  "weeks": [
+   {
+    "focus": "Base week 1",
+    "days": [
+     "a-sweet-spot-3x10",
+     "a-endurance-60",
+     "a-tempo-2x20",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Base week 2",
+    "days": [
+     "a-sweet-spot-3x15",
+     "a-endurance-60",
+     "b-hill-seated-65",
+     "a-endurance-progressive-75",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Base week 3",
+    "days": [
+     "a-sweet-spot-2x20",
+     "a-endurance-60",
+     "a-tempo-60",
+     "b-hill-rolling",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "a-tempo-3x10",
+     "a-endurance-60",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Build 1",
+    "days": [
+     "a-sweet-spot-3x20",
+     "a-endurance-60",
+     "b-hill-alpine",
+     "a-tempo-surges-2x20",
+     "a-endurance-180"
+    ]
+   },
+   {
+    "focus": "Build 2",
+    "days": [
+     "a-threshold-2x20",
+     "a-endurance-60",
+     "b-vo2-4x4",
+     "a-recovery-spin-45",
+     "b-mix-gran-fondo"
+    ]
+   },
+   {
+    "focus": "Peak",
+    "days": [
+     "a-sweet-spot-2x30",
+     "a-endurance-60",
+     "b-hill-repeats-6x5",
+     "b-hill-alpine-epic"
+    ]
+   },
+   {
+    "focus": "Taper",
+    "days": [
+     "a-endurance-60",
+     "a-sweet-spot-4x8",
+     "a-recovery-spin-30",
+     "c-openers-45"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "criterium-6wk",
+  "name": "Criterium & Punchy",
+  "level": "Advanced",
+  "goal": "Repeatable surges and a sprint",
+  "desc": "Short, repeated VO2max and anaerobic efforts, neuromuscular sprints and crit simulations, for racing that keeps surging. Week 4 is a lighter week, and week 6 checks your 1-minute power before a final crit simulation. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Race-specific build (Friel build/peak; Rønnestad short intervals)",
+  "weeks": [
+   {
+    "focus": "Punch base",
+    "days": [
+     "b-vo2-30-30-3x12",
+     "a-endurance-60",
+     "b-spr-standing",
+     "a-sweet-spot-bursts-3x12",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Punch build 1",
+    "days": [
+     "b-ana-1min-8x",
+     "a-endurance-60",
+     "b-spr-neuro-10s",
+     "a-endurance-60",
+     "b-mix-crit-short"
+    ]
+   },
+   {
+    "focus": "Punch build 2",
+    "days": [
+     "b-vo2-40-20-hard",
+     "a-endurance-60",
+     "b-spr-leadout",
+     "a-endurance-60",
+     "b-mix-crit"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-recovery-spin-45",
+     "b-spr-neuro-10s",
+     "a-endurance-60",
+     "a-tempo-bursts-3x12"
+    ]
+   },
+   {
+    "focus": "Race sharpening",
+    "days": [
+     "b-ana-1min-10x",
+     "a-endurance-60",
+     "b-vo2-30-15-3x13",
+     "b-spr-30s",
+     "b-mix-crit"
+    ]
+   },
+   {
+    "focus": "Peak + check",
+    "days": [
+     "b-test-1min",
+     "a-endurance-60",
+     "b-ana-15-15",
+     "c-openers-45",
+     "b-mix-crit"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "time-crunched-3x-6wk",
+  "name": "Time-Crunched 3x/Week",
+  "level": "Intermediate",
+  "goal": "Max fitness on ~3h/week",
+  "desc": "Three efficient sessions a week, all under 90 minutes and most around an hour. They mix sweet spot, threshold and VO2max so you get the most from limited time. Week 4 is easier, and the plan ends with a ramp test. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Time-crunched training (Carmichael), high-intensity low-volume",
+  "weeks": [
+   {
+    "focus": "Week 1",
+    "days": [
+     "a-sweet-spot-3x10",
+     "b-vo2-30-30-intro",
+     "c-time-crunch-ss-55"
+    ]
+   },
+   {
+    "focus": "Week 2",
+    "days": [
+     "c-time-crunch-thr-55",
+     "b-vo2-30-15-2x13",
+     "a-sweet-spot-2x20"
+    ]
+   },
+   {
+    "focus": "Week 3",
+    "days": [
+     "a-threshold-3x10",
+     "b-vo2-4x4",
+     "a-sweet-spot-4x12"
+    ]
+   },
+   {
+    "focus": "Recovery",
+    "days": [
+     "a-endurance-45",
+     "a-tempo-3x10",
+     "a-endurance-60"
+    ]
+   },
+   {
+    "focus": "Week 5",
+    "days": [
+     "a-threshold-2x20",
+     "b-vo2-40-20",
+     "a-over-under-95-105-3x9"
+    ]
+   },
+   {
+    "focus": "Week 6 + test",
+    "days": [
+     "b-vo2-30-15-3x13",
+     "c-time-crunch-thr-55",
+     "b-test-ramp"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "recovery-week",
+  "name": "Recovery Week",
+  "level": "Beginner",
+  "goal": "Absorb training, freshen up",
+  "desc": "A one-week template to drop into any plan after 2-3 hard weeks. Volume and intensity come down, with one short tempo session to keep the legs sharp. Finish it feeling eager to train. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "3:1 / 2:1 load-recovery cycles (Friel; Coggan active recovery)",
+  "weeks": [
+   {
+    "focus": "Recovery week",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-60",
+     "a-tempo-3x10",
+     "a-recovery-flush-60",
+     "a-recovery-spin-45"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ramp-test-ftp-check",
+  "name": "FTP Check (Ramp Test)",
+  "level": "Beginner",
+  "goal": "Set accurate training zones",
+  "desc": "A few easy days and an openers session so you arrive fresh for a ramp test. The next week checks the new FTP with sweet spot and threshold sessions. Lower FTP by 3-5% if 2x15 at threshold feels impossible.",
+  "src": "Ramp test protocol (MAP x 0.75); field-validation approach",
+  "weeks": [
+   {
+    "focus": "Freshen + test",
+    "days": [
+     "a-recovery-spin-45",
+     "a-endurance-60",
+     "c-openers-45",
+     "b-test-ramp"
+    ]
+   },
+   {
+    "focus": "Validate new FTP",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-60",
+     "a-sweet-spot-2x20",
+     "a-threshold-2x15"
+    ]
+   }
+  ]
+ }
+]
