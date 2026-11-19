@@ -14,7 +14,10 @@ const parts = ext => existsSync(partsDir) ? readdirSync(partsDir).filter(f => f.
   .map(f => `/* ---- parts/${f} ---- */\n` + readFileSync(join(partsDir, f), 'utf8').replace(/<\/(script|style)/gi, '<\\/$1')).join('\n') : '';
 const tpl = readFileSync(join(here, 'app.template.html'), 'utf8')
   .replace('/*__PARTS_CSS__*/', () => parts('.css'))
-  .replace('/*__PARTS_JS__*/', () => parts('.js'));
+  .replace('/*__PARTS_JS__*/', () => parts('.js'))
+  // Browsers turn CRLF into LF before hashing an inline script for the CSP, so the output must be LF-only
+  // (Windows editors save CRLF) or the script hash won't match and the page stays blank.
+  .replace(/\r\n?/g, '\n');
 
 const workouts = [];
 for (const f of readdirSync(dataDir).filter(f => /^workouts.*\.json$/.test(f)).sort()) {

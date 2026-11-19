@@ -381,7 +381,7 @@ body.riding #btBanner{display:none}
             <div class="card gauge" id="gHr"></div>
           </div>
           <div class="card chartbox"><canvas id="chart"></canvas>
-            <div class="legend"><span><i style="background:#fff"></i>Power</span><span><i style="background:#ff4d6d"></i>HR</span><span><i style="background:#4cc2ff"></i>Cadence</span></div></div>
+            <div class="legend"><span><i style="background:var(--c-power,#fff)"></i>Power</span><span><i style="background:var(--c-hr,#ff4d6d)"></i>HR</span><span><i style="background:var(--c-cad,#4cc2ff)"></i>Cadence</span></div></div>
         </div>
       </div>
       <div class="statsrow">
@@ -411,8 +411,14 @@ body.riding #btBanner{display:none}
 
   <!-- HISTORY -->
   <section class="view" id="v-history">
-    <div class="sect-h"><div><h2>History</h2><p>Rides are stored in this browser. Export TCX to upload to Strava, Garmin Connect, TrainingPeaks or intervals.icu.</p></div></div>
+    <div class="sect-h"><div><h2>History</h2><p>Every ride keeps its second-by-second data. Tap a ride to analyse it, or export TCX for Strava, Garmin Connect, TrainingPeaks or intervals.icu.</p></div></div>
     <div id="hist"></div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="view" id="v-progress">
+    <div class="sect-h"><div><h2>Progress</h2><p>Fitness, fatigue and form, power curve, time in zones and records, from every ride you saved.</p></div></div>
+    <div id="progress"></div>
   </section>
 
   <!-- SETTINGS -->
@@ -424,12 +430,14 @@ body.riding #btBanner{display:none}
         <div class="field"><label>Weight (kg)</label><input type="number" id="sWeight" min="30" max="200" step="0.1"><span class="hint" id="sWkgHint"></span></div>
         <div class="field"><label>Max heart rate (bpm)</label><input type="number" id="sMaxHr" min="120" max="230"><span class="hint">Used for heart-rate zones.</span></div>
         <div class="field"><label>Resting heart rate (bpm)</label><input type="number" id="sRestHr" min="30" max="100"><span class="hint">Used by the simulator.</span></div>
+        <div class="field"><label>W′ anaerobic capacity (J)</label><input type="number" id="sWprime" min="5000" max="60000" step="500"><span class="hint">For the W′ balance chart. Typical 15 000–25 000 J; Progress shows an estimate from your rides.</span></div>
       </div>
       <div class="zones" id="zoneTable"></div>
     </div>
     <div class="card pad" style="margin-top:12px">
       <h3 style="margin-bottom:12px">Ride behaviour</h3>
       <div class="form">
+        <div class="field"><label>Theme</label><select id="sTheme"><option value="neon">Neon Miami</option><option value="classic">Classic</option></select></div>
         <div class="field"><label>Power display smoothing</label><select id="sSmooth"><option value="1">Instant</option><option value="3">3 s average</option><option value="5">5 s average</option><option value="10">10 s average</option></select></div>
         <div class="field"><label>Auto-pause</label><select id="sAutoPause"><option value="1">On (pause when you stop pedalling)</option><option value="0">Off</option></select></div>
         <div class="field"><label>Sound cues</label><select id="sSound"><option value="1">On (countdown beeps)</option><option value="0">Off</option></select></div>
@@ -560,7 +568,7 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 /* =====================================================================
    SETTINGS & ZONES
    ===================================================================== */
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100 };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon' };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
 const saveSettings = () => { const ok = store('erglab.settings', S); if (typeof cloud !== 'undefined') cloud.schedulePush(); return ok; };
 
@@ -1358,9 +1366,11 @@ function buildRideRecord(completed) {
     dur: R.samples.length, avgP: Math.round(a.sumP / Math.max(1, a.n)), np: Math.round(aggNP(a)), maxP: a.maxP, kj: Math.round(a.kj),
     avgHr: a.nHr ? Math.round(a.sumHr / a.nHr) : null, maxHr: R.samples.reduce((m, x) => Math.max(m, x.hr || 0), 0) || null,
     avgC: a.nC ? Math.round(a.sumC / a.nC) : null, ftp: S.ftp, dist: Math.round(R.dist), completed: done,
-    p: R.samples.map(x => x.p), hr: R.samples.map(x => x.hr), c: R.samples.map(x => x.c), dd: R.samples.map(x => x.d),
+    p: R.samples.map(x => x.p), hr: R.samples.map(x => x.hr), c: R.samples.map(x => x.c), dd: R.samples.map(x => x.d), tg: R.samples.map(x => x.tgt == null ? 0 : Math.round(x.tgt)),
+    wt: S.weight,
   };
   ride.IF = +(ride.np / S.ftp).toFixed(2); ride.tss = Math.round(ride.dur / 3600 * ride.IF * ride.IF * 100);
+  ride.an = analyse(ride, ride);
   return ride;
 }
 function finishRide(completed) {
@@ -1388,30 +1398,41 @@ function cleanRide(r) {
   const out = { id: String(r.id), date: d.toISOString(), name: String(r.name || 'Ride').slice(0, 200), wid: String(r.wid || '').slice(0, 80), cat: CATS.includes(r.cat) ? r.cat : 'Custom', completed: !!r.completed };
   for (const k of ['dur', 'avgP', 'np', 'maxP', 'kj', 'avgHr', 'maxHr', 'avgC', 'ftp', 'dist', 'IF', 'tss']) out[k] = n(r[k]);
   if (!out.ftp) out.ftp = S.ftp;
-  for (const k of ['p', 'hr', 'c', 'dd']) { const a = arr(r[k]); if (a) out[k] = a; }
+  if (n(r.wt) > 0) out.wt = n(r.wt);
+  const an = cleanAn(r.an); if (an) out.an = an;
+  for (const k of SKEYS) { const a = arr(r[k]); if (a) out[k] = a; }
   if (out.p && (!out.hr || !out.c)) { out.hr = out.hr || out.p.map(() => 0); out.c = out.c || out.p.map(() => 0); }
   return out;
 }
-function saveRide(ride) {
+async function saveRide(ride) {
   if (cloud.user) ride.owner = cloud.user.id;
-  cloud.pushRide(ride).then(ok => { if (ok) { const h = load('erglab.history', []); const x = h.find(y => y.id === ride.id); if (x) { x.cloud = true; store('erglab.history', h); } } });
-  const h = load('erglab.history', []).filter(x => x.id !== ride.id); h.unshift(ride);
-  let stripped = 0, evicted = 0;
-  while (!store('erglab.history', h)) {
-    // first drop the per-second data of the oldest rides (keep their summaries), then whole rides
-    const old = [...h].reverse().find((x, i) => x.p && x !== ride);
-    if (old) { delete old.p; delete old.hr; delete old.c; delete old.dd; stripped++; continue; }
-    if (h.length > 1) { h.pop(); evicted++; continue; }
-    toast('Storage full: could not save this ride. Download the TCX now!', 8000); break;
-  }
-  if (stripped || evicted) toast(`Storage nearly full: detailed data of ${stripped} old ride(s) removed${evicted ? `, ${evicted} ride(s) deleted` : ''}`, 6000);
+  // the history list (localStorage) keeps summaries; the second-by-second streams go to IndexedDB (much more room)
+  const st = pickStreams(ride), sum = stripStreams({ ...ride });
+  if (st) { sum.pv = preview(st.p); if (await sdb.put(ride.id, st)) sum.hs = true; else Object.assign(sum, st); } // no IndexedDB: keep it inline
+  const h = load('erglab.history', []).filter(x => x.id !== ride.id); h.unshift(sum);
+  storeHistory(h, sum);
+  cloud.pushRide(ride).then(ok => { if (ok) markRide(ride.id, { cloud: true }); });
   renderHistory();
 }
+// saves the history list; when localStorage is full, frees room from the oldest rides first
+function storeHistory(h, keep) {
+  let stripped = 0, evicted = 0;
+  while (!store('erglab.history', h)) {
+    const old = [...h].reverse().find(x => x !== keep && (x.p || (x.an && x.an.ints)));
+    if (old && old.p) { if (!old.hs && !old.cloud) stripped++; stripStreams(old); continue; } // inline streams (no IndexedDB)
+    if (old) { delete old.an.ints; continue; } // interval lists are recomputed from the streams when needed
+    if (h.length > 1) { h.pop(); evicted++; continue; }
+    toast('Storage full: could not save this ride. Download the TCX now!', 8000); return false;
+  }
+  if (stripped || evicted) toast(`Storage nearly full: detailed data of ${stripped} old ride(s) removed${evicted ? `, ${evicted} ride(s) deleted` : ''}`, 6000);
+  return true;
+}
+function markRide(id, patch) { const h = load('erglab.history', []); const x = h.find(y => y.id === id); if (x) { Object.assign(x, patch); storeHistory(h, x); } return x; }
 /* crash / reload recovery (iOS may kill the page in the background) */
 function saveCheckpoint() {
   if (!R.w || R.freeRide && R.samples.length < 30 || !(R.state === 'running' || R.state === 'paused')) return;
   const snap = { w: R.w, source: R.source, t: R.t, elapsed: R.elapsed, skipped: R.skipped, startedAt: R.startedAt, dist: R.dist, intensity: R.intensity, freeRide: R.freeRide, freeMode: R.freeMode, freeWatts: R.freeWatts, freeGrade: R.freeGrade, testEnded: R.testEnded, savedAt: Date.now(),
-    p: R.samples.map(x => x.p), hr: R.samples.map(x => x.hr), c: R.samples.map(x => x.c), dd: R.samples.map(x => x.d), pos: R.samples.map(x => x.pos) };
+    p: R.samples.map(x => x.p), hr: R.samples.map(x => x.hr), c: R.samples.map(x => x.c), dd: R.samples.map(x => x.d), pos: R.samples.map(x => x.pos), tg: R.samples.map(x => x.tgt == null ? null : Math.round(x.tgt)) };
   store('erglab.inprogress', snap);
 }
 function clearCheckpoint() { try { localStorage.removeItem('erglab.inprogress'); } catch { } }
@@ -1419,7 +1440,7 @@ function restoreCheckpoint(snap) {
   const { segs, total } = snap.freeRide ? { segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: 'Free ride', c: null }], total: 0 } : expand(snap.w);
   Object.assign(R, RIDE_RESET(), { w: snap.w, segs, total, source: snap.source, freeRide: !!snap.freeRide, freeMode: snap.freeMode || 'erg', freeWatts: snap.freeWatts || 150, freeGrade: snap.freeGrade ?? 1,
     t: snap.t, elapsed: snap.p.length, skipped: snap.skipped || 0, startedAt: snap.startedAt, dist: snap.dist || 0, intensity: snap.intensity || 100, testEnded: !!snap.testEnded, state: 'paused', autoPaused: false });
-  R.samples = snap.p.map((p, i) => ({ s: i, pos: snap.pos[i], p, c: snap.c[i], hr: snap.hr[i], tgt: null, d: snap.dd[i] }));
+  R.samples = snap.p.map((p, i) => ({ s: i, pos: snap.pos[i], p, c: snap.c[i], hr: snap.hr[i], tgt: snap.tg ? snap.tg[i] : null, d: snap.dd[i] }));
   R.samples.forEach(x => addAgg(R.agg, x.p, x.hr, x.c));
   R.lastSec = R.samples.length - 1; R.idx = idxAt(R.t);
   showRide(); go('ride');
@@ -1741,9 +1762,10 @@ function drawChart() {
       c.stroke();
     };
     const hrMax = S.maxHr;
-    line(s => s.hr ? (s.hr - 40) / (hrMax - 40) * mx * 0.95 : null, 'rgba(255,77,109,.9)', 1.5, 0);
-    line(s => s.c ? s.c / 140 * mx * 0.95 : null, 'rgba(76,194,255,.55)', 1, 3);
-    line(s => s.p / S.ftp, '#ffffff', 1.6, 2);
+    const css = getComputedStyle(document.documentElement), cv = (k, d) => (css.getPropertyValue(k) || '').trim() || d;
+    line(s => s.hr ? (s.hr - 40) / (hrMax - 40) * mx * 0.95 : null, cv('--c-hr', 'rgba(255,77,109,.9)'), 1.5, 0);
+    c.globalAlpha = .6; line(s => s.c ? s.c / 140 * mx * 0.95 : null, cv('--c-cad', '#4cc2ff'), 1, 3); c.globalAlpha = 1;
+    line(s => s.p / S.ftp, cv('--c-power', '#ffffff'), 1.6, 2);
   }
   // cursor
   const cur = R.freeRide ? R.elapsed : R.t;
@@ -1763,6 +1785,7 @@ const TABS = [
   { id: 'ride', label: 'Ride', icon: '<circle cx="6" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 16l4-8h5l3 8M10 8l2 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
   { id: 'build', label: 'Build', icon: '<path d="M4 20h16M6 16V9M10 16V5M14 16v-6M18 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
   { id: 'history', label: 'History', icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'progress', label: 'Progress', icon: '<path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
   { id: 'settings', label: 'Settings', icon: '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
 ];
 function buildTabs() {
@@ -1777,6 +1800,7 @@ function go(id) {
   if (id === 'ride') { showRide(); }
   if (id === 'plans') renderPlans();
   if (id === 'history') renderHistory();
+  if (id === 'progress') renderProgress();
   // keep an invitation/sign-in fragment intact until the auth library has read it
   if (!/(access_token|error_description|error_code)=/.test(location.hash)) { try { history.replaceState(null, '', '#' + id); } catch { } }
   window.scrollTo({ top: 0 });
@@ -1922,6 +1946,93 @@ async function importFiles(files) {
   if (n) { saveCustom(); refreshLibraries(); toast(`Imported ${n} workout${n > 1 ? 's' : ''}`); }
 }
 
+/* ---- per-second ride data: IndexedDB (localStorage only holds the history summaries) ---- */
+const SKEYS = ['p', 'hr', 'c', 'dd', 'tg'];
+const sdb = {
+  db: null,
+  open() {
+    if (!this.db) {
+      this.db = new Promise((res, rej) => {
+        if (!window.indexedDB) return rej(new Error('IndexedDB unavailable'));
+        const q = indexedDB.open('erglab', 1);
+        q.onupgradeneeded = () => q.result.createObjectStore('streams');
+        q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); q.onblocked = () => rej(new Error('IndexedDB blocked'));
+      });
+      this.db.catch(() => { this.db = null; });
+    }
+    return this.db;
+  },
+  async run(mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => { const t = db.transaction('streams', mode), q = fn(t.objectStore('streams')); t.oncomplete = () => res(q.result); t.onerror = t.onabort = () => rej(t.error); });
+  },
+  get(id) { return this.run('readonly', s => s.get(id)).catch(() => null); },
+  put(id, st) { return this.run('readwrite', s => s.put(st, id)).then(() => true, () => false); },
+  del(id) { return this.run('readwrite', s => s.delete(id)).catch(() => { }); },
+  clear() { return this.run('readwrite', s => s.clear()).catch(() => { }); },
+};
+const pickStreams = r => r && Array.isArray(r.p) && r.p.length ? Object.fromEntries(SKEYS.filter(k => Array.isArray(r[k])).map(k => [k, r[k]])) : null;
+const stripStreams = r => { SKEYS.forEach(k => delete r[k]); return r; };
+function normStreams(st) {
+  if (!st || !Array.isArray(st.p) || !st.p.length) return null;
+  const n = st.p.length, fix = a => Array.isArray(a) && a.length === n ? a.map(v => +v || 0) : null;
+  return { p: st.p.map(v => +v || 0), hr: fix(st.hr) || new Array(n).fill(0), c: fix(st.c) || new Array(n).fill(0), dd: fix(st.dd), tg: fix(st.tg) };
+}
+// second-by-second data of a ride: inline (legacy), this device's IndexedDB, or the cloud (then cached on this device)
+async function rideStreams(r) {
+  if (!r) throw new Error('Ride not found');
+  let st = normStreams(r.p ? r : null) || normStreams(await sdb.get(r.id));
+  if (st) return st;
+  if (cloud.user && r.cloud) {
+    st = normStreams(await cloud.fetchStreams(r.id));
+    if (!st) throw new Error('No per-second data stored for this ride');
+    if (await sdb.put(r.id, st)) markRide(r.id, { hs: true });
+    return st;
+  }
+  throw new Error('Only a summary is stored for this ride');
+}
+async function rideFull(r) { const st = await rideStreams(r); return { ...r, ...st, dd: st.dd || r.dd }; }
+// analysis summary (power curve, zones, intervals…) of one ride; null when the analysis code isn't available
+function analyse(st, r) {
+  if (typeof AN === 'undefined' || !st || !st.p || !st.p.length) return undefined;
+  try { return AN.analyzeRide(st, { ftp: r.ftp || S.ftp, maxHr: S.maxHr, weight: r.wt || S.weight, wprime: S.wprime }); } catch (e) { console.warn('analysis', e); return undefined; }
+}
+const AN_VER = 1;
+// stored analyses come from this device, the cloud or backup files: keep only well-formed numbers
+function cleanAn(a) {
+  if (!a || typeof a !== 'object') return undefined;
+  const num = v => (v == null || v === '' || !isFinite(+v)) ? null : +v;
+  const arr = (x, len) => Array.isArray(x) && (!len || x.length === len) ? x.slice(0, 64).map(num) : null;
+  const out = { v: num(a.v) || 0, mmp: arr(a.mmp) || [], tiz: arr(a.tiz, 7), thz: arr(a.thz, 5), coast: num(a.coast) };
+  for (const k of ['np', 'avgP', 'vi', 'ef', 'dec', 'wbalMin']) out[k] = num(a[k]);
+  if (Array.isArray(a.ints)) out.ints = a.ints.slice(0, 60).filter(i => i && typeof i === 'object').map(i => { const o = { k: i.k === 'work' ? 'work' : 'rec' }; for (const k of ['s', 'd', 'p', 'np', 'tgt', 'hr', 'hrMax', 'c']) o[k] = num(i[k]); return o; });
+  return out;
+}
+// background jobs: move old inline streams into IndexedDB, then analyse rides that have no analysis yet
+let storageJobsRunning = false;
+async function storageJobs() {
+  if (storageJobsRunning) return; storageJobsRunning = true;
+  try {
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => { });
+    const moved = new Map();
+    for (const r of load('erglab.history', [])) if (r.p && r.p.length && await sdb.put(r.id, pickStreams(r))) { r.pv = r.pv || preview(r.p); stripStreams(r); r.hs = true; moved.set(r.id, r); }
+    if (moved.size) storeHistory(load('erglab.history', []).map(x => x.p && moved.has(x.id) ? moved.get(x.id) : x));
+    if (typeof AN === 'undefined') return;
+    let n = 0;
+    for (const r of load('erglab.history', [])) {
+      if ((r.an && r.an.v === AN_VER) || r.noData) continue;
+      if (!r.p && !r.hs && !(cloud.user && r.cloud)) continue;
+      let st; try { st = await rideStreams(r); } catch { markRide(r.id, { noData: true }); continue; }
+      const an = analyse(st, r); if (!an) continue;
+      const x = markRide(r.id, { an });
+      if (x && x.cloud) await cloud.updateSummary(x);
+      if (++n % 10 === 0) { renderHistory(); if ($('#v-progress').classList.contains('on')) renderProgress(); }
+      await new Promise(f => setTimeout(f, cloud.user ? 150 : 20));
+    }
+    if (n && $('#v-progress').classList.contains('on')) renderProgress();
+  } finally { storageJobsRunning = false; }
+}
+
 /* ---- history ---- */
 function rideSVG(r, W = 600, H = 40) {
   const P = r.p || r.pv; const n = P ? P.length : 0; if (!n) return '';
@@ -1929,7 +2040,7 @@ function rideSVG(r, W = 600, H = 40) {
   const mx = Math.max(r.ftp * 1.5, ...r.p) * 1.05; const step = Math.max(1, Math.floor(n / 300));
   let d = `M0 ${H}`; for (let i = 0; i < n; i += step) { let a = 0, k = 0; for (let j = i; j < Math.min(n, i + step); j++) { a += r.p[j]; k++; } d += ` L${(i / n * W).toFixed(1)} ${(H - a / k / mx * H).toFixed(1)}`; }
   d += ` L${W} ${H} Z`;
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="rgba(255,138,31,.55)" stroke="#ff8a1f" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="${W}" y1="${H - r.ftp / mx * H}" y2="${H - r.ftp / mx * H}" stroke="#fff" stroke-opacity=".4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="var(--c-mini,rgba(255,138,31,.55))" stroke="var(--c-mini-line,#ff8a1f)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="${W}" y1="${H - r.ftp / mx * H}" y2="${H - r.ftp / mx * H}" stroke="#fff" stroke-opacity=".4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg>`;
 }
 function renderHistory() {
   const h = load('erglab.history', []);
@@ -1939,15 +2050,16 @@ function renderHistory() {
       <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ ≈ kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
-        if (!stv.connected || !(r.p || r.cloud || s.upload)) return '';
-        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.p || r.cloud ? `<button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button></div>
-      <div class="mini">${rideSVG(r)}</div></div>`).join('');
+        if (!stv.connected || !(r.p || r.hs || r.cloud || s.upload)) return '';
+        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">Analyse</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button></div>
+      <div class="mini" data-ana="${r.p || r.hs || r.cloud ? esc(r.id) : ''}">${rideSVG(r)}</div></div>`).join('');
+  $$('[data-ana]').forEach(b => { if (b.dataset.ana) { b.style.cursor = 'pointer'; b.onclick = () => openRideAnalysis(b.dataset.ana); } });
   $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast('Could not load ride: ' + e.message); } });
   $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = 'Uploading…'; uploadToStrava(r, null).catch(() => { }); });
   $$('[data-hdel]').forEach(b => b.onclick = async () => {
     if (!confirm(cloud.user ? 'Delete this ride everywhere (this device and your cloud space)?' : 'Delete this ride?')) return;
     if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast('Could not delete from the cloud: ' + e.message, 5000); return; } }
-    store('erglab.history', load('erglab.history', []).filter(x => x.id !== b.dataset.hdel)); renderHistory();
+    store('erglab.history', load('erglab.history', []).filter(x => x.id !== b.dataset.hdel)); sdb.del(b.dataset.hdel); renderHistory();
   });
 }
 function toTCX(r) {
@@ -2275,6 +2387,7 @@ function applySettings(o) {
   if (!o || typeof o !== 'object') return;
   for (const k of Object.keys(DEFAULTS)) { const v = o[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v; }
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
+  S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
   if (['VirtualRide', 'Ride'].includes(o.stravaSport)) S.stravaSport = o.stravaSport;
   if (typeof o.stravaAuto === 'boolean') S.stravaAuto = o.stravaAuto;
 }
@@ -2301,6 +2414,7 @@ async function rideFull(r) {
 function wipeLocal(all = false) {
   const keys = USER_KEYS.concat('erglab.profileDirty', all ? ['erglab.lastUser'] : []);
   keys.forEach(k => { try { localStorage.removeItem(k); } catch { } });
+  sdb.clear();
   if (all) { try { Object.keys(localStorage).filter(k => k.startsWith('erglab-auth') || /^sb-.*-auth-token/.test(k)).forEach(k => localStorage.removeItem(k)); } catch { } }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.user && cloud.pushT) { clearTimeout(cloud.pushT); cloud.pushProfile(); } });
@@ -2325,7 +2439,7 @@ const cloud = {
       const fromLink = frag.has('access_token') || !!linkErr;
       this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'erglab-auth' } });
       this.sb.auth.onAuthStateChange((ev, session) => {
-        if (ev === 'SIGNED_OUT' && this.user && !this._leaving) { this._leaving = true; wipeLocal(); location.replace(location.pathname); return; }
+        if (ev === 'SIGNED_OUT' && this.user && !this._leaving) { this._leaving = true; wipeLocal(); sdb.clear().finally(() => location.replace(location.pathname)); return; }
         if (session && session.user) this.user = session.user;
       });
       const { data } = await this.sb.auth.getSession();
@@ -2340,7 +2454,9 @@ const cloud = {
     const localRides = load('erglab.history', []), unsynced = localRides.filter(r => !r.cloud);
     if (last && last !== this.user.id) {
       // another account used this device: keep its not-yet-uploaded rides aside for that account, then start clean
-      if (unsynced.length) store('erglab.pending.' + last, unsynced.filter(r => !r.owner || r.owner === last));
+      const keep = unsynced.filter(r => !r.owner || r.owner === last);
+      for (const r of keep) if (!r.p) Object.assign(r, (await sdb.get(r.id)) || {}); // their streams travel with them
+      if (keep.length) store('erglab.pending.' + last, keep);
       wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
     } else if (!last && (localRides.length || CUSTOM.length) && !confirm(`This device has ${localRides.length} ride(s) and ${CUSTOM.length} custom workout(s) from before you signed in. Add them to ${this.user.email}?`)) {
       wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
@@ -2368,6 +2484,7 @@ const cloud = {
     if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
     try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
     wipeLocal(true); // nothing personal stays on this device
+    await sdb.clear();
     location.replace(location.pathname);
   },
   async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error('Signed out'); return data.session; },
@@ -2386,15 +2503,20 @@ const cloud = {
     return true;
   },
   rideRow(r) {
-    const { p, hr, c, dd, cloud: _c, strava: _s, ...sum } = r;
+    const { p, hr, c, dd, tg, cloud: _c, strava: _s, hs: _h, noData: _n, ...sum } = r;
     sum.pv = preview(p) || r.pv || null;
-    return { user_id: this.user.id, id: r.id, started_at: r.date, name: String(r.name || 'Ride').slice(0, 200) || 'Ride', summary: sum, streams: p ? { p, hr, c, dd } : undefined, strava: stvOf(r) || null };
+    return { user_id: this.user.id, id: r.id, started_at: r.date, name: String(r.name || 'Ride').slice(0, 200) || 'Ride', summary: sum, streams: p ? { p, hr, c, dd, ...(tg ? { tg } : {}) } : undefined, strava: stvOf(r) || null };
   },
   async pushRide(r) {
     if (!this.user || !r || !/^[\w-]{1,64}$/.test(r.id)) return false;
     const row = this.rideRow(r); if (row.streams === undefined) delete row.streams;
     const { error } = await this.sb.from('rides').upsert(row);
     if (error) { console.warn('ride sync', error); return false; } return true;
+  },
+  async updateSummary(r) { // analysis added later: send the summary only
+    if (!this.user) return false;
+    const { error } = await this.sb.from('rides').update({ summary: this.rideRow(r).summary }).eq('id', r.id);
+    if (error) { console.warn('summary sync', error); return false; } return true;
   },
   async fetchStreams(id) {
     const { data, error } = await this.sb.from('rides').select('streams').eq('id', id).maybeSingle();
@@ -2426,7 +2548,8 @@ const cloud = {
       const base = cleanRide({ ...(row.summary || {}), id: row.id, date: row.started_at, name: row.name, p: undefined, hr: undefined, c: undefined, dd: undefined });
       if (!base) continue;
       const pv = row.summary && Array.isArray(row.summary.pv) ? row.summary.pv.map(v => +v || 0) : null; if (pv) base.pv = pv;
-      const loc = byId.get(row.id); if (loc && loc.p) Object.assign(base, { p: loc.p, hr: loc.hr, c: loc.c, dd: loc.dd });
+      const loc = byId.get(row.id);
+      if (loc) { if (loc.p) Object.assign(base, pickStreams(loc)); if (loc.hs) base.hs = true; if (!base.an && loc.an) base.an = loc.an; if (!base.wt && loc.wt) base.wt = loc.wt; }
       base.cloud = true;
       if (row.strava && typeof row.strava === 'object' && !marks[row.id]) { const s = row.strava; if (/^\d+$/.test(String(s.id || '')) || s.pending) marks[row.id] = { id: s.id ? String(s.id) : undefined, pending: !!s.pending && !s.id, upload: s.upload ? String(s.upload).replace(/\D/g, '') : undefined, at: +s.at || 0 }; }
       merged.push(base); byId.delete(row.id);
@@ -2439,8 +2562,9 @@ const cloud = {
     merged.sort((a, b) => b.date.localeCompare(a.date));
     store('erglab.stravaIds', marks);
     // keep per-second data locally only for the 10 newest rides; older ones load from the cloud on demand
-    merged.forEach((r, i) => { if (i >= 10 && r.cloud && r.p) { r.pv = r.pv || preview(r.p); delete r.p; delete r.hr; delete r.c; delete r.dd; } });
-    store('erglab.history', merged);
+    merged.forEach((r, i) => { if (i >= 10 && r.cloud && r.p && !r.hs) { r.pv = r.pv || preview(r.p); stripStreams(r); } });
+    storeHistory(merged);
+    setTimeout(storageJobs, 300);
     afterSettings(); renderHistory(); renderPlans(); renderCustom();
     if (unsynced.length) toast(`Synced ${unsynced.length} ride${unsynced.length > 1 ? 's' : ''} from this device to your cloud space`);
   },
@@ -2494,7 +2618,7 @@ function bindCloud() {
 
 /* ---- settings ---- */
 function renderSettings() {
-  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr;
+  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme;
   $('#sSmooth').value = S.smooth; $('#sAutoPause').value = S.autoPause ? '1' : '0'; $('#sSound').value = S.sound ? '1' : '0';
   $('#sSprintGrade').value = S.sprintGrade; $('#sSoftStart').value = S.softStart;
   $('#sWkgHint').textContent = `FTP = ${(S.ftp / S.weight).toFixed(2)} W/kg`;
@@ -2503,25 +2627,36 @@ function renderSettings() {
 function bindSettings() {
   const num = (id, key, lo, hi) => $(id).addEventListener('change', e => { const v = +e.target.value; if (isFinite(v) && v >= lo && v <= hi) { S[key] = v; saveSettings(); afterSettings(); } else e.target.value = S[key]; });
   num('#sFtp', 'ftp', 50, 700); num('#sWeight', 'weight', 25, 250); num('#sMaxHr', 'maxHr', 100, 240); num('#sRestHr', 'restHr', 25, 120);
-  num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60);
+  num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60); num('#sWprime', 'wprime', 5000, 60000);
+  $('#sTheme').onchange = e => { S.theme = e.target.value; saveSettings(); afterSettings(); renderHistory(); };
   $('#sSmooth').onchange = e => { S.smooth = +e.target.value; saveSettings(); };
   $('#sAutoPause').onchange = e => { S.autoPause = e.target.value === '1'; saveSettings(); };
   $('#sSound').onchange = e => { S.sound = e.target.value === '1'; saveSettings(); };
   $('#sReset').onclick = () => { if (confirm('Reset rider settings to defaults?')) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
-  $('#sExport').onclick = () => download('erglab-backup.json', JSON.stringify({ settings: S, custom: CUSTOM, history: load('erglab.history', []), plandone: load('erglab.plandone', {}) }), 'application/json');
+  $('#sExport').onclick = async () => {
+    const history = [];
+    for (const r of load('erglab.history', [])) { const st = r.p ? null : await sdb.get(r.id); const { hs, noData, ...x } = r; history.push(st ? { ...x, ...st } : x); }
+    download('erglab-backup.json', JSON.stringify({ settings: S, custom: CUSTOM, history, plandone: load('erglab.plandone', {}) }), 'application/json');
+  };
   $('#sImport').onchange = async e => {
     try {
       const j = JSON.parse(await e.target.files[0].text());
       applySettings(j.settings);
       if (Array.isArray(j.custom)) CUSTOM = cleanCustom(j.custom);
       saveSettings(); saveCustom();
-      if (Array.isArray(j.history)) { const hs = j.history.map(cleanRide).filter(Boolean); store('erglab.history', hs); hs.forEach(r => cloud.pushRide(r)); }
+      if (Array.isArray(j.history)) {
+        const hs = j.history.map(cleanRide).filter(Boolean);
+        await sdb.clear();
+        for (const r of hs) { cloud.pushRide(r); const st = pickStreams(r); if (st && await sdb.put(r.id, st)) { r.pv = preview(st.p); stripStreams(r); r.hs = true; } }
+        storeHistory(hs); setTimeout(storageJobs, 300);
+      }
       if (j.plandone && typeof j.plandone === 'object') { store('erglab.plandone', cleanPlanDone(j.plandone)); cloud.schedulePush(); }
       afterSettings(); renderHistory(); toast('Backup restored');
     } catch (err) { toast('Restore failed: ' + err.message); }
   };
 }
-function afterSettings() { renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } }
+function setTheme() { if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon'); }
+function afterSettings() { setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
 
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
@@ -2649,11 +2784,12 @@ function bind() {
 /*__PARTS_JS__*/
 
 function init() {
+  setTheme();
   buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false); renderInstall();
   const oauthReturn = /[?&]state=/.test(location.search) && /[?&](code|error)=/.test(location.search);
   const h = (location.hash || '').slice(1); go(oauthReturn ? 'settings' : TABS.some(t => t.id === h) ? h : 'workouts');
   bindCloud();
-  (cloud.on ? cloud.start() : Promise.resolve()).then(() => stv.handleRedirect()).then(() => { setTimeout(offerRecovery, 300); });
+  (cloud.on ? cloud.start() : Promise.resolve()).then(() => stv.handleRedirect()).then(() => { setTimeout(offerRecovery, 300); if (!cloud.on) setTimeout(storageJobs, 1500); });
   tickTimer = setInterval(tick, 250);
   window.addEventListener('resize', updateConnUI);
 }
