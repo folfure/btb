@@ -605,37 +605,40 @@ function cleanWlog(a) {
 S.wlog = cleanWlog(S.wlog);
 const todayKey = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
 function addWeightLog(d, kg, rhr) {
-  if (DEMO.active) { toast('Demo data is shown while the simulator is on: turn Sim off to log your own weight', 5000); return false; }
+  if (DEMO.active) { toast(t('Demo data is shown while the simulator is on: turn Sim off to log your own weight'), 5000); return false; }
   d = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? String(d) : todayKey();
-  if (!(+kg >= 25 && +kg <= 250)) { toast('Weight must be between 25 and 250 kg'); return false; }
+  if (!(+kg >= 25 && +kg <= 250)) { toast(t('Weight must be between 25 and 250 kg')); return false; }
   S.wlog = cleanWlog(S.wlog.filter(e => e.d !== d).concat({ d, kg: +kg, rhr: rhr === '' || rhr == null ? undefined : +rhr }));
   const last = S.wlog[S.wlog.length - 1]; if (last) S.weight = last.kg; // the newest entry is the current weight
   saveSettings(); afterSettings(); return true;
 }
 function removeWeightLog(d) {
-  if (DEMO.active) { toast('Demo data: turn Sim off to edit your own weight log', 4000); return; } S.wlog = S.wlog.filter(e => e.d !== d); saveSettings(); afterSettings(); }
+  if (DEMO.active) { toast(t('Demo data: turn Sim off to edit your own weight log'), 4000); return; } S.wlog = S.wlog.filter(e => e.d !== d); saveSettings(); afterSettings(); }
 const saveSettings = () => { const ok = store('erglab.settings', S); if (typeof cloud !== 'undefined') cloud.schedulePush(); return ok; };
 
 const PZ = [
-  { n: 'Z1', name: 'Active recovery', lo: 0, hi: 0.55, col: '#8b95a7' },
-  { n: 'Z2', name: 'Endurance', lo: 0.55, hi: 0.75, col: '#3d8bfd' },
-  { n: 'Z3', name: 'Tempo', lo: 0.75, hi: 0.90, col: '#2fbf71' },
-  { n: 'Z4', name: 'Threshold', lo: 0.90, hi: 1.05, col: '#f5c518' },
-  { n: 'Z5', name: 'VO2max', lo: 1.05, hi: 1.20, col: '#ff8a1f' },
-  { n: 'Z6', name: 'Anaerobic', lo: 1.20, hi: 1.50, col: '#ff3b3b' },
-  { n: 'Z7', name: 'Neuromuscular', lo: 1.50, hi: 9, col: '#b04dff' },
+  { n: 'Z1', name: t('Active recovery'), lo: 0, hi: 0.55, col: '#8b95a7' },
+  { n: 'Z2', name: t('Endurance'), lo: 0.55, hi: 0.75, col: '#3d8bfd' },
+  { n: 'Z3', name: t('Tempo'), lo: 0.75, hi: 0.90, col: '#2fbf71' },
+  { n: 'Z4', name: t('Threshold'), lo: 0.90, hi: 1.05, col: '#f5c518' },
+  { n: 'Z5', name: t('VO2max'), lo: 1.05, hi: 1.20, col: '#ff8a1f' },
+  { n: 'Z6', name: t('Anaerobic'), lo: 1.20, hi: 1.50, col: '#ff3b3b' },
+  { n: 'Z7', name: t('Neuromuscular'), lo: 1.50, hi: 9, col: '#b04dff' },
 ];
 const HZ = [
-  { n: 'Z1', name: 'Recovery', lo: 0, hi: 0.60, col: '#8b95a7' },
-  { n: 'Z2', name: 'Endurance', lo: 0.60, hi: 0.70, col: '#3d8bfd' },
-  { n: 'Z3', name: 'Aerobic', lo: 0.70, hi: 0.80, col: '#2fbf71' },
-  { n: 'Z4', name: 'Threshold', lo: 0.80, hi: 0.90, col: '#ff8a1f' },
-  { n: 'Z5', name: 'Maximum', lo: 0.90, hi: 9, col: '#ff3b3b' },
+  { n: 'Z1', name: t('Recovery'), lo: 0, hi: 0.60, col: '#8b95a7' },
+  { n: 'Z2', name: t('Endurance'), lo: 0.60, hi: 0.70, col: '#3d8bfd' },
+  { n: 'Z3', name: t('Aerobic'), lo: 0.70, hi: 0.80, col: '#2fbf71' },
+  { n: 'Z4', name: t('Threshold'), lo: 0.80, hi: 0.90, col: '#ff8a1f' },
+  { n: 'Z5', name: t('Maximum'), lo: 0.90, hi: 9, col: '#ff3b3b' },
 ];
 const pZone = f => PZ.find(z => f < z.hi - 1e-9) || PZ[6];
 const hZone = f => HZ.find(z => f < z.hi - 1e-9) || HZ[4];
 const CAT_COL = { Recovery: '#8b95a7', Endurance: '#3d8bfd', Tempo: '#2fbf71', 'Sweet Spot': '#b5d334', Threshold: '#f5c518', 'Over-Under': '#ffb020', VO2max: '#ff8a1f', Anaerobic: '#ff3b3b', Sprint: '#b04dff', Hills: '#1fc9b3', Test: '#4cc2ff', Mixed: '#e05bb5', Custom: '#c0c6d4' };
 const CATS = Object.keys(CAT_COL);
+// display names of the categories (w.cat itself stays English: it is compared in code and stored)
+const CAT_NAME = { Recovery: t('Recovery'), Endurance: t('Endurance'), Tempo: t('Tempo'), 'Sweet Spot': t('Sweet Spot'), Threshold: t('Threshold'), 'Over-Under': t('Over-Under'), VO2max: t('VO2max'), Anaerobic: t('Anaerobic'), Sprint: t('Sprint'), Hills: t('Hills'), Test: t('Test'), Mixed: t('Mixed'), Custom: t('Custom') };
+const catName = c => CAT_NAME[c] || c;
 const FREE_FRAC = 1.6; // nominal intensity used to draw/estimate "max" segments
 
 /* =====================================================================
@@ -666,8 +669,8 @@ function expand(w) {
 const segFracAt = (seg, t) => seg.kind === 'free' ? null : seg.kind === 'ramp' ? seg.p0 + (seg.p1 - seg.p0) * clamp((t - seg.start) / seg.d, 0, 1) : seg.p0;
 function segLabel(seg) {
   if (seg.lbl) return seg.lbl;
-  if (seg.kind === 'free') return 'Max effort';
-  if (seg.kind === 'ramp') return seg.p1 > seg.p0 ? 'Ramp up' : 'Ramp down';
+  if (seg.kind === 'free') return t('Max effort');
+  if (seg.kind === 'ramp') return seg.p1 > seg.p0 ? t('Ramp up') : t('Ramp down');
   return pZone(seg.p0).name;
 }
 function workoutStats(w) {
@@ -760,9 +763,9 @@ function parseText(text, ftp = S.ftp) {
   for (let line of splitTop(noComments)) {
     const rep = line.match(/^(\d+)\s*x\s*\(([\s\S]*)\)\s*$/i);
     if (rep) {
-      if (+rep[1] < 1 || +rep[1] > 100) throw new Error(`Repeat count must be 1-100 in "${line.slice(0, 30)}"`);
+      if (+rep[1] < 1 || +rep[1] > 100) throw new Error(t('Repeat count must be 1-100 in "{line}"', { line: line.slice(0, 30) }));
       const inner = parseText(rep[2], ftp);
-      if (!inner.length) throw new Error('Empty repeat block');
+      if (!inner.length) throw new Error(t('Empty repeat block'));
       steps.push({ t: 'x', n: +rep[1], s: inner }); continue;
     }
     let lbl = ''; line = line.replace(/"([^"]*)"/, (_, l) => { lbl = l; return ' '; });
@@ -770,13 +773,13 @@ function parseText(text, ftp = S.ftp) {
     const toks = line.trim().split(/\s+/).filter(Boolean);
     if (!toks.length) continue;
     const d = parseDuration(toks[0]);
-    if (d == null) throw new Error(`Can't read duration in "${line.trim()}"`);
+    if (d == null) throw new Error(t('Can\'t read duration in "{line}"', { line: line.trim() }));
     const pw = (toks[1] || '').toLowerCase();
     let seg;
     if (/^(max|free|all-?out|sprint)$/.test(pw)) seg = { t: 'f', d };
     else {
       const m = pw.match(/^(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?(%|w)$/);
-      if (!m) throw new Error(`Can't read power in "${line.trim()}" (use 95%, 50-75% or 250w)`);
+      if (!m) throw new Error(t('Can\'t read power in "{line}" (use 95%, 50-75% or 250w)', { line: line.trim() }));
       const k = m[3] === 'w' ? 1 / ftp : 1 / 100;
       const a = +m[1] * k, b = m[2] != null ? +m[2] * k : null;
       seg = b != null ? { t: 'r', d, p0: +a.toFixed(3), p1: +b.toFixed(3) } : { t: 's', d, p: +a.toFixed(3) };
@@ -789,14 +792,14 @@ function parseText(text, ftp = S.ftp) {
 }
 function validateSeg(s, ctx = '', depth = 0) {
   const bad = p => !(p > 0.05 && p <= 3);
-  if (!s || typeof s !== 'object') throw new Error(`Bad step in "${ctx}"`);
+  if (!s || typeof s !== 'object') throw new Error(t('Bad step in "{ctx}"', { ctx }));
   if (s.t === 'x') {
-    if (!(Number.isInteger(+s.n) && +s.n >= 1 && +s.n <= 100) || depth > 2 || !Array.isArray(s.s) || !s.s.length || s.s.length > 200) throw new Error(`Bad repeat block in "${ctx}"`);
+    if (!(Number.isInteger(+s.n) && +s.n >= 1 && +s.n <= 100) || depth > 2 || !Array.isArray(s.s) || !s.s.length || s.s.length > 200) throw new Error(t('Bad repeat block in "{ctx}"', { ctx }));
     s.s.forEach(c => validateSeg(c, ctx, depth + 1)); return;
   }
-  if (!['s', 'r', 'f'].includes(s.t)) throw new Error(`Unknown step type in "${ctx}"`);
-  if (!(s.d >= 1 && s.d <= 6 * 3600)) throw new Error(`Duration out of range in "${ctx}"`);
-  if ((s.t === 's' && bad(s.p)) || (s.t === 'r' && (bad(s.p0) || bad(s.p1)))) throw new Error(`Power out of range (5-300% FTP) in "${ctx}"`);
+  if (!['s', 'r', 'f'].includes(s.t)) throw new Error(t('Unknown step type in "{ctx}"', { ctx }));
+  if (!(s.d >= 1 && s.d <= 6 * 3600)) throw new Error(t('Duration out of range in "{ctx}"', { ctx }));
+  if ((s.t === 's' && bad(s.p)) || (s.t === 'r' && (bad(s.p0) || bad(s.p1)))) throw new Error(t('Power out of range (5-300% FTP) in "{ctx}"', { ctx }));
 }
 function segsToText(segs) {
   const pc = f => Math.round(f * 100);
@@ -810,12 +813,12 @@ function segsToText(segs) {
 }
 function parseZWO(xml) {
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  if (doc.querySelector('parsererror')) throw new Error('Invalid ZWO/XML');
+  if (doc.querySelector('parsererror')) throw new Error(t('Invalid ZWO/XML'));
   const root = doc.querySelector('workout_file') || doc.documentElement;
-  const name = root.querySelector('name')?.textContent?.trim() || 'Imported ZWO';
+  const name = root.querySelector('name')?.textContent?.trim() || t('Imported ZWO');
   const desc = root.querySelector('description')?.textContent?.trim() || '';
   const wk = root.querySelector('workout');
-  if (!wk) throw new Error('No <workout> element');
+  if (!wk) throw new Error(t('No <workout> element'));
   const A = (el, n, d) => { const v = el.getAttribute(n) ?? el.getAttribute(n.toLowerCase()); return v == null ? d : +v; };
   const seg = [];
   for (const el of wk.children) {
@@ -823,20 +826,20 @@ function parseZWO(xml) {
     const add = o => { if (cad) o.c = cad; seg.push(o); };
     if (tag === 'warmup' || tag === 'cooldown' || tag === 'ramp') {
       const lo = A(el, 'PowerLow', 0.5), hi = A(el, 'PowerHigh', lo);
-      add({ t: 'r', d, p0: lo, p1: hi, lbl: tag === 'warmup' ? 'Warm-up' : tag === 'cooldown' ? 'Cool-down' : '' });
+      add({ t: 'r', d, p0: lo, p1: hi, lbl: tag === 'warmup' ? t('Warm-up') : tag === 'cooldown' ? t('Cool-down') : '' });
     } else if (tag === 'steadystate') add({ t: 's', d, p: A(el, 'Power', A(el, 'PowerLow', 0.6)) });
     else if (tag === 'intervalst') {
       const n = clamp(Math.round(A(el, 'Repeat', 1)) || 1, 1, 100), on = { t: 's', d: A(el, 'OnDuration', 60), p: A(el, 'OnPower', A(el, 'PowerOnHigh', 1)), lbl: 'On' }, off = { t: 's', d: A(el, 'OffDuration', 60), p: A(el, 'OffPower', A(el, 'PowerOffHigh', 0.5)), lbl: 'Off' };
       if (cad) on.c = cad; const cr = A(el, 'CadenceResting', null); if (cr) off.c = cr;
       seg.push({ t: 'x', n, s: [on, off] });
-    } else if (tag === 'freeride' || tag === 'maxeffort') add({ t: tag === 'maxeffort' ? 'f' : 's', d, p: 0.6, lbl: tag === 'freeride' ? 'Free ride' : 'Max effort' });
+    } else if (tag === 'freeride' || tag === 'maxeffort') add({ t: tag === 'maxeffort' ? 'f' : 's', d, p: 0.6, lbl: tag === 'freeride' ? t('Free ride') : t('Max effort') });
   }
-  if (!seg.length) throw new Error('Workout has no supported steps');
+  if (!seg.length) throw new Error(t('Workout has no supported steps'));
   return { name, desc, seg };
 }
 function parseERG(txt) {
   const lines = txt.split(/\r?\n/);
-  let ftp = null, name = 'Imported workout', desc = '', inData = false, mode = 'pct';
+  let ftp = null, name = t('Imported workout'), desc = '', inData = false, mode = 'pct';
   const pts = [];
   for (const raw of lines) {
     const l = raw.trim(); if (!l) continue;
@@ -848,7 +851,7 @@ function parseERG(txt) {
     if (/^\[END COURSE DATA\]/i.test(l)) { inData = false; continue; }
     if (inData && (m = l.match(/^([\d.]+)\s+([\d.]+)/))) pts.push([+m[1] * 60, +m[2]]);
   }
-  if (pts.length < 2) throw new Error('No course data found');
+  if (pts.length < 2) throw new Error(t('No course data found'));
   const f = v => mode === 'w' ? v / (ftp || S.ftp) : v / 100;
   const seg = [];
   for (let i = 0; i < pts.length - 1; i++) {
@@ -926,9 +929,9 @@ class FtmsTrainer {
   }
   async start() {
     const P = TRAINER_PROTO.ftms;
-    if (this.features && !this.features.power) toast('This trainer does not report ERG (power target) support. Trying anyway.', 5000);
+    if (this.features && !this.features.power) toast(t('This trainer does not report ERG (power target) support. Trying anyway.'), 5000);
     const r = await this.requestControl();
-    if (r !== 1 && r !== -1) toast('Trainer did not grant control (' + (P.RESULT[r] || 'error') + '). Close other apps using it.', 5000);
+    if (r !== 1 && r !== -1) toast(t('Trainer did not grant control ({why}). Close other apps using it.', { why: P.RESULT[r] || t('error') }), 5000);
     await this.t.cmd(P.start()); // start / resume (tolerate "not supported")
   }
   requestControl() { return this.t.cmd(TRAINER_PROTO.ftms.requestControl()); }
@@ -951,10 +954,10 @@ class FtmsTrainer {
   onStatus(v) {
     const m = TRAINER_PROTO.ftms.parseStatus(v); if (!m || !(m.reset || m.lost)) return;
     // reset / control permission lost → request control again and resend (some trainers reset themselves after a stop)
-    const t = this.t; t.applied = null; this.lostCount++;
-    if (m.lost && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).', 7000); return; }
-    if (m.lost) toast('Another app took control of the trainer');
-    setTimeout(() => { if (t.ad === this && t.cp) this.requestControl().then(() => { t.applied = null; applyControl(); }); }, 1500);
+    const tr = this.t; tr.applied = null; this.lostCount++;
+    if (m.lost && this.lostCount > 3) { toast(t('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).'), 7000); return; }
+    if (m.lost) toast(t('Another app took control of the trainer'));
+    setTimeout(() => { if (tr.ad === this && tr.cp) this.requestControl().then(() => { tr.applied = null; applyControl(); }); }, 1500);
   }
   onIBD(v) {
     const d = TRAINER_PROTO.ftms.parseIndoorBikeData(v);
@@ -1015,7 +1018,7 @@ class WahooTrainer { // older KICKR / Snap / Core firmware: Wahoo control charac
   async start() {
     this.mode = null;
     const r = await this.t.cmd(TRAINER_PROTO.wahoo.unlock());
-    if (r !== 1 && r !== -1) toast('The trainer did not accept the control unlock. Close other apps using it, then reconnect.', 5000);
+    if (r !== 1 && r !== -1) toast(t('The trainer did not accept the control unlock. Close other apps using it, then reconnect.'), 5000);
   }
   async send(d) {
     const W = TRAINER_PROTO.wahoo, t = this.t, ok = r => r === 1 || r === -1;
@@ -1030,7 +1033,7 @@ class WahooTrainer { // older KICKR / Snap / Core firmware: Wahoo control charac
 }
 
 class ReadOnlyTrainer { // power meter, or a trainer that offers no control we can use
-  constructor(t) { this.t = t; this.name = 'Power meter'; this.range = null; }
+  constructor(tr) { this.t = tr; this.name = t('Power meter'); this.range = null; }
   get canSim() { return false; }
   async setup(s) { await this.t.listen(await s.cps.getCharacteristic(TRAINER_PROTO.UUID.CPM), v => this.t.onCPM(v)); }
 }
@@ -1062,18 +1065,18 @@ class Trainer {
       });
       if (this.dev && this.dev !== dev) this.disconnect();
       clearTimeout(this.reconnTimer); this.reconnTimer = null;
-      this.dev = dev; this.name = dev.name || 'Trainer'; this.userDisconnect = false; this.reconnTries = 0;
+      this.dev = dev; this.name = dev.name || t('Trainer'); this.userDisconnect = false; this.reconnTries = 0;
       dev.removeEventListener('gattserverdisconnected', this._disc);
       dev.addEventListener('gattserverdisconnected', this._disc);
       await this.setup(++this.gen);
     } catch (e) {
       if (e && e.name === 'NotFoundError') {
-        if (/adapter|not available|unavailable/i.test(e.message || '')) toast('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.', 7000);
+        if (/adapter|not available|unavailable/i.test(e.message || '')) toast(t('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.'), 7000);
         this.setStatus(this.dev && this.dev.gatt.connected && this.ad ? 'connected' : 'idle'); return;
       }
       console.error(e); this.setStatus('error', e.message);
       if (e && (e.name === 'SecurityError' || e.name === 'NotAllowedError')) showBtHelp(true, 'security');
-      toast('Trainer: ' + (e.message || e), 5000);
+      toast(t('Trainer: {msg}', { msg: e.message || e }), 5000);
     }
   }
   async setup(gen) {
@@ -1092,22 +1095,22 @@ class Trainer {
     found.wahooCp = found.ftmsCp || found.fec ? null : (await chr(found.cps, U.WAHOO_CP)) || (await chr(await svc(U.WAHOO_SVC), U.WAHOO_CP));
     if (stale()) return;
     const kind = P.pick({ ftms: !!found.ftms, ftmsCp: !!found.ftmsCp, fec: !!found.fec, wahoo: !!found.wahooCp, cps: !!found.cps });
-    if (!kind) throw new Error('No supported service found (FTMS, Tacx FE-C, Wahoo or Cycling Power). Is it a smart trainer or power meter?');
+    if (!kind) throw new Error(t('No supported service found (FTMS, Tacx FE-C, Wahoo or Cycling Power). Is it a smart trainer or power meter?'));
     const ad = new ({ ftms: FtmsTrainer, fec: FecTrainer, wahoo: WahooTrainer, cps: ReadOnlyTrainer })[kind](this);
     this.ad = ad; this.protocol = ad.name;
     await ad.setup(found, stale);
     if (stale()) return;
     this.reconnTries = 0;
     this.setStatus('connected');
-    if (sim.on) { sim.stop(); toast('Simulator turned off: trainer connected'); }
+    if (sim.on) { sim.stop(); toast(t('Simulator turned off: trainer connected')); }
     if (!this.cp) {
-      const why = kind === 'cps' ? 'power data only, ERG is not available on this device' : 'data only: the trainer offers no control';
-      toast(`${this.name} connected (${this.protocol}): ${why}`, 5000); return;
+      const why = kind === 'cps' ? t('power data only, ERG is not available on this device') : t('data only: the trainer offers no control');
+      toast(t('{name} connected ({protocol}): {why}', { name: this.name, protocol: this.protocol, why }), 5000); return;
     }
     await ad.start?.();
     if (stale() || !this.cp) return;
     this.applied = null; this.kick(); applyControl();
-    toast(`${this.name} connected · ${this.protocol} · ERG ready`);
+    toast(t('{name} connected · {protocol} · ERG ready', { name: this.name, protocol: this.protocol }));
   }
   // subscribe to notifications / indications; every listener is removed again on reconnect / disconnect
   listen(ch, fn) {
@@ -1137,7 +1140,7 @@ class Trainer {
         if (gen !== this.gen || this.userDisconnect) return;
         console.warn('reconnect failed', e);
         if (this.reconnTries < 15) { this.setStatus('reconnecting'); this.reconnTimer = setTimeout(tryIt, Math.min(8000, 1000 * this.reconnTries)); }
-        else { this.setStatus('error', 'Lost connection'); toast('Trainer connection lost. Tap Trainer to reconnect.', 6000); }
+        else { this.setStatus('error', t('Lost connection')); toast(t('Trainer connection lost. Tap Trainer to reconnect.'), 6000); }
       }
     };
     this.reconnTimer = setTimeout(tryIt, 800);
@@ -1228,12 +1231,12 @@ class HrStrap {
       const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [UUID.HRS] }], optionalServices: ['battery_service'] });
       clearTimeout(this.timer); this.timer = null;
       if (this.dev && this.dev !== dev) { this.dev.removeEventListener('gattserverdisconnected', this._d); try { this.dev.gatt.disconnect(); } catch { } }
-      this.dev = dev; this.name = dev.name || 'HR'; this.user = false;
+      this.dev = dev; this.name = dev.name || t('HR'); this.user = false;
       dev.removeEventListener('gattserverdisconnected', this._d); dev.addEventListener('gattserverdisconnected', this._d);
       await this.setup(++this.gen);
     } catch (e) {
-      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast('No Bluetooth adapter found.', 6000); return; }
-      this.status = 'error'; updateConnUI(); toast('HR: ' + e.message);
+      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast(t('No Bluetooth adapter found.'), 6000); return; }
+      this.status = 'error'; updateConnUI(); toast(t('HR: {msg}', { msg: e.message }));
     }
   }
   async setup(gen) {
@@ -1242,7 +1245,7 @@ class HrStrap {
     const c = await (await s.getPrimaryService(UUID.HRS)).getCharacteristic(UUID.HRM);
     c.removeEventListener('characteristicvaluechanged', this._v); c.addEventListener('characteristicvaluechanged', this._v);
     await c.startNotifications(); if (gen !== this.gen) return;
-    this.status = 'connected'; updateConnUI(); toast(`${this.name} connected`);
+    this.status = 'connected'; updateConnUI(); toast(t('{name} connected', { name: this.name }));
   }
   onHR(v) { if (v.byteLength < 2) return; const f = v.getUint8(0); const hr = f & 1 ? v.getUint16(1, true) : v.getUint8(1); if (hr > 0) { live.hr = hr; live.tHr = performance.now(); } }
   onDisc() {
@@ -1268,13 +1271,13 @@ const antUsable = () => typeof ANT !== 'undefined' && ANT.supported();
 // connect: Bluetooth directly, or a small chooser when this browser can also use an ANT+ USB stick (WebUSB)
 function chooseLink(kind) {
   const isHr = kind === 'hr', cur = isHr ? hrm : trainer;
-  if (cur.connected) { if (confirm(`Disconnect ${cur.name}?`)) cur.disconnect(); return; }
+  if (cur.connected) { if (confirm(t('Disconnect {name}?', { name: cur.name }))) cur.disconnect(); return; }
   const ble = () => { if (isHr) { hrm = bleHr; bleHr.connect(); } else { trainer = bleTrainer; bleTrainer.connect(); } };
   if (!antUsable()) { ble(); return; }
-  const m = openModal(`<h2>${isHr ? 'Connect heart rate' : 'Connect your trainer'}</h2>
-    <p class="muted" style="margin:6px 0 14px">${isHr ? 'Pick how your heart-rate strap talks to this computer.' : 'Pick how your smart trainer talks to this computer. Both control ERG.'}</p>
-    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">ANT+ USB stick</button><span class="spacer"></span><button class="btn ghost" id="lkX">Cancel</button></div>
-    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? 'ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).' : 'ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.'}</p>`, true);
+  const m = openModal(`<h2>${isHr ? t('Connect heart rate') : t('Connect your trainer')}</h2>
+    <p class="muted" style="margin:6px 0 14px">${isHr ? t('Pick how your heart-rate strap talks to this computer.') : t('Pick how your smart trainer talks to this computer. Both control ERG.')}</p>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">${t('ANT+ USB stick')}</button><span class="spacer"></span><button class="btn ghost" id="lkX">${t('Cancel')}</button></div>
+    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? t('ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).') : t('ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.')}</p>`, true);
   $('#lkX', m).onclick = closeModal;
   $('#lkBle', m).onclick = () => { closeModal(); ble(); };
   $('#lkAnt', m).onclick = () => {
@@ -1290,11 +1293,11 @@ function chooseLink(kind) {
 const sim = {
   on: false, p: 0, hr: 0, timer: null,
   start() {
-    if (trainer.connected) { toast('Disconnect the trainer to use the simulator'); return; }
+    if (trainer.connected) { toast(t('Disconnect the trainer to use the simulator')); return; }
     this.on = true; this.p = 0; this.hr = S.restHr + 10;
     clearInterval(this.timer);
     this.timer = setInterval(() => this.step(), 1000);
-    updateConnUI(); toast('Simulator on: the app rides itself. History and Progress show demo data.', 4500); demoChanged();
+    updateConnUI(); toast(t('Simulator on: the app rides itself. History and Progress show demo data.'), 4500); demoChanged();
   },
   stop() { this.on = false; clearInterval(this.timer); updateConnUI(); demoChanged(); },
   step() {
@@ -1355,15 +1358,15 @@ const aggNP = a => a.npN ? Math.pow(a.np4 / a.npN, 0.25) : (a.n ? a.sumP / a.n :
 
 function rideInProgress() { return R.state === 'running' || R.state === 'paused'; }
 function loadWorkout(w, source = null) {
-  if (rideInProgress() && !confirm('A ride is in progress. Discard it and load this workout?')) return false;
+  if (rideInProgress() && !confirm(t('A ride is in progress. Discard it and load this workout?'))) return false;
   const { segs, total } = expand(w);
   Object.assign(R, RIDE_RESET(), { w, segs, total, freeRide: false, source });
   clearCheckpoint(); showRide(); go('ride'); return true;
 }
 function startFreeRide(mode) {
-  if (rideInProgress() && !confirm('A ride is in progress. Discard it?')) return;
-  const w = { id: 'free-ride', name: mode === 'erg' ? 'Free ride · ERG' : 'Free ride · Slope', cat: 'Endurance', seg: [] };
-  Object.assign(R, RIDE_RESET(), { w, segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: 'Free ride', c: null }], total: 0, freeRide: true, freeMode: mode, freeWatts: Math.round(S.ftp * 0.6 / 5) * 5, freeGrade: R.freeGrade ?? 1, source: null });
+  if (rideInProgress() && !confirm(t('A ride is in progress. Discard it?'))) return;
+  const w = { id: 'free-ride', name: mode === 'erg' ? t('Free ride · ERG') : t('Free ride · Slope'), cat: 'Endurance', seg: [] };
+  Object.assign(R, RIDE_RESET(), { w, segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: t('Free ride'), c: null }], total: 0, freeRide: true, freeMode: mode, freeWatts: Math.round(S.ftp * 0.6 / 5) * 5, freeGrade: R.freeGrade ?? 1, source: null });
   clearCheckpoint(); showRide(); go('ride');
 }
 function idxAt(t) {
@@ -1429,12 +1432,12 @@ const isRampTest = () => !R.freeRide && R.w && R.w.cat === 'Test' && /ramp/i.tes
 function endRampTest() {
   if (R.testEnded) return;
   R.testEnded = true; R.failSince = null;
-  let cd = R.segs.findIndex((s, i) => i > R.idx && /cool/i.test(s.lbl));
+  let cd = R.segs.findIndex((s, i) => i > R.idx && /cool|calme/i.test(s.lbl));
   if (cd < 0) cd = R.segs.length - 1;
   const best = bestAvg(R.samples.map(x => x.p), 60);
   jumpTo(R.segs[cd].start, false);
   if (R.state === 'paused') { R.state = 'running'; R.autoPaused = false; }
-  toast(`Ramp test finished${best ? ` · best minute ${Math.round(best)} W → FTP ≈ ${Math.round(best * 0.75)} W` : ''}. Cool down!`, 7000);
+  toast(best ? t('Ramp test finished · best minute {best} W → FTP ≈ {ftp} W. Cool down!', { best: Math.round(best), ftp: Math.round(best * 0.75) }) : t('Ramp test finished. Cool down!'), 7000);
   if (S.sound) beep(1046, 0.5, 0.25);
 }
 let tickTimer = null, lastNudge = 0;
@@ -1446,11 +1449,11 @@ function tick() {
   const pwr = liveFresh('Power') ? live.power : 0, cad = liveFresh('Cad') ? live.cadence : 0;
   const hasData = trainer.connected || sim.on || liveFresh('Power');
   // The page was frozen (screen lock / app switch on iOS): don't credit the missing time, pause instead.
-  if (R.state === 'running' && gap > 5 && trainer.connected) { pauseRide(false, 'Ride paused: the app was asleep or in the background'); return; }
+  if (R.state === 'running' && gap > 5 && trainer.connected) { pauseRide(false, t('Ride paused: the app was asleep or in the background')); return; }
   let dt = Math.min(gap, 120);
   if (R.state === 'running') {
     const seg = R.segs[R.idx];
-    if (isRampTest() && !R.testEnded && seg && seg.kind !== 'free' && seg.p0 >= 0.9 && !/cool/i.test(seg.lbl) && hasData) {
+    if (isRampTest() && !R.testEnded && seg && seg.kind !== 'free' && seg.p0 >= 0.9 && !/cool|calme/i.test(seg.lbl) && hasData) {
       const tgt = targetWattsAt(R.t);
       const failing = cad < 50 || (tgt && pwr < tgt * 0.75);
       R.failSince = failing ? (R.failSince || now) : null;
@@ -1534,12 +1537,12 @@ function finishRide(completed) {
   releaseWake();
   trainer.release();
   renderRide(true);
-  if (!wasStarted) { clearCheckpoint(); toast('Ride too short to save'); return; }
+  if (!wasStarted) { clearCheckpoint(); toast(t('Ride too short to save')); return; }
   const ride = buildRideRecord(completed);
-  saveRide(ride).then(clearCheckpoint, e => { console.warn('save', e); toast('Could not save the ride: ' + e.message, 8000); });
+  saveRide(ride).then(clearCheckpoint, e => { console.warn('save', e); toast(t('Could not save the ride: {msg}', { msg: e.message }), 8000); });
   if (R.source && R.source.plan && ride.completed) {
     const d = load('erglab.plandone', {}); (d[R.source.plan] ||= {})[R.source.key] = ride.date;
-    if (!store('erglab.plandone', d)) toast('Storage full: plan progress not saved', 5000);
+    if (!store('erglab.plandone', d)) toast(t('Storage full: plan progress not saved'), 5000);
     cloud.schedulePush();
   }
   summaryModal(ride);
@@ -1577,9 +1580,9 @@ function storeHistory(h, keep) {
     if (old && old.p) { if (!old.hs && !old.cloud) stripped++; stripStreams(old); continue; } // inline streams (no IndexedDB)
     if (old) { delete old.an.ints; continue; } // interval lists are recomputed from the streams when needed
     if (h.length > 1) { h.pop(); evicted++; continue; }
-    toast('Storage full: could not save this ride. Download the TCX now!', 8000); return false;
+    toast(t('Storage full: could not save this ride. Download the TCX now!'), 8000); return false;
   }
-  if (stripped || evicted) toast(`Storage nearly full: detailed data of ${stripped} old ride(s) removed${evicted ? `, ${evicted} ride(s) deleted` : ''}`, 6000);
+  if (stripped || evicted) toast((stripped === 1 ? t('Storage nearly full: detailed data of {n} old ride removed', { n: stripped }) : t('Storage nearly full: detailed data of {n} old rides removed', { n: stripped })) + (evicted ? ', ' + (evicted === 1 ? t('{n} ride deleted', { n: evicted }) : t('{n} rides deleted', { n: evicted })) : ''), 6000);
   return true;
 }
 function markRide(id, patch) { const h = load('erglab.history', []); const x = h.find(y => y.id === id); if (x) { Object.assign(x, patch); storeHistory(h, x); } return x; }
@@ -1592,7 +1595,7 @@ function saveCheckpoint() {
 }
 function clearCheckpoint() { try { localStorage.removeItem('erglab.inprogress'); } catch { } }
 function restoreCheckpoint(snap) {
-  const { segs, total } = snap.freeRide ? { segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: 'Free ride', c: null }], total: 0 } : expand(snap.w);
+  const { segs, total } = snap.freeRide ? { segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: t('Free ride'), c: null }], total: 0 } : expand(snap.w);
   Object.assign(R, RIDE_RESET(), { w: snap.w, segs, total, source: snap.source, freeRide: !!snap.freeRide, freeMode: snap.freeMode || 'erg', freeWatts: snap.freeWatts || 150, freeGrade: snap.freeGrade ?? 1,
     t: snap.t, elapsed: snap.p.length, skipped: snap.skipped || 0, startedAt: snap.startedAt, dist: snap.dist || 0, intensity: snap.intensity || 100, testEnded: !!snap.testEnded, state: 'paused', autoPaused: false });
   R.samples = snap.p.map((p, i) => ({ s: i, pos: snap.pos[i], p, c: snap.c[i], hr: snap.hr[i], tgt: snap.tg ? snap.tg[i] : null, d: snap.dd[i] }));
@@ -1603,12 +1606,12 @@ function restoreCheckpoint(snap) {
 function offerRecovery() {
   const snap = load('erglab.inprogress', null);
   if (!snap || !snap.p || snap.p.length < 30) return;
-  const m = openModal(`<h2>Unfinished ride found</h2>
-    <p class="muted">${esc(snap.w.name)} · ${fmtTime(snap.p.length)} recorded · last saved ${new Date(snap.savedAt).toLocaleTimeString()}.<br>The app was closed or reloaded during the ride.</p>
-    <div class="row" style="margin-top:14px"><button class="btn primary" id="rcResume">Resume ride</button><button class="btn" id="rcSave">Save it as finished</button><span class="spacer"></span><button class="btn danger" id="rcDrop">Discard</button></div>`, true);
-  $('#rcResume', m).onclick = () => { closeModal(); restoreCheckpoint(snap); toast('Ride restored and paused. Press Resume when ready.', 5000); };
+  const m = openModal(`<h2>${t('Unfinished ride found')}</h2>
+    <p class="muted">${t('{name} · {time} recorded · last saved {at}.<br>The app was closed or reloaded during the ride.', { name: esc(snap.w.name), time: fmtTime(snap.p.length), at: new Date(snap.savedAt).toLocaleTimeString(LOCALE) })}</p>
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="rcResume">${t('Resume ride')}</button><button class="btn" id="rcSave">${t('Save it as finished')}</button><span class="spacer"></span><button class="btn danger" id="rcDrop">${t('Discard')}</button></div>`, true);
+  $('#rcResume', m).onclick = () => { closeModal(); restoreCheckpoint(snap); toast(t('Ride restored and paused. Press Resume when ready.'), 5000); };
   $('#rcSave', m).onclick = () => { closeModal(); restoreCheckpoint(snap); finishRide(false); };
-  $('#rcDrop', m).onclick = () => { if (confirm('Discard this unfinished ride?')) { clearCheckpoint(); closeModal(); } };
+  $('#rcDrop', m).onclick = () => { if (confirm(t('Discard this unfinished ride?'))) { clearCheckpoint(); closeModal(); } };
 }
 
 /* =====================================================================
@@ -1648,7 +1651,7 @@ function noSleepVideo() { // fallback for browsers without the Wake Lock API: ke
     const p = nsv.play(); return p ? p.then(() => true, () => false) : Promise.resolve(true);
   } catch { return Promise.resolve(false); }
 }
-function warnSleep() { if (warnedSleep) return; warnedSleep = true; toast(isIOS ? 'Tip: set Settings › Display & Brightness › Auto-Lock to "Never" during rides so the screen stays on.' : 'Tip: keep this screen on during the ride.', 8000); }
+function warnSleep() { if (warnedSleep) return; warnedSleep = true; toast(isIOS ? t('Tip: set Settings › Display & Brightness › Auto-Lock to "Never" during rides so the screen stays on.') : t('Tip: keep this screen on during the ride.'), 8000); }
 function requestWake() { // call synchronously from a tap (Start / Resume)
   if ('wakeLock' in navigator) {
     if (wake) return;
@@ -1660,7 +1663,7 @@ function releaseWake() { try { wake?.release(); } catch { } wake = null; try { n
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') { if (rideInProgress()) requestWake(); return; }
   // iOS freezes hidden pages: drop the trainer to an easy load and pause, rather than holding an interval target forever
-  if (isIOS && R.state === 'running') pauseRide(false, 'Ride paused: the app went to the background');
+  if (isIOS && R.state === 'running') pauseRide(false, t('Ride paused: the app went to the background'));
   if (rideInProgress()) saveCheckpoint();
 });
 window.addEventListener('pagehide', () => { if (rideInProgress()) saveCheckpoint(); });
@@ -1672,12 +1675,12 @@ window.addEventListener('pagehide', () => { if (rideInProgress()) saveCheckpoint
 let G = {};
 function buildGauges() {
   const ftp = S.ftp, maxP = Math.ceil(ftp * 1.6 / 50) * 50;
-  G.power = makeGauge($('#gPower'), { label: 'Power', unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
+  G.power = makeGauge($('#gPower'), { label: t('Power'), unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
   const wk = ftp / S.weight, maxW = Math.ceil(wk * 1.6 * 2) / 2;
   G.wkg = makeGauge($('#gWkg'), { label: 'W/kg', unit: 'W/kg', min: 0, max: maxW, bands: PZ.map(z => ({ from: z.lo * wk, to: Math.min(z.hi, 9) * wk, col: z.col })), ticks: [0, +(wk * 0.75).toFixed(1), +wk.toFixed(1), maxW] });
-  G.cad = makeGauge($('#gCad'), { label: 'Cadence', unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
+  G.cad = makeGauge($('#gCad'), { label: t('Cadence'), unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
   const hrMin = 40, mx = S.maxHr;
-  G.hr = makeGauge($('#gHr'), { label: 'Heart rate', unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
+  G.hr = makeGauge($('#gHr'), { label: t('Heart rate'), unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
 }
 function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
