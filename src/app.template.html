@@ -2978,6 +2978,8 @@ function browserLabel() {
   let app = false; try { app = !!(navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)); } catch { }
   return os + ' ' + br + (app ? ' app' : '');
 }
+// the label in the interface language (the English label stays the sync key)
+const brShow = l => String(l || '').replace(/ in-app browser/, ' ' + t('in-app browser')).replace(/ browser$/, ' ' + t('browser')).replace(/^Other /, t('Other device') + ' ').replace(/ app$/, ' ' + t('(home-screen app)'));
 function cleanSeen(o) {
   const out = {}; if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
   Object.entries(o).filter(([k, v]) => /^[\w .()-]{1,40}$/.test(k) && Number.isFinite(+v) && +v > 0)
@@ -2993,15 +2995,15 @@ function whyText(w) {
     case 'server': return t('The server ended your session ({when}): it would not renew it. Usually the phone slept or lost the network just as BTB was renewing the sign-in, or you signed out on another device.', { when }) + seen;
     case 'refused': return t('The server no longer accepted the sign-in saved in this browser. Usually the phone slept or lost the network just as BTB was renewing it, or you signed out on another device.') + seen;
     case 'lost': return t('This browser deleted your saved sign-in but kept BTB’s other data.') + seen;
-    case 'erased': return t('{browser} was signed in before (last open {when}) and has since erased its website data. iPhone and iPad do that after about 7 days without opening a site; clearing the history or private browsing does it too.', { browser: w.br || '', when: w.seen ? fmtWhen(w.seen) : '?' });
-    case 'first': return t('First sign-in recorded for this browser ({browser}).', { browser: w.br || '' });
+    case 'erased': return t('BTB was last used in {browser} on {when}. If that was this browser, it has since erased its website data: iPhone and iPad do that after about 7 days without opening a site; clearing the history or private browsing does it too. If it was another device of the same kind, this is simply a first sign-in here.', { browser: brShow(w.br), when: w.seen ? fmtWhen(w.seen) : '?' });
+    case 'first': return t('First sign-in recorded for this browser ({browser}).', { browser: brShow(w.br) });
     default: return t('This browser has no saved sign-in: either you never signed in here, or it erased its website data (iPhone and iPad do that after about 7 days without opening a site; clearing the history or private browsing does it too).');
   }
 }
 function renderAcctWhy() {
   const el = $('#acctWhy'); if (!el) return;
   const l = authWhy.get().last;
-  el.textContent = l && l.why ? t('Last time a code was needed ({when}, {browser}): {why}', { when: fmtWhen(l.code || l.at), browser: l.br || '?', why: whyText(l) }) : '';
+  el.textContent = l && l.why ? t('Last time a code was needed ({when}, {browser}): {why}', { when: fmtWhen(l.code || l.at), browser: brShow(l.br) || '?', why: whyText(l) }) : '';
   el.classList.toggle('hidden', !el.textContent);
 }
 const hasSavedSignIn = () => { try { return !!localStorage.getItem('erglab-auth'); } catch { return false; } };
@@ -3035,7 +3037,7 @@ const cloud = {
           if (uns.length) store('erglab.pending.' + this.user.id, uns.concat(load('erglab.pending.' + this.user.id, []).filter(x => !uns.some(u => u.id === x.id))));
           Promise.resolve(wipeLocal(false, pendingIds())).finally(() => location.replace(location.pathname)); return;
         }
-        if (session && session.user) this.user = session.user;
+        if (session && session.user) { if (this.waiting) { if (this._netRetry) this._netRetry(); } else this.user = session.user; }
       });
       const { data, error } = await this.sb.auth.getSession();
       if (fromLink) { try { history.replaceState(null, '', location.pathname + location.search + '#workouts'); } catch { } }
@@ -3057,10 +3059,11 @@ const cloud = {
     this.offline = true;
     gate('offline', t('Can’t reach the server yet. You stay signed in; BTB keeps trying.'));
     let busy = false, n = 0, timer = 0, lost = false;
-    const done = () => { clearTimeout(timer); window.removeEventListener('online', again); document.removeEventListener('visibilitychange', again); };
+    this.waiting = true; this._netRetry = () => again();
+    const done = () => { this.waiting = false; this._netRetry = null; clearTimeout(timer); window.removeEventListener('online', again); document.removeEventListener('visibilitychange', again); };
     const later = () => { clearTimeout(timer); timer = setTimeout(again, [3000, 6000, 10000][n++] || 20000); };
     const again = async () => {
-      if (busy || this.user || document.visibilityState === 'hidden') { if (!this.user) later(); return; }
+      if (busy || document.visibilityState === 'hidden') { later(); return; }
       if (lost) { if (!rideInProgress()) { done(); this.needCode(authWhy.reason(true)); } else later(); return; }
       busy = true;
       try {
@@ -3081,7 +3084,12 @@ const cloud = {
       d.last = prev ? { ...l, why: 'erased', seen: prev } : { ...l, why: 'first' }; store(AUTH_WHY, d);
       if (prev) toast(whyText(d.last), 9000);
     }
-    if (Date.now() - prev > 6 * 3600000) { S.seenOn = cleanSeen({ ...S.seenOn, [br]: Date.now() }); store('erglab.settings', S); this.schedulePush(); }
+    if (Date.now() - prev > 6 * 3600000) {
+      S.seenOn = cleanSeen({ ...S.seenOn, [br]: Date.now() }); store('erglab.settings', S);
+      // a pending local change goes up with its own push; otherwise S is the cloud copy pulled just now, so write only the
+      // settings back without flagging the profile as changed here (a stale flag would let this device overwrite newer data)
+      if (!load('erglab.profileDirty', false)) this.sb.from('profiles').update({ settings: this.profile().settings }).eq('user_id', this.user.id).then(({ error }) => { if (error) console.warn('seen sync', error); });
+    }
     renderAcctWhy();
   },
   async afterLogin() {
@@ -3258,7 +3266,7 @@ function bindCloud() {
   $('#gateOfflineBtn').onclick = () => { gate(null); toast(t('Offline: rides are kept on this device and sync after you sign in.'), 6000); };
   $('#acctOut').onclick = () => { if (confirm(t('Sign out? Data on this device is removed; it stays in your cloud space.'))) cloud.signOut(); };
   $('#acctSync').onclick = async () => { try { await cloud.pull(); toast(t('Synced')); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); } };
-  window.addEventListener('online', () => { if (cloud.user) cloud.pull().catch(() => { }); });
+  window.addEventListener('online', () => { if (cloud.user && !cloud.waiting) cloud.pull().catch(() => { }); });
 }
 
 /* ---- settings ---- */
