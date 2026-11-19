@@ -16,6 +16,8 @@
 // All app globals are reached through ANT.hooks (typeof-guarded), so the part also runs in Node for the tests.
 // Tests: node src/test/ant.test.mjs
 const ANT = (() => {
+  // t() is the page's translation helper (i18n.js); the Node tests run this part without it: English, placeholders filled
+  const t = typeof globalThis.t === 'function' ? globalThis.t : (s, v) => v ? s.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m) : s;
   const VENDOR = 0x0fcf;
   const PRODUCTS = { 0x1008: 'ANT USB2 stick', 0x1009: 'ANT USB-m stick', 0x1004: 'ANT USB stick' };
   const KEY_STORE = 'erglab.antKey';
@@ -28,9 +30,9 @@ const ANT = (() => {
   const EV = { RX_SEARCH_TIMEOUT: 1, RX_FAIL: 2, TX: 3, TRANSFER_RX_FAILED: 4, TX_COMPLETED: 5, TX_FAILED: 6, CHANNEL_CLOSED: 7, RX_FAIL_GO_TO_SEARCH: 8, COLLISION: 9 };
   // ANT+ device profiles: device type, channel period (32768 / Hz), what to call it
   const PROFILE = {
-    fec: { devType: 17, period: 8192, title: 'ANT+ trainer', what: 'trainer' },
-    power: { devType: 11, period: 8182, title: 'ANT+ power', what: 'power meter' },
-    hr: { devType: 120, period: 8070, title: 'ANT+ HR', what: 'heart-rate strap' },
+    fec: { devType: 17, period: 8192, title: t('ANT+ trainer'), what: 'trainer' },
+    power: { devType: 11, period: 8182, title: t('ANT+ power'), what: 'power meter' },
+    hr: { devType: 120, period: 8070, title: t('ANT+ HR'), what: 'heart-rate strap' },
   };
   const RF = 57;          // 2457 MHz, the ANT+ frequency
   const SEARCH = 12;      // search timeout in 2.5 s units (30 s), then the stick closes the channel and we reopen it
@@ -53,7 +55,7 @@ const ANT = (() => {
     ui: msg => { if (typeof updateConnUI === 'function') { try { updateConnUI(msg); } catch (e) { console.warn(e); } } },
     toast: (m, ms) => { if (typeof toast === 'function') toast(m, ms); else console.log('[ANT]', m); },
     initAudio: () => { try { if (typeof initAudio === 'function') initAudio(); } catch { } },
-    simOff: () => { if (typeof sim === 'object' && sim && sim.on && typeof sim.stop === 'function') { sim.stop(); H.toast('Simulator turned off: trainer connected'); } },
+    simOff: () => { if (typeof sim === 'object' && sim && sim.on && typeof sim.stop === 'function') { sim.stop(); H.toast(t('Simulator turned off: trainer connected')); } },
     applyControl: () => { try { if (typeof applyControl === 'function') applyControl(); } catch (e) { console.warn(e); } },
     riderKg: () => (typeof S === 'object' && S && S.weight > 0 ? S.weight : 75),
     needKey: () => { }, // the app can open Settings here
@@ -120,11 +122,11 @@ const ANT = (() => {
     const k = normKey(input);
     if (!k) {
       const n = String(input).replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '').length;
-      return { ok: false, error: /[g-wyz]/i.test(String(input).replace(/0x/gi, '')) ? 'The key may only contain hex digits (0-9, A-F).' : `The key must be 8 bytes = 16 hex digits (got ${n}).` };
+      return { ok: false, error: /[g-wyz]/i.test(String(input).replace(/0x/gi, '')) ? t('The key may only contain hex digits (0-9, A-F).') : t('The key must be 8 bytes = 16 hex digits (got {n}).', { n }) };
     }
-    try { localStorage.setItem(KEY_STORE, JSON.stringify(k)); } catch { return { ok: false, error: 'Could not save: browser storage is blocked.' }; }
+    try { localStorage.setItem(KEY_STORE, JSON.stringify(k)); } catch { return { ok: false, error: t('Could not save: browser storage is blocked.') }; }
     if (stick) stick.keySent = null; // sent again before the next channel opens
-    return { ok: true, key: k, warn: /^0+$/.test(k) ? 'Saved, but this is the public ANT network key (all zeros): ANT+ devices use the ANT+ network key.' : '' };
+    return { ok: true, key: k, warn: /^0+$/.test(k) ? t('Saved, but this is the public ANT network key (all zeros): ANT+ devices use the ANT+ network key.') : '' };
   }
   const keyBytes = k => Array.from({ length: 8 }, (_, i) => parseInt(k.slice(i * 2, i * 2 + 2), 16));
 
@@ -297,7 +299,7 @@ const ANT = (() => {
     write(id, data) {
       const f = frame(id, data);
       const run = async () => {
-        const dev = this.dev; if (!dev) throw new Error('ANT stick is not open');
+        const dev = this.dev; if (!dev) throw new Error(t('ANT stick is not open'));
         const r = await dev.transferOut(this.epOut, f);
         if (r && r.status === 'stall') { await dev.clearHalt('out', this.epOut); await dev.transferOut(this.epOut, f); }
       };
@@ -327,11 +329,11 @@ const ANT = (() => {
     }
     ensureKey() {
       const key = getKey();
-      if (!key) return Promise.reject(named('NoKeyError', 'No ANT+ network key saved. Add it in Settings › ANT+.'));
+      if (!key) return Promise.reject(named('NoKeyError', t('No ANT+ network key saved. Add it in Settings › ANT+.')));
       if (this.keySent === key) return Promise.resolve();
       if (!this.keyP) this.keyP = (async () => {
         const r = await this.cmd(MSG.NETKEY, [0, ...keyBytes(key)]);
-        if (r !== 0) throw new Error(`The ANT stick did not accept the network key (${r == null ? 'no answer' : 'code ' + r})`);
+        if (r !== 0) throw new Error(t('The ANT stick did not accept the network key ({why})', { why: r == null ? t('no answer') : t('code {n}', { n: r }) }));
         this.keySent = key;
       })().finally(() => { this.keyP = null; });
       return this.keyP;
@@ -340,7 +342,7 @@ const ANT = (() => {
       await this.ensure();
       await this.ensureKey();
       let num = 0; while (num < this.maxChannels && this.channels.some(c => c.num === num)) num++;
-      if (num >= this.maxChannels) throw new Error('All ANT channels of the stick are in use');
+      if (num >= this.maxChannels) throw new Error(t('All ANT channels of the stick are in use'));
       const ch = new AntChannel(this, num, spec, owner);
       this.channels.push(ch);
       try { await ch.setup(); }
@@ -376,7 +378,7 @@ const ANT = (() => {
       const chans = this.channels; this.channels = [];
       let wanted = false;
       for (const c of chans) { c.dead = true; c.ackDone(false); if (c.owner && !c.owner.user) { wanted = true; this.lostOwners.add(c.owner); } }
-      if (wanted) H.toast('ANT+ stick disconnected. Plug it back in to resume.', 6000);
+      if (wanted) H.toast(t('ANT+ stick disconnected. Plug it back in to resume.'), 6000);
       for (const c of chans) if (c.owner) c.owner.onStickLost();
     }
   }
@@ -394,7 +396,7 @@ const ANT = (() => {
         if (id === MSG.SEARCH_TIMEOUT && lpFailed) data = [this.num, this.spec.search || SEARCH];
         const r = await this.stick.cmd(id, data);
         if (id === MSG.LP_SEARCH_TIMEOUT) { if (r !== 0) lpFailed = true; continue; }
-        if (r !== 0) throw new Error(`The ANT stick refused command ${hex(id)} (${r == null ? 'no answer' : 'code ' + r})`);
+        if (r !== 0) throw new Error(t('The ANT stick refused command {cmd} ({why})', { cmd: hex(id), why: r == null ? t('no answer') : t('code {n}', { n: r }) }));
       }
     }
     // after a search timeout closed the channel: reopen it, now locked to the device we were paired with
@@ -453,7 +455,7 @@ const ANT = (() => {
     setStatus(s, msg) { this.status = s; H.ui(msg); }
     async connect() {
       if (!supported()) { H.toast(unsupportedMsg(), 8000); return; }
-      if (!getKey()) { H.toast('Add your ANT+ network key in Settings › ANT+ first (the instructions are there).', 7000); H.needKey(); return; }
+      if (!getKey()) { H.toast(t('Add your ANT+ network key in Settings › ANT+ first (the instructions are there).'), 7000); H.needKey(); return; }
       if (this.attaching) return; // already opening (USB chooser / channel setup)
       H.initAudio();
       if (this.ch) await this.drop();
@@ -517,7 +519,8 @@ const ANT = (() => {
       if (code !== EV.CHANNEL_CLOSED || this.user || !this.ch) return;
       if (!this.everData) { // the first search found nothing
         this.drop(); this.setStatus('error', 'not found');
-        H.toast(`No ANT+ ${this.prof.what} found. ${this.wakeHint()} Check the ANT+ network key in Settings, and close other apps that use it.`, 9000);
+        const none = { fec: t('No ANT+ trainer found.'), power: t('No ANT+ power meter found.'), hr: t('No ANT+ heart-rate strap found.') }[this.kind];
+        H.toast(`${none} ${this.wakeHint()} ${t('Check the ANT+ network key in Settings, and close other apps that use it.')}`, 9000);
         return;
       }
       if (this.status === 'connected') this.setStatus('reconnecting');
@@ -529,7 +532,7 @@ const ANT = (() => {
       const ok = await ch.reopen().catch(() => false);
       if (!ok && this.ch === ch && !this.user) this.reopenT = setTimeout(() => this.reopen(), T.retry);
     }
-    wakeHint() { return 'Make sure it is awake and near the stick.'; }
+    wakeHint() { return t('Make sure it is awake and near the stick.'); }
     onConnected() { }
     onPage() { }
   }
@@ -544,7 +547,7 @@ const ANT = (() => {
     }
     get cp() { return this.connected && !(this.caps && !this.caps.power && !this.caps.sim && !this.caps.basic); }
     get canSim() { return !(this.caps && !this.caps.sim && !this.caps.basic); }
-    wakeHint() { return 'Pedal a few strokes to wake the trainer.'; }
+    wakeHint() { return t('Pedal a few strokes to wake the trainer.'); }
     setPower(w) {
       w = clamp(Math.round(w), Math.max(0, this.range.min), this.range.max);
       this.mode = { kind: 'power', w }; this.command(fec.targetPower(w));
@@ -584,7 +587,7 @@ const ANT = (() => {
       this.pw = null; this.extraTries = 0; this.lastSent = 0;
       this.extra = [fec.userConfig(H.riderKg()), fec.requestPage(54)];
       if (this.cmdPage) this.dirty = true; // resend the target after a reconnect
-      if (first) { H.simOff(); H.toast(`${this.name} connected · ERG ready`); }
+      if (first) { H.simOff(); H.toast(t('{name} connected · ERG ready', { name: this.name })); }
       H.applyControl();
       this.pump();
     }
@@ -606,12 +609,12 @@ const ANT = (() => {
         case 54:
           this.caps = { basic: d.basic, power: d.power, sim: d.sim, maxResistance: d.maxResistance };
           if (!d.sim && d.basic && !this.simUnsupported) { this.simUnsupported = true; if (this.mode && this.mode.kind === 'sim') this.setSim(this.mode.grade); }
-          if (!d.power && !this.warned.erg) { this.warned.erg = true; H.toast('This trainer does not report ERG (target power) over ANT+. Trying anyway.', 6000); }
+          if (!d.power && !this.warned.erg) { this.warned.erg = true; H.toast(t('This trainer does not report ERG (target power) over ANT+. Trying anyway.'), 6000); }
           H.ui(); break;
         case 71:
           if (d.status === 2 || d.status === 3) {
             if (d.lastCommand === 0x33 && !this.simUnsupported) { this.simUnsupported = true; if (this.mode && this.mode.kind === 'sim') this.setSim(this.mode.grade); }
-            else if (d.lastCommand === 0x31 && !this.warned.rej) { this.warned.rej = true; H.toast('The trainer rejected the ERG power target over ANT+.', 6000); }
+            else if (d.lastCommand === 0x31 && !this.warned.rej) { this.warned.rej = true; H.toast(t('The trainer rejected the ERG power target over ANT+.'), 6000); }
           }
           break;
         case 80: this.info.manufacturer = d.manufacturer; this.info.model = d.model; this.info.hw = d.hw; break;
@@ -623,16 +626,16 @@ const ANT = (() => {
   // ANT+ heart-rate strap (device type 120): computed heart rate is byte 7 of every page.
   class AntHr extends AntDevice {
     constructor() { super('hr'); }
-    wakeHint() { return 'Wet the strap contacts and put it on.'; }
-    onConnected(first) { if (first) H.toast(`${this.name} connected`); }
+    wakeHint() { return t('Wet the strap contacts and put it on.'); }
+    onConnected(first) { if (first) H.toast(t('{name} connected', { name: this.name })); }
     onPage(p) { const d = hr.parse(p); if (d.hr) H.hr(d.hr, 'ant'); }
   }
 
   // ANT+ power meter (device type 11), read-only: power and cadence from page 16 (standard power-only).
   class AntPower extends AntDevice {
     constructor(src = 'antpower') { super('power'); this.src = src; this.pw = null; }
-    wakeHint() { return 'Spin the cranks to wake the power meter.'; }
-    onConnected(first) { this.pw = null; if (first) H.toast(`${this.name} connected (power data only, no control)`, 4000); }
+    wakeHint() { return t('Spin the cranks to wake the power meter.'); }
+    onConnected(first) { this.pw = null; if (first) H.toast(t('{name} connected (power data only, no control)', { name: this.name }), 4000); }
     onPage(p) {
       const d = power.parse(p);
       if (d.page === 16) {
@@ -658,59 +661,60 @@ const ANT = (() => {
   }
   function unsupportedMsg() {
     const p = platform();
-    if (p === 'ios') return 'ANT+ USB sticks can\'t be used on iPhone or iPad (Apple gives web pages no USB access). Use Bluetooth in Bluefy instead.';
-    if (typeof navigator !== 'undefined' && navigator.usb && typeof isSecureContext !== 'undefined' && !isSecureContext) return 'ANT+ needs a secure page: open BTB over https:// or localhost.';
-    return 'This browser can\'t use USB devices. For an ANT+ stick use Chrome or Edge (Windows, macOS, Linux, Android).';
+    if (p === 'ios') return t('ANT+ USB sticks can\'t be used on iPhone or iPad (Apple gives web pages no USB access). Use Bluetooth in Bluefy instead.');
+    if (typeof navigator !== 'undefined' && navigator.usb && typeof isSecureContext !== 'undefined' && !isSecureContext) return t('ANT+ needs a secure page: open BTB over https:// or localhost.');
+    return t('This browser can\'t use USB devices. For an ANT+ stick use Chrome or Edge (Windows, macOS, Linux, Android).');
   }
   function explain(e) {
     const m = String((e && e.message) || e || ''), n = e && e.name, p = platform();
     if (n === 'NoKeyError') return m;
     if (n === 'NotSupportedError') return unsupportedMsg();
     if (n === 'SecurityError' || /access denied/i.test(m)) {
-      if (p === 'win') return 'Windows blocked access to the ANT+ stick. Install the WinUSB driver for it with Zadig (Settings › ANT+), then unplug and replug the stick.';
-      if (p === 'linux') return 'Linux blocked access to the ANT+ stick. Add the udev rule from Settings › ANT+, then unplug and replug the stick.';
-      return 'The browser was not allowed to open the ANT+ stick: ' + m;
+      if (p === 'win') return t('Windows blocked access to the ANT+ stick. Install the WinUSB driver for it with Zadig (Settings › ANT+), then unplug and replug the stick.');
+      if (p === 'linux') return t('Linux blocked access to the ANT+ stick. Add the udev rule from Settings › ANT+, then unplug and replug the stick.');
+      return t('The browser was not allowed to open the ANT+ stick: {err}', { err: m });
     }
     if (/claim|busy|in use/i.test(m) || n === 'NetworkError' || n === 'InvalidStateError')
-      return 'Could not open the ANT+ stick: another program is probably using it (Garmin Express, Zwift, another BTB tab). Close it, then unplug and replug the stick.' + (p === 'win' ? ' On Windows the stick also needs the WinUSB driver (Settings › ANT+).' : '');
+      return t('Could not open the ANT+ stick: another program is probably using it (Garmin Express, Zwift, another BTB tab). Close it, then unplug and replug the stick.') + (p === 'win' ? ' ' + t('On Windows the stick also needs the WinUSB driver (Settings › ANT+).') : '');
     return 'ANT+: ' + m;
   }
 
   /* ---------------- Settings card ---------------- */
   // Static HTML (no user data inside); ANT.bindSettings(root) wires it up. No inline handlers (CSP).
   function settingsCard() {
+    const code = s => `<code>${s}</code>`;
     return `<div class="card pad ant-card" id="antCard">
-  <div class="row"><h3>ANT+ <span class="dim ant-sub">USB stick</span></h3><span class="spacer"></span><span class="badge" data-ant="badge"></span></div>
-  <p class="muted ant-p">Ride with an <b>ANT+ USB stick</b> (Garmin, CooSpo, Anself…) instead of Bluetooth: ANT+ FE-C smart trainers (ERG and slope), heart-rate straps and power meters, all on one stick. Chrome or Edge on Windows, macOS, Linux and Android (with a USB OTG adapter). Not on iPhone or iPad.</p>
+  <div class="row"><h3>ANT+ <span class="dim ant-sub">${t('USB stick')}</span></h3><span class="spacer"></span><span class="badge" data-ant="badge"></span></div>
+  <p class="muted ant-p">${t('Ride with an <b>ANT+ USB stick</b> (Garmin, CooSpo, Anself…) instead of Bluetooth: ANT+ FE-C smart trainers (ERG and slope), heart-rate straps and power meters, all on one stick. Chrome or Edge on Windows, macOS, Linux and Android (with a USB OTG adapter). Not on iPhone or iPad.')}</p>
   <div class="field">
-    <label for="antKeyIn">ANT+ network key</label>
+    <label for="antKeyIn">${t('ANT+ network key')}</label>
     <div class="ant-keyrow">
-      <input type="password" id="antKeyIn" data-ant="key" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="80" placeholder="16 hex digits (8 bytes)">
-      <button class="btn sm" type="button" data-ant="show">Show</button>
-      <button class="btn sm primary" type="button" data-ant="save">Save</button>
-      <button class="btn sm" type="button" data-ant="clear">Clear</button>
+      <input type="password" id="antKeyIn" data-ant="key" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="80" placeholder="${t('16 hex digits (8 bytes)')}">
+      <button class="btn sm" type="button" data-ant="show">${t('Show')}</button>
+      <button class="btn sm primary" type="button" data-ant="save">${t('Save')}</button>
+      <button class="btn sm" type="button" data-ant="clear">${t('Clear')}</button>
     </div>
     <span class="hint" data-ant="msg" role="status" aria-live="polite"></span>
   </div>
   <details class="ant-help">
-    <summary>Where do I get the key?</summary>
+    <summary>${t('Where do I get the key?')}</summary>
     <ol>
-      <li>Register for free as an <b>ANT+ Adopter</b> at <a href="https://www.thisisant.com/register/" target="_blank" rel="noopener noreferrer">thisisant.com</a> and sign in.</li>
-      <li>Open the <a href="https://www.thisisant.com/developer/ant-plus/ant-plus-basics/network-keys" target="_blank" rel="noopener noreferrer">ANT+ network keys</a> page and copy the <b>ANT+ Managed Network</b> key (8 bytes).</li>
-      <li>Paste it above (spaces, commas or 0x are fine) and tap <b>Save</b>.</li>
+      <li>${t('Register for free as an <b>ANT+ Adopter</b> at <a href="https://www.thisisant.com/register/" target="_blank" rel="noopener noreferrer">thisisant.com</a> and sign in.')}</li>
+      <li>${t('Open the <a href="https://www.thisisant.com/developer/ant-plus/ant-plus-basics/network-keys" target="_blank" rel="noopener noreferrer">ANT+ network keys</a> page and copy the <b>ANT+ Managed Network</b> key (8 bytes).')}</li>
+      <li>${t('Paste it above (spaces, commas or 0x are fine) and tap <b>Save</b>.')}</li>
     </ol>
-    <p>The key is licensed to ANT+ adopters, so BTB can't include it for you. It is stored on <b>this device only</b> and is never synced to your account.</p>
+    <p>${t('The key is licensed to ANT+ adopters, so BTB can\'t include it for you. It is stored on <b>this device only</b> and is never synced to your account.')}</p>
   </details>
   <details class="ant-help">
-    <summary>Setting up the USB stick</summary>
+    <summary>${t('Setting up the USB stick')}</summary>
     <ul>
-      <li><b>Windows:</b> Chrome and Edge need the <b>WinUSB</b> driver for the stick. Install it with <a href="https://zadig.akeo.ie/" target="_blank" rel="noopener noreferrer">Zadig</a>: Options › List All Devices, pick the ANT stick (USB ID 0FCF 1008 or 1009, e.g. "ANT USBStick2"), select <b>WinUSB</b>, Replace Driver, then replug the stick. This replaces the Garmin driver, so Garmin Express, Zwift and other ANT+ programs can't use that stick until you roll the driver back (Device Manager › the stick › Uninstall device, tick "delete the driver", replug).</li>
-      <li><b>macOS:</b> works as is.</li>
-      <li><b>Linux:</b> allow the browser to open the stick with a udev rule, e.g. <code>/etc/udev/rules.d/51-ant-usb.rules</code> containing <code>SUBSYSTEM=="usb", ATTRS{idVendor}=="0fcf", MODE="0666"</code>, then run <code>sudo udevadm control --reload-rules</code> and replug the stick.</li>
-      <li><b>Android:</b> Chrome with a USB OTG adapter (USB-C or micro-USB). Allow access when Android asks.</li>
-      <li><b>iPhone / iPad:</b> not possible (no USB access for web pages): use Bluetooth in Bluefy.</li>
+      <li>${t('<b>Windows:</b> Chrome and Edge need the <b>WinUSB</b> driver for the stick. Install it with <a href="https://zadig.akeo.ie/" target="_blank" rel="noopener noreferrer">Zadig</a>: Options › List All Devices, pick the ANT stick (USB ID 0FCF 1008 or 1009, e.g. "ANT USBStick2"), select <b>WinUSB</b>, Replace Driver, then replug the stick. This replaces the Garmin driver, so Garmin Express, Zwift and other ANT+ programs can\'t use that stick until you roll the driver back (Device Manager › the stick › Uninstall device, tick "delete the driver", replug).')}</li>
+      <li>${t('<b>macOS:</b> works as is.')}</li>
+      <li>${t('<b>Linux:</b> allow the browser to open the stick with a udev rule, e.g. {file} containing {rule}, then run {cmd} and replug the stick.', { file: code('/etc/udev/rules.d/51-ant-usb.rules'), rule: code('SUBSYSTEM=="usb", ATTRS{idVendor}=="0fcf", MODE="0666"'), cmd: code('sudo udevadm control --reload-rules') })}</li>
+      <li>${t('<b>Android:</b> Chrome with a USB OTG adapter (USB-C or micro-USB). Allow access when Android asks.')}</li>
+      <li>${t('<b>iPhone / iPad:</b> not possible (no USB access for web pages): use Bluetooth in Bluefy.')}</li>
     </ul>
-    <p>Only <b>one program</b> can use the stick at a time: close Garmin Express, Zwift and other BTB tabs first. The first time, BTB pairs with the first trainer / strap / power meter it hears, so keep other people's devices asleep or away.</p>
+    <p>${t('Only <b>one program</b> can use the stick at a time: close Garmin Express, Zwift and other BTB tabs first. The first time, BTB pairs with the first trainer / strap / power meter it hears, so keep other people\'s devices asleep or away.')}</p>
   </details>
 </div>`;
   }
@@ -722,22 +726,22 @@ const ANT = (() => {
     const refresh = () => {
       const has = !!getKey(), ok = supported();
       if (badge) {
-        badge.textContent = !ok ? 'not available here' : has ? (stick && stick.open ? 'stick connected' : 'key saved') : 'key needed';
+        badge.textContent = !ok ? t('not available here') : has ? (stick && stick.open ? t('stick connected') : t('key saved')) : t('key needed');
         badge.className = 'badge ' + (!ok ? 'ant-dim' : has ? 'ant-ok' : 'ant-warn');
       }
-      input.placeholder = has ? 'Key saved on this device. Paste a new one to replace it' : '16 hex digits (8 bytes)';
+      input.placeholder = has ? t('Key saved on this device. Paste a new one to replace it') : t('16 hex digits (8 bytes)');
       if (clear) clear.disabled = !has;
     };
     save.onclick = () => {
       const r = setKey(input.value);
       if (!r.ok) { say(r.error, 'bad'); return; }
-      if (r.cleared) { say('No key entered.', 'warn'); refresh(); return; }
-      input.value = ''; input.type = 'password'; if (show) show.textContent = 'Show';
-      say(r.warn || ('Saved on this device only (never synced).' + (stick && stick.channels.length ? ' Reconnect your ANT+ devices to use it.' : '')), r.warn ? 'warn' : 'ok');
+      if (r.cleared) { say(t('No key entered.'), 'warn'); refresh(); return; }
+      input.value = ''; input.type = 'password'; if (show) show.textContent = t('Show');
+      say(r.warn || (t('Saved on this device only (never synced).') + (stick && stick.channels.length ? ' ' + t('Reconnect your ANT+ devices to use it.') : '')), r.warn ? 'warn' : 'ok');
       refresh();
     };
-    if (clear) clear.onclick = () => { setKey(''); input.value = ''; say('Key removed from this device.', ''); refresh(); };
-    if (show) show.onclick = () => { const hid = input.type === 'password'; input.type = hid ? 'text' : 'password'; show.textContent = hid ? 'Hide' : 'Show'; };
+    if (clear) clear.onclick = () => { setKey(''); input.value = ''; say(t('Key removed from this device.'), ''); refresh(); };
+    if (show) show.onclick = () => { const hid = input.type === 'password'; input.type = hid ? 'text' : 'password'; show.textContent = hid ? t('Hide') : t('Show'); };
     input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); save.click(); } };
     if (!supported()) say(unsupportedMsg(), 'warn');
     refresh();
