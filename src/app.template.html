@@ -1713,19 +1713,19 @@ function renderRide(force) {
   // header + state
   $('#rWname').textContent = R.w.name;
   const st = $('#rState');
-  st.textContent = { ready: 'Ready', running: 'Riding', paused: R.autoPaused ? 'Auto-paused' : 'Paused', done: 'Finished' }[R.state] || '';
+  st.textContent = { ready: t('Ready'), running: t('Riding'), paused: R.autoPaused ? t('Auto-paused') : t('Paused'), done: t('Finished') }[R.state] || '';
   st.className = 'state-tag ' + (R.state === 'running' ? 'run' : R.state === 'paused' ? 'pause' : '');
   // interval card
   let tgtW = null, frac = null, col = '#8c96ab';
   if (R.freeRide) {
-    $('#rIname').textContent = R.freeMode === 'erg' ? 'Free ride · ERG' : 'Free ride · Slope';
+    $('#rIname').textContent = R.freeMode === 'erg' ? t('Free ride · ERG') : t('Free ride · Slope');
     if (R.freeMode === 'erg') { tgtW = R.freeWatts; frac = tgtW / S.ftp; col = pZone(frac).col; $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W'; $('#rTgtPct').textContent = Math.round(frac * 100) + '% FTP'; }
-    else { $('#rTgt').textContent = R.freeGrade.toFixed(1); $('#rTgtU').textContent = '% slope'; $('#rTgtPct').textContent = ''; col = '#1fc9b3'; }
+    else { $('#rTgt').textContent = R.freeGrade.toFixed(1); $('#rTgtU').textContent = t('% slope'); $('#rTgtPct').textContent = ''; col = '#1fc9b3'; }
     $('#rTgtCad').textContent = '';
-    $('#rLeft').innerHTML = `${fmtTime(R.elapsed)}<small>ride time</small>`;
+    $('#rLeft').innerHTML = `${fmtTime(R.elapsed)}<small>${t('ride time')}</small>`;
     $('#rProg').style.width = '0%';
     $('#rRem').textContent = '—'; $('#rIdx').textContent = '—'; $('#rNext').innerHTML = '';
-    $('#cFreeLab').textContent = R.freeMode === 'erg' ? 'Target' : 'Slope';
+    $('#cFreeLab').textContent = R.freeMode === 'erg' ? t('Target') : t('Slope');
     $('#cFree').textContent = R.freeMode === 'erg' ? `${R.freeWatts} W` : `${R.freeGrade.toFixed(1)} %`;
     $('#rSprint').classList.add('hidden');
   } else if (seg) {
@@ -1735,11 +1735,11 @@ function renderRide(force) {
       col = PZ[6].col;
       if (seg.d >= 180) { // long all-out test efforts: show a pacing guide instead of just MAX
         const g = Math.round(S.ftp * (seg.est || (seg.d >= 1200 ? 1.03 : seg.d >= 480 ? 1.08 : seg.d >= 300 ? 1.15 : 1.25)));
-        $('#rTgt').textContent = '≈' + g; $('#rTgtU').textContent = 'W pace'; $('#rTgtPct').textContent = `All-out, paced evenly · ERG off · ${S.sprintGrade}% slope, use your gears`;
-      } else { $('#rTgt').textContent = 'MAX'; $('#rTgtU').textContent = ''; $('#rTgtPct').textContent = `ERG off · ${S.sprintGrade}% slope, shift up and go`; }
+        $('#rTgt').textContent = '≈' + g; $('#rTgtU').textContent = t('W pace'); $('#rTgtPct').textContent = t('All-out, paced evenly · ERG off · {g}% slope, use your gears', { g: S.sprintGrade });
+      } else { $('#rTgt').textContent = 'MAX'; $('#rTgtU').textContent = ''; $('#rTgtPct').textContent = t('ERG off · {g}% slope, shift up and go', { g: S.sprintGrade }); }
     } else if (!R.ergOn) {
       frac = segFracAt(seg, R.t) * intensityK(); tgtW = Math.round(frac * S.ftp); col = pZone(frac).col;
-      $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W goal'; $('#rTgtPct').textContent = `Slope ${R.simGrade.toFixed(1)}% · ${Math.round(frac * 100)}% FTP`;
+      $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = t('W goal'); $('#rTgtPct').textContent = t('Slope {g}% · {pct}% FTP', { g: R.simGrade.toFixed(1), pct: Math.round(frac * 100) });
     } else {
       tgtW = ctl && ctl.kind === 'power' && R.state === 'running' ? ctl.w : targetWattsAt(R.t); frac = tgtW / S.ftp; col = pZone(frac).col;
       $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W';
@@ -1747,18 +1747,18 @@ function renderRide(force) {
     }
     $('#rTgtPct').style.color = col;
     $('#rTgtCad').textContent = seg.c ? `@ ${seg.c} rpm` : '';
-    $('#rLeft').innerHTML = `${fmtTime(left)}<small>left in interval</small>`;
+    $('#rLeft').innerHTML = `${fmtTime(left)}<small>${t('left in interval')}</small>`;
     $('#rProg').style.width = `${clamp((R.t - seg.start) / seg.d * 100, 0, 100)}%`;
     $('#rProg').style.background = col;
     $('#rEl').textContent = fmtTime(R.elapsed);
     $('#rRem').textContent = fmtTime(R.total - R.t);
     $('#rIdx').textContent = `${R.idx + 1} / ${R.segs.length}`;
     const nx = R.segs.slice(R.idx + 1, R.idx + 4);
-    $('#rNext').innerHTML = nx.length ? 'Next: ' + nx.map((s, i) => {
+    $('#rNext').innerHTML = nx.length ? t('Next:') + ' ' + nx.map((s, i) => {
       const w = s.kind === 'free' ? 'MAX' : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp * intensityK())}→${Math.round(s.p1 * S.ftp * intensityK())} W` : `${Math.round(s.p0 * S.ftp * intensityK())} W`;
       const c = s.kind === 'free' ? PZ[6].col : pZone(Math.max(s.p0, s.p1)).col;
       return `<span style="${i ? 'opacity:.7' : ''}"><b style="color:${c}">${w}</b> ${fmtSegDur(s.d)}${s.c ? ` @${s.c}` : ''}</span>`;
-    }).join(' &nbsp;·&nbsp; ') : '<b>Last interval: finish strong!</b>';
+    }).join(' &nbsp;·&nbsp; ') : '<b>' + t('Last interval: finish strong!') + '</b>';
     $('#rSprint').classList.toggle('hidden', !(seg.kind === 'free' && seg.d < 180 && R.state === 'running'));
   }
   if (R.freeRide) $('#rEl').textContent = fmtTime(R.elapsed);
@@ -1766,28 +1766,28 @@ function renderRide(force) {
   $('#rTgt').style.color = col;
   // start button
   const sb = $('#cStart');
-  if (R.state === 'running') { sb.textContent = '❚❚ Pause'; sb.className = 'btn lg'; }
-  else if (R.state === 'done') { sb.textContent = '✓ Finished'; sb.className = 'btn lg'; sb.disabled = true; }
-  else { sb.textContent = R.state === 'paused' ? '▶ Resume' : '▶ Start'; sb.className = 'btn go lg'; sb.disabled = false; }
+  if (R.state === 'running') { sb.textContent = t('❚❚ Pause'); sb.className = 'btn lg'; }
+  else if (R.state === 'done') { sb.textContent = t('✓ Finished'); sb.className = 'btn lg'; sb.disabled = true; }
+  else { sb.textContent = R.state === 'paused' ? t('▶ Resume') : t('▶ Start'); sb.className = 'btn go lg'; sb.disabled = false; }
   if (R.state !== 'done') sb.disabled = false;
-  $('#cEnd').textContent = R.state === 'done' ? 'Close' : R.state === 'ready' ? 'Cancel' : 'End & save';
+  $('#cEnd').textContent = R.state === 'done' ? t('Close') : R.state === 'ready' ? t('Cancel') : t('End & save');
   $('#cInt').textContent = ergMode() || R.freeRide ? R.intensity + '%' : R.simGrade.toFixed(1) + '%';
-  $('#cIntLab').textContent = ergMode() || R.freeRide ? 'Intensity' : 'Slope';
+  $('#cIntLab').textContent = ergMode() || R.freeRide ? t('Intensity') : t('Slope');
   $('#cErg').className = 'btn sm' + ((R.freeRide ? R.freeMode === 'erg' : R.ergOn) ? ' primary' : '');
   $('#cSlope').className = 'btn sm' + ((R.freeRide ? R.freeMode !== 'erg' : !R.ergOn) ? ' primary' : '');
   // gauges
   const p = smoothedPower();
   if (G.power) {
     const pz = p != null ? pZone(p / S.ftp) : null;
-    G.power.set(p, { target: tgtW, color: pz ? pz.col : '#555', zoneText: pz ? `${pz.n} · ${pz.name.toUpperCase()}` : '', subHtml: p != null ? `<b>${Math.round(p / S.ftp * 100)}%</b> FTP${tgtW ? ` · Δ <b>${Math.round(p - tgtW) > 0 ? '+' : ''}${Math.round(p - tgtW)}</b> W` : ''}` : 'no power data' });
+    G.power.set(p, { target: tgtW, color: pz ? pz.col : '#555', zoneText: pz ? `${pz.n} · ${pz.name.toUpperCase()}` : '', subHtml: p != null ? `<b>${Math.round(p / S.ftp * 100)}%</b> FTP${tgtW ? ` · Δ <b>${Math.round(p - tgtW) > 0 ? '+' : ''}${Math.round(p - tgtW)}</b> W` : ''}` : t('no power data') });
     const wkg = p != null ? p / S.weight : null;
     G.wkg.set(wkg, { target: tgtW ? tgtW / S.weight : null, color: pz ? pz.col : '#555', zoneText: pz ? pz.n : '', dec: 1, subHtml: `FTP <b>${(S.ftp / S.weight).toFixed(2)}</b> W/kg · ${S.weight} kg` });
     const c = liveFresh('Cad') ? live.cadence : null;
     const tc = !R.freeRide && seg && seg.c ? seg.c : null;
-    G.cad.set(c, { target: tc, color: c != null ? cadColor(c) : '#555', zoneText: c == null ? '' : c < 60 ? 'GRIND' : c < 75 ? 'LOW' : c < 100 ? 'SWEET' : c < 115 ? 'HIGH' : 'SPIN', subHtml: tc ? `target <b>${tc}</b> rpm` : (live.speed != null && liveFresh('Power') ? `<b>${live.speed.toFixed(1)}</b> km/h` : '') });
+    G.cad.set(c, { target: tc, color: c != null ? cadColor(c) : '#555', zoneText: c == null ? '' : c < 60 ? t('GRIND') : c < 75 ? t('LOW') : c < 100 ? t('SWEET') : c < 115 ? t('HIGH') : t('SPIN'), subHtml: tc ? t('target <b>{n}</b> rpm', { n: tc }) : (live.speed != null && liveFresh('Power') ? `<b>${live.speed.toFixed(1)}</b> km/h` : '') });
     const hr = liveFresh('Hr', 6000) ? live.hr : null;
     const hz = hr ? hZone(hr / S.maxHr) : null;
-    G.hr.set(hr, { color: hz ? hz.col : '#555', zoneText: hz ? `${hz.n} · ${hz.name.toUpperCase()}` : '', subHtml: hr ? `<b>${Math.round(hr / S.maxHr * 100)}%</b> of max ${S.maxHr}` : (hrm.connected ? 'waiting…' : 'connect HR strap') });
+    G.hr.set(hr, { color: hz ? hz.col : '#555', zoneText: hz ? `${hz.n} · ${hz.name.toUpperCase()}` : '', subHtml: hr ? t('<b>{pct}%</b> of max {max}', { pct: Math.round(hr / S.maxHr * 100), max: S.maxHr }) : (hrm.connected ? t('waiting…') : t('connect HR strap')) });
   }
   // stats
   const a = R.agg, ia = R.iagg;
@@ -1894,17 +1894,17 @@ function drawChart() {
    VIEWS: tabs, library, plans, builder, history, settings
    ===================================================================== */
 const TABS = [
-  { id: 'workouts', label: 'Workouts', icon: '<path d="M3 17l4-6 4 3 5-8 5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
-  { id: 'plans', label: 'Plans', icon: '<rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'ride', label: 'Ride', icon: '<circle cx="6" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 16l4-8h5l3 8M10 8l2 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
-  { id: 'build', label: 'Build', icon: '<path d="M4 20h16M6 16V9M10 16V5M14 16v-6M18 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'history', label: 'History', icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'progress', label: 'Progress', icon: '<path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
-  { id: 'settings', label: 'Settings', icon: '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'workouts', label: t('Workouts'), icon: '<path d="M3 17l4-6 4 3 5-8 5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { id: 'plans', label: t('Plans'), icon: '<rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'ride', label: t('Ride'), icon: '<circle cx="6" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 16l4-8h5l3 8M10 8l2 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
+  { id: 'build', label: t('Build'), icon: '<path d="M4 20h16M6 16V9M10 16V5M14 16v-6M18 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'history', label: t('History'), icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'progress', label: t('Progress'), icon: '<path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { id: 'settings', label: t('Settings'), icon: '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
 ];
 function buildTabs() {
-  $('#tabs').innerHTML = TABS.map(t => `<button data-tab="${t.id}"><span>${t.label}</span></button>`).join('');
-  $('#btabs').innerHTML = TABS.map(t => `<button data-tab="${t.id}"><svg viewBox="0 0 24 24">${t.icon}</svg><span>${t.label}</span></button>`).join('');
+  $('#tabs').innerHTML = TABS.map(tb => `<button data-tab="${tb.id}"><span>${tb.label}</span></button>`).join('');
+  $('#btabs').innerHTML = TABS.map(tb => `<button data-tab="${tb.id}"><svg viewBox="0 0 24 24">${tb.icon}</svg><span>${tb.label}</span></button>`).join('');
   $$('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
 }
 function go(id) {
@@ -1926,15 +1926,15 @@ let catFilter = 'All';
 function renderCats() {
   const counts = {}; allWorkouts().forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
   const cats = ['All', ...CATS.filter(c => counts[c])];
-  $('#cats').innerHTML = cats.map(c => `<button class="chip ${c === catFilter ? 'on' : ''}" data-cat="${esc(c)}" style="${c !== 'All' ? `color:${CAT_COL[c]}` : ''}">${c !== 'All' ? `<i style="background:${CAT_COL[c]}"></i>` : ''}${esc(c)} <span class="dim">${c === 'All' ? allWorkouts().length : counts[c]}</span></button>`).join('');
+  $('#cats').innerHTML = cats.map(c => `<button class="chip ${c === catFilter ? 'on' : ''}" data-cat="${esc(c)}" style="${c !== 'All' ? `color:${CAT_COL[c]}` : ''}">${c !== 'All' ? `<i style="background:${CAT_COL[c]}"></i>` : ''}${esc(t(c))} <span class="dim">${c === 'All' ? allWorkouts().length : counts[c]}</span></button>`).join('');
   $$('#cats .chip').forEach(b => b.onclick = () => { catFilter = b.dataset.cat; renderCats(); renderLib(); });
 }
 function wCard(w) {
   const st = wStats(w); const col = CAT_COL[w.cat] || '#aaa';
   return `<div class="card wcard" data-wid="${esc(w.id)}">
-    <div class="top"><h3>${esc(w.name)}</h3><span class="badge" style="color:${col}">${esc(w.cat)}</span></div>
+    <div class="top"><h3>${esc(w.name)}</h3><span class="badge" style="color:${col}">${esc(t(w.cat))}</span></div>
     <div class="prof">${profileSVG(w, { W: 300, H: 54 })}</div>
-    <div class="kv num"><span><b>${fmtDur(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>avg <b>${Math.round(st.avgF * S.ftp)} W</b></span></div>
+    <div class="kv num"><span><b>${fmtDur(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span></div>
     <div class="desc">${esc(w.desc || '')}</div></div>`;
 }
 function renderLib() {
@@ -1944,8 +1944,8 @@ function renderLib() {
   if (durf) list = list.filter(w => { const m = wStats(w).total / 60; return durf === 999 ? m > 90 : m <= durf + 0.5; });
   const by = { cat: (a, b) => CATS.indexOf(a.cat) - CATS.indexOf(b.cat) || wStats(a).tss - wStats(b).tss, dur: (a, b) => wStats(a).total - wStats(b).total, tss: (a, b) => wStats(a).tss - wStats(b).tss, if: (a, b) => wStats(a).IF - wStats(b).IF, name: (a, b) => a.name.localeCompare(b.name) }[sort];
   list.sort(by);
-  $('#libCount').textContent = `${allWorkouts().length} workouts · scaled to FTP ${S.ftp} W (${(S.ftp / S.weight).toFixed(2)} W/kg)`;
-  $('#lib').innerHTML = list.length ? list.map(wCard).join('') : '<div class="empty">No workouts match.</div>';
+  $('#libCount').textContent = t('{n} workouts · scaled to FTP {ftp} W ({wkg} W/kg)', { n: allWorkouts().length, ftp: S.ftp, wkg: (S.ftp / S.weight).toFixed(2) });
+  $('#lib').innerHTML = list.length ? list.map(wCard).join('') : `<div class="empty">${t('No workouts match.')}</div>`;
 }
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-wid]'); if (c && !e.target.closest('button')) { const w = findWorkout(c.dataset.wid); if (w) workoutModal(w, c.dataset.src ? JSON.parse(c.dataset.src) : null); }
@@ -1955,7 +1955,7 @@ document.addEventListener('click', e => {
 /* ---- modals ---- */
 function openModal(html, narrow) {
   const root = $('#modalRoot');
-  root.innerHTML = `<div class="modal"><div class="box ${narrow ? 'narrow' : ''}"><button class="x" aria-label="Close">×</button>${html}</div></div>`;
+  root.innerHTML = `<div class="modal"><div class="box ${narrow ? 'narrow' : ''}"><button class="x" aria-label="${t('Close')}">×</button>${html}</div></div>`;
   const m = root.firstElementChild;
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('.x')) closeModal(); });
   return m;
@@ -1965,37 +1965,37 @@ function workoutModal(w, source) {
   const st = wStats(w); const { segs } = expand(w);
   const rows = segs.map(s => {
     const f = s.kind === 'free' ? null : s;
-    const pw = s.kind === 'free' ? '<b>MAX</b> (ERG off)' : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp)} → ${Math.round(s.p1 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}–${Math.round(s.p1 * 100)}%</span>` : `${Math.round(s.p0 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}%</span>`;
+    const pw = s.kind === 'free' ? t('<b>MAX</b> (ERG off)') : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp)} → ${Math.round(s.p1 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}–${Math.round(s.p1 * 100)}%</span>` : `${Math.round(s.p0 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}%</span>`;
     const col = s.kind === 'free' ? PZ[6].col : pZone(Math.max(s.p0, s.p1)).col;
     return `<tr><td class="num dim">${fmtTime(s.start)}</td><td><span class="sw" style="background:${col}"></span>${esc(segLabel(s))}${s.rep ? ` <span class="dim">${s.rep.i}/${s.rep.n}</span>` : ''}</td><td class="num">${fmtSegDur(s.d)}</td><td class="num">${pw}</td><td class="num">${s.c ? s.c + ' rpm' : ''}</td></tr>`;
   }).join('');
   const m = openModal(`
-    <div class="row" style="gap:8px"><span class="badge" style="color:${CAT_COL[w.cat] || '#aaa'}">${esc(w.cat)}</span>${w.custom ? '<span class="badge" style="color:#c0c6d4">custom</span>' : ''}</div>
+    <div class="row" style="gap:8px"><span class="badge" style="color:${CAT_COL[w.cat] || '#aaa'}">${esc(t(w.cat))}</span>${w.custom ? `<span class="badge" style="color:#c0c6d4">${t('custom')}</span>` : ''}</div>
     <h2 style="margin:8px 0 4px">${esc(w.name)}</h2>
     <p class="muted" style="margin:0 0 6px">${esc(w.desc || '')}</p>
-    ${w.src ? `<p class="dim" style="margin:0;font-size:12.5px">Origin: ${esc(w.src)}</p>` : ''}
+    ${w.src ? `<p class="dim" style="margin:0;font-size:12.5px">${t('Origin: {src}', { src: esc(w.src) })}</p>` : ''}
     <div class="bigprof">${profileSVG(w, { W: 800, H: 170, axis: true })}</div>
-    <div class="kv num" style="margin-bottom:12px"><span>Duration <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>Avg <b>${Math.round(st.avgF * S.ftp)} W</b></span><span>Work <b>${Math.round(st.avgF * S.ftp * st.total / 1000)} kJ</b></span><span>Intervals <b>${st.n}</b></span><span>@ FTP <b>${S.ftp} W</b></span></div>
-    <div class="segwrap"><table class="segs"><thead><tr><th>Start</th><th>Interval</th><th>Duration</th><th>Target</th><th>Cadence</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="kv num" style="margin-bottom:12px"><span>${t('Duration')} <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('Avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span><span>${t('Work')} <b>${Math.round(st.avgF * S.ftp * st.total / 1000)} kJ</b></span><span>${t('Intervals')} <b>${st.n}</b></span><span>@ FTP <b>${S.ftp} W</b></span></div>
+    <div class="segwrap"><table class="segs"><thead><tr><th>${t('Start')}</th><th>${t('Interval')}</th><th>${t('Duration')}</th><th>${t('Target')}</th><th>${t('Cadence')}</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="row" style="margin-top:14px">
-      <button class="btn primary lg" id="mRide">▶ Ride this workout</button>
+      <button class="btn primary lg" id="mRide">${t('▶ Ride this workout')}</button>
       <span class="spacer"></span>
-      <button class="btn sm" id="mEdit">Copy to builder</button>
+      <button class="btn sm" id="mEdit">${t('Copy to builder')}</button>
       <button class="btn sm" id="mZwo">.zwo</button><button class="btn sm" id="mErg">.erg</button>
-      ${w.custom ? '<button class="btn sm danger" id="mDel">Delete</button>' : ''}
+      ${w.custom ? `<button class="btn sm danger" id="mDel">${t('Delete')}</button>` : ''}
     </div>`);
   $('#mRide', m).onclick = () => { closeModal(); loadWorkout(w, source); };
   $('#mZwo', m).onclick = () => download(slug(w.name) + '.zwo', toZWO(w), 'application/xml');
   $('#mErg', m).onclick = () => download(slug(w.name) + '.erg', toERG(w), 'text/plain');
-  $('#mEdit', m).onclick = () => { closeModal(); $('#bName').value = w.name + (w.custom ? '' : ' (copy)'); $('#bCat').value = CATS.includes(w.cat) ? w.cat : 'Custom'; $('#bText').value = segsToText(w.seg); builderPreview(); go('build'); };
-  const del = $('#mDel', m); if (del) del.onclick = () => { if (confirm('Delete this custom workout?')) { CUSTOM = CUSTOM.filter(x => x.id !== w.id); saveCustom(); closeModal(); refreshLibraries(); } };
+  $('#mEdit', m).onclick = () => { closeModal(); $('#bName').value = w.name + (w.custom ? '' : ' (' + t('copy') + ')'); $('#bCat').value = CATS.includes(w.cat) ? w.cat : 'Custom'; $('#bText').value = segsToText(w.seg); builderPreview(); go('build'); };
+  const del = $('#mDel', m); if (del) del.onclick = () => { if (confirm(t('Delete this custom workout?'))) { CUSTOM = CUSTOM.filter(x => x.id !== w.id); saveCustom(); closeModal(); refreshLibraries(); } };
 }
 
 /* ---- plans ---- */
 const openPlans = new Set();
 function renderPlans() {
   const done = load('erglab.plandone', {});
-  if (!PLANS.length) { $('#plans').innerHTML = '<div class="empty">No plans available.</div>'; return; }
+  if (!PLANS.length) { $('#plans').innerHTML = `<div class="empty">${t('No plans available.')}</div>`; return; }
   $('#plans').innerHTML = PLANS.map(pl => {
     const d = done[pl.id] || {};
     let total = 0, nDone = 0, nextKey = null;
@@ -2006,19 +2006,19 @@ function renderPlans() {
       <div class="head" data-ptoggle="${esc(pl.id)}">
         <div style="flex:1;min-width:240px"><div class="row" style="gap:8px"><h3>${esc(pl.name)}</h3><span class="badge" style="color:${pl.level === 'Beginner' ? '#2fbf71' : pl.level === 'Advanced' ? '#ff3b3b' : '#f5c518'}">${esc(pl.level || '')}</span></div>
           <p class="muted" style="margin:4px 0 0;font-size:13.5px">${esc(pl.desc || '')}</p>
-          <div class="kv num" style="margin-top:6px"><span><b>${pl.weeks.length}</b> weeks</span><span><b>${total}</b> sessions</span><span>Goal <b>${esc(pl.goal || '')}</b></span><span>Avg weekly TSS <b>${Math.round(tssWeeks.reduce((a, b) => a + b, 0) / pl.weeks.length)}</b></span>${pl.src ? `<span class="dim">${esc(pl.src)}</span>` : ''}</div>
+          <div class="kv num" style="margin-top:6px"><span>${t(pl.weeks.length === 1 ? '<b>{n}</b> week' : '<b>{n}</b> weeks', { n: pl.weeks.length })}</span><span>${t(total === 1 ? '<b>{n}</b> session' : '<b>{n}</b> sessions', { n: total })}</span><span>${t('Goal')} <b>${esc(pl.goal || '')}</b></span><span>${t('Avg weekly TSS')} <b>${Math.round(tssWeeks.reduce((a, b) => a + b, 0) / pl.weeks.length)}</b></span>${pl.src ? `<span class="dim">${esc(pl.src)}</span>` : ''}</div>
           <div class="bar2"><i style="width:${total ? nDone / total * 100 : 0}%"></i></div>
         </div>
-        <div class="row"><span class="muted num" style="font-size:13px">${nDone}/${total} done</span><button class="btn sm">${open ? 'Hide' : 'Open'}</button></div>
+        <div class="row"><span class="muted num" style="font-size:13px">${t('{done}/{total} done', { done: nDone, total })}</span><button class="btn sm">${open ? t('Hide') : t('Open')}</button></div>
       </div>
-      ${open ? `<div class="weeks">${pl.weeks.map((wk, wi) => `<div class="week"><h4>Week ${wi + 1}${wk.focus ? ' · ' + esc(wk.focus) : ''} <span class="dim num">· ${wk.days.length} sessions · TSS ${Math.round(tssWeeks[wi])}</span></h4>
-        <div class="days">${wk.days.map((id, di) => { const w = findWorkout(id); const k = `${wi}-${di}`; if (!w) return `<div class="day dim">Missing workout: ${esc(id)}</div>`; const st = wStats(w);
-          return `<div class="day ${d[k] ? 'done' : ''} ${k === nextKey ? 'next' : ''}" data-wid="${esc(id)}" data-src='${esc(JSON.stringify({ plan: pl.id, key: k }))}'><b>${esc(w.name)}</b><div class="dim num" style="font-size:12px">${fmtDur(st.total)} · TSS ${Math.round(st.tss)} · ${esc(w.cat)}</div><div class="mini">${profileSVG(w, { W: 200, H: 26 })}</div></div>`; }).join('')}</div></div>`).join('')}
-        <div class="row" style="margin-top:4px"><button class="btn sm danger" data-preset="${esc(pl.id)}">Reset progress</button></div></div>` : ''}
+      ${open ? `<div class="weeks">${pl.weeks.map((wk, wi) => `<div class="week"><h4>${t('Week {n}', { n: wi + 1 })}${wk.focus ? ' · ' + esc(wk.focus) : ''} <span class="dim num">· ${t(wk.days.length === 1 ? '{n} session' : '{n} sessions', { n: wk.days.length })} · TSS ${Math.round(tssWeeks[wi])}</span></h4>
+        <div class="days">${wk.days.map((id, di) => { const w = findWorkout(id); const k = `${wi}-${di}`; if (!w) return `<div class="day dim">${t('Missing workout: {id}', { id: esc(id) })}</div>`; const st = wStats(w);
+          return `<div class="day ${d[k] ? 'done' : ''} ${k === nextKey ? 'next' : ''}" data-wid="${esc(id)}" data-src='${esc(JSON.stringify({ plan: pl.id, key: k }))}'><b>${esc(w.name)}</b><div class="dim num" style="font-size:12px">${fmtDur(st.total)} · TSS ${Math.round(st.tss)} · ${esc(t(w.cat))}</div><div class="mini">${profileSVG(w, { W: 200, H: 26 })}</div></div>`; }).join('')}</div></div>`).join('')}
+        <div class="row" style="margin-top:4px"><button class="btn sm danger" data-preset="${esc(pl.id)}">${t('Reset progress')}</button></div></div>` : ''}
     </div>`;
   }).join('');
   $$('[data-ptoggle]').forEach(h => h.onclick = () => { const id = h.dataset.ptoggle; openPlans.has(id) ? openPlans.delete(id) : openPlans.add(id); renderPlans(); });
-  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm('Reset progress for this plan?')) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); cloud.schedulePush(); renderPlans(); });
+  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm(t('Reset progress for this plan?'))) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); cloud.schedulePush(); renderPlans(); });
 }
 
 /* ---- builder ---- */
@@ -2026,22 +2026,22 @@ let builderSegs = null;
 function builderPreview() {
   try {
     const seg = parseText($('#bText').value);
-    if (!seg.length) throw new Error('Add at least one step');
+    if (!seg.length) throw new Error(t('Add at least one step'));
     builderSegs = seg; $('#bErr').textContent = '';
     const w = { id: '_preview', name: $('#bName').value, seg };
     $('#bProf').innerHTML = profileSVG(w, { W: 800, H: 170, axis: true });
     const st = workoutStats(w);
-    $('#bStats').innerHTML = `<span>Duration <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>Avg <b>${Math.round(st.avgF * S.ftp)} W</b></span>`;
+    $('#bStats').innerHTML = `<span>${t('Duration')} <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('Avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span>`;
   } catch (e) { builderSegs = null; $('#bErr').textContent = e.message; }
 }
 function builderWorkout() {
   builderPreview(); if (!builderSegs) return null;
-  const name = $('#bName').value.trim() || 'My workout';
-  return { id: 'u-' + slug(name) + '-' + Date.now().toString(36), name, cat: $('#bCat').value, desc: 'Custom workout', src: 'Built in BTB', seg: builderSegs };
+  const name = $('#bName').value.trim() || t('My workout');
+  return { id: 'u-' + slug(name) + '-' + Date.now().toString(36), name, cat: $('#bCat').value, desc: t('Custom workout'), src: t('Built in BTB'), seg: builderSegs };
 }
 function addCustom(w) { CUSTOM.push(w); saveCustom(); refreshLibraries(); }
 function refreshLibraries() { statsCache.clear(); renderCats(); renderLib(); renderCustom(); }
-function renderCustom() { $('#customList').innerHTML = CUSTOM.length ? CUSTOM.map(w => wCard({ ...w, custom: true })).join('') : '<div class="empty card">Nothing yet. Save a workout above or import .zwo/.erg/.mrc files.</div>'; }
+function renderCustom() { $('#customList').innerHTML = CUSTOM.length ? CUSTOM.map(w => wCard({ ...w, custom: true })).join('') : `<div class="empty card">${t('Nothing yet. Save a workout above or import .zwo/.erg/.mrc files.')}</div>`; }
 async function importFiles(files) {
   let n = 0;
   for (const f of files) {
@@ -2053,12 +2053,12 @@ async function importFiles(files) {
       for (const w of list) {
         if (!w.seg || !w.seg.length) continue;
         w.seg.forEach(s => validateSeg(s, f.name));
-        { const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) throw new Error('workout too long'); }
-        CUSTOM.push({ id: 'u-' + slug(w.name || f.name) + '-' + (Date.now() + n).toString(36), name: w.name || f.name, cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: w.desc || `Imported from ${f.name}`, src: w.src || f.name, seg: w.seg }); n++;
+        { const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) throw new Error(t('workout too long')); }
+        CUSTOM.push({ id: 'u-' + slug(w.name || f.name) + '-' + (Date.now() + n).toString(36), name: w.name || f.name, cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: w.desc || t('Imported from {file}', { file: f.name }), src: w.src || f.name, seg: w.seg }); n++;
       }
     } catch (e) { toast(`${f.name}: ${e.message}`, 4000); }
   }
-  if (n) { saveCustom(); refreshLibraries(); toast(`Imported ${n} workout${n > 1 ? 's' : ''}`); }
+  if (n) { saveCustom(); refreshLibraries(); toast(n > 1 ? t('Imported {n} workouts', { n }) : t('Imported {n} workout', { n })); }
 }
 
 /* ---- per-second ride data: IndexedDB (localStorage only holds the history summaries) ---- */
@@ -2096,17 +2096,17 @@ function normStreams(st) {
 }
 // second-by-second data of a ride: inline (legacy), this device's IndexedDB, or the cloud (then cached on this device)
 async function rideStreams(r, { cache = true } = {}) {
-  if (!r) throw new Error('Ride not found');
-  if (r.demo) { const d = normStreams(DEMO.streams(r.id)); if (d) return d; throw new Error('Demo ride not available'); }
+  if (!r) throw new Error(t('Ride not found'));
+  if (r.demo) { const d = normStreams(DEMO.streams(r.id)); if (d) return d; throw new Error(t('Demo ride not available')); }
   let st = normStreams(r.p ? r : null) || normStreams(await sdb.get(r.id));
   if (st) return st;
   if (cloud.user && r.cloud) {
     st = normStreams(await cloud.fetchStreams(r.id));
-    if (!st) throw new Error('No per-second data stored for this ride');
+    if (!st) throw new Error(t('No per-second data stored for this ride'));
     if (cache && await sdb.put(r.id, st)) markRide(r.id, { hs: true });
     return st;
   }
-  throw new Error('Only a summary is stored for this ride');
+  throw new Error(t('Only a summary is stored for this ride'));
 }
 async function rideFull(r) { const st = await rideStreams(r); return { ...r, ...st, dd: st.dd || r.dd }; }
 // analysis summary (power curve, zones, intervals…) of one ride; null when the analysis code isn't available
@@ -2185,22 +2185,22 @@ function demoChanged() {
 }
 function renderHistory() {
   const h = viewHistory();
-  if (!h.length) { $('#hist').innerHTML = '<div class="empty card">No rides yet. Your finished rides will appear here.</div>'; return; }
+  if (!h.length) { $('#hist').innerHTML = `<div class="empty card">${t('No rides yet. Your finished rides will appear here.')}</div>`; return; }
   $('#hist').innerHTML = h.map(r => `<div class="card hist">
-      <div>${r.demo ? '<span class="badge" style="color:var(--warn);margin-right:6px">DEMO</span>' : ''}<b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString()}</span>
-      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ · ≈<b>${rideKcalText(r)}</b> kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
+      <div>${r.demo ? `<span class="badge" style="color:var(--warn);margin-right:6px">${t('DEMO')}</span>` : ''}<b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString(LOCALE)}</span>
+      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>${t('avg')} <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ · ≈<b>${rideKcalText(r)}</b> kcal</span>${r.avgHr ? `<span>${t('HR')} <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>${t('cad')} <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
         if (r.demo) return '';
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
         if (!stv.connected || !(r.p || r.hs || r.cloud || s.upload)) return '';
-        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.demo || r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">Analyse</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}${r.demo ? '' : `<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button>`}</div>
+        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? t('Uploading…') : s.pending ? t('Check Strava') : '↑ Strava'}</button>`; })()}${r.demo || r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">${t('Analyse')}</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : `<span class="dim" style="font-size:12px">${t('summary only')}</span>`}${r.demo ? '' : `<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button>`}</div>
       <div class="mini" data-ana="${r.demo || r.p || r.hs || r.cloud ? esc(r.id) : ''}">${rideSVG(r)}</div></div>`).join('');
   $$('[data-ana]').forEach(b => { if (b.dataset.ana) { b.style.cursor = 'pointer'; b.onclick = () => openRideAnalysis(b.dataset.ana); } });
-  $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast('Could not load ride: ' + e.message); } });
-  $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = 'Uploading…'; uploadToStrava(r, null).catch(() => { }); });
+  $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast(t('Could not load ride: {msg}', { msg: e.message })); } });
+  $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = t('Uploading…'); uploadToStrava(r, null).catch(() => { }); });
   $$('[data-hdel]').forEach(b => b.onclick = async () => {
-    if (!confirm(cloud.user ? 'Delete this ride everywhere (this device and your cloud space)?' : 'Delete this ride?')) return;
-    if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast('Could not delete from the cloud: ' + e.message, 5000); return; } }
+    if (!confirm(cloud.user ? t('Delete this ride everywhere (this device and your cloud space)?') : t('Delete this ride?'))) return;
+    if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast(t('Could not delete from the cloud: {msg}', { msg: e.message }), 5000); return; } }
     store('erglab.history', load('erglab.history', []).filter(x => x.id !== b.dataset.hdel)); sdb.del(b.dataset.hdel); renderHistory();
   });
 }
@@ -2223,59 +2223,59 @@ function testResult(r) {
   if (r.cat !== 'Test') return null;
   const id = ((r.wid || '') + ' ' + r.name).toLowerCase();
   const b = s => bestAvg(r.p, s), W = x => `${Math.round(x)} W`;
-  if (/ramp/.test(id)) { const m = b(60); return m && { est: m * 0.75, how: `75% of best 1-minute power (${W(m)}): standard ramp-test formula` }; }
+  if (/ramp/.test(id)) { const m = b(60); return m && { est: m * 0.75, how: t('75% of best 1-minute power ({w}): standard ramp-test formula', { w: W(m) }) }; }
   if (/cp|critical/.test(id)) {
     const p3 = b(180), p12 = b(720); if (!p3 || !p12) return null;
     const cp = (p12 * 720 - p3 * 180) / (720 - 180), wp = (p3 - cp) * 180;
-    return cp > 0 && { est: cp * 0.95, how: `Best 3-min ${W(p3)}, best 12-min ${W(p12)} → Critical Power ${W(cp)}, W′ ${(wp / 1000).toFixed(1)} kJ. FTP ≈ 95% of CP` };
+    return cp > 0 && { est: cp * 0.95, how: t('Best 3-min {p3}, best 12-min {p12} → Critical Power {cp}, W′ {wp} kJ. FTP ≈ 95% of CP', { p3: W(p3), p12: W(p12), cp: W(cp), wp: (wp / 1000).toFixed(1) }) };
   }
-  if (/8.?min|2x8/.test(id)) { const m = b(480); return m && { est: m * 0.9, how: `90% of best 8-minute power (${W(m)})` }; }
-  if (/20|ftp/.test(id)) { const m = b(1200); return m && { est: m * 0.95, how: `95% of best 20-minute power (${W(m)})` }; }
-  if (/5.?min|map/.test(id)) { const m = b(300); return m && { est: null, how: `Best 5-minute power (MAP proxy): <b>${W(m)}</b> = ${(m / S.weight).toFixed(2)} W/kg (${Math.round(m / S.ftp * 100)}% of current FTP; typically 110–125%)` }; }
-  if (/1.?min/.test(id)) { const m = b(60); return m && { est: null, how: `Best 1-minute power: <b>${W(m)}</b> = ${(m / S.weight).toFixed(2)} W/kg (${Math.round(m / S.ftp * 100)}% of FTP)` }; }
+  if (/8.?min|2x8/.test(id)) { const m = b(480); return m && { est: m * 0.9, how: t('90% of best 8-minute power ({w})', { w: W(m) }) }; }
+  if (/20|ftp/.test(id)) { const m = b(1200); return m && { est: m * 0.95, how: t('95% of best 20-minute power ({w})', { w: W(m) }) }; }
+  if (/5.?min|map/.test(id)) { const m = b(300); return m && { est: null, how: t('Best 5-minute power (MAP proxy): <b>{w}</b> = {wkg} W/kg ({pct}% of current FTP; typically 110–125%)', { w: W(m), wkg: (m / S.weight).toFixed(2), pct: Math.round(m / S.ftp * 100) }) }; }
+  if (/1.?min/.test(id)) { const m = b(60); return m && { est: null, how: t('Best 1-minute power: <b>{w}</b> = {wkg} W/kg ({pct}% of FTP)', { w: W(m), wkg: (m / S.weight).toFixed(2), pct: Math.round(m / S.ftp * 100) }) }; }
   const p5 = b(5) || Math.max(...r.p), p15 = b(15);
-  return { est: null, how: `Peak 5-second power <b>${W(p5)}</b>${p15 ? `, best 15 s ${W(p15)}` : ''} · max ${W(Math.max(...r.p))} (${(p5 / S.weight).toFixed(1)} W/kg)` };
+  return { est: null, how: t('Peak 5-second power <b>{p5}</b>{best15} · max {max} ({wkg} W/kg)', { p5: W(p5), best15: p15 ? t(', best 15 s {w}', { w: W(p15) }) : '', max: W(Math.max(...r.p)), wkg: (p5 / S.weight).toFixed(1) }) };
 }
 function summaryModal(r) {
   let ftpHtml = '';
-  const t = testResult(r);
-  if (t) {
+  const tr = testResult(r);
+  if (tr) {
     ftpHtml = `<div class="card pad" style="margin-top:12px;border-color:var(--z5)">
-      ${t.est ? `<h3>Estimated FTP: <span style="color:var(--z5)">${Math.round(t.est)} W</span> <span class="muted" style="font-size:14px">(${(t.est / S.weight).toFixed(2)} W/kg)</span></h3>` : `<h3>Test result</h3>`}
-      <p class="muted" style="margin:4px 0 10px;font-size:13.5px">${t.how}${t.est ? `. Current FTP: ${S.ftp} W.` : ''}</p>
-      ${t.est ? `<button class="btn primary" id="applyFtp" data-v="${Math.round(t.est)}">Set FTP to ${Math.round(t.est)} W</button>` : ''}</div>`;
+      ${tr.est ? `<h3>${t('Estimated FTP:')} <span style="color:var(--z5)">${Math.round(tr.est)} W</span> <span class="muted" style="font-size:14px">(${(tr.est / S.weight).toFixed(2)} W/kg)</span></h3>` : `<h3>${t('Test result')}</h3>`}
+      <p class="muted" style="margin:4px 0 10px;font-size:13.5px">${tr.how}${tr.est ? '. ' + t('Current FTP: {ftp} W.', { ftp: S.ftp }) : ''}</p>
+      ${tr.est ? `<button class="btn primary" id="applyFtp" data-v="${Math.round(tr.est)}">${t('Set FTP to {w} W', { w: Math.round(tr.est) })}</button>` : ''}</div>`;
   }
-  const m = openModal(`<h2>Ride complete ${r.completed ? '🎉' : ''}</h2><p class="muted" style="margin:4px 0 10px">${esc(r.name)}</p>
+  const m = openModal(`<h2>${t('Ride complete')} ${r.completed ? '🎉' : ''}</h2><p class="muted" style="margin:4px 0 10px">${esc(r.name)}</p>
     <div class="hist" style="padding:0"><div class="mini" style="height:70px">${rideSVG(r, 600, 70)}</div></div>
     <div class="statsrow sumstats">
-      <div class="card stat"><div class="k">Time</div><div class="v num">${fmtTime(r.dur)}</div></div>
-      <div class="card stat"><div class="k">Avg / NP</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
+      <div class="card stat"><div class="k">${t('Time')}</div><div class="v num">${fmtTime(r.dur)}</div></div>
+      <div class="card stat"><div class="k">${t('Avg / NP')}</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
       <div class="card stat"><div class="k">TSS · IF</div><div class="v num">${r.tss}<small>· ${r.IF}</small></div></div>
-      <div class="card stat"><div class="k">Energy (est.)</div><div class="v num">${rideKcalText(r)}<small>kcal · ${r.kj} kJ</small></div></div>
-      <div class="card stat"><div class="k">Max power</div><div class="v num">${r.maxP}<small>W</small></div></div>
-      <div class="card stat"><div class="k">Avg HR</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
-      <div class="card stat"><div class="k">Avg cadence</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>
-      <div class="card stat"><div class="k">Distance</div><div class="v num">${(r.dist / 1000).toFixed(1)}<small>km</small></div></div>
+      <div class="card stat"><div class="k">${t('Energy (est.)')}</div><div class="v num">${rideKcalText(r)}<small>kcal · ${r.kj} kJ</small></div></div>
+      <div class="card stat"><div class="k">${t('Max power')}</div><div class="v num">${r.maxP}<small>W</small></div></div>
+      <div class="card stat"><div class="k">${t('Avg HR')}</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
+      <div class="card stat"><div class="k">${t('Avg cadence')}</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>
+      <div class="card stat"><div class="k">${t('Distance')}</div><div class="v num">${(r.dist / 1000).toFixed(1)}<small>km</small></div></div>
     </div>${ftpHtml}
-    <div class="row" style="margin-top:14px">${stv.connected ? '<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Upload to Strava</button>' : ''}<button class="btn primary" id="sumAna">Analyse ride</button><button class="btn" id="sumTcx">Download TCX</button><button class="btn" id="sumClose">Close</button></div>
-    <p id="sumStvStatus" class="muted" style="font-size:13.5px;margin:10px 0 0">${stv.connected ? '' : 'Tip: connect Strava in Settings to upload rides automatically.'}</p>`, true);
+    <div class="row" style="margin-top:14px">${stv.connected ? `<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">${t('Upload to Strava')}</button>` : ''}<button class="btn primary" id="sumAna">${t('Analyse ride')}</button><button class="btn" id="sumTcx">${t('Download TCX')}</button><button class="btn" id="sumClose">${t('Close')}</button></div>
+    <p id="sumStvStatus" class="muted" style="font-size:13.5px;margin:10px 0 0">${stv.connected ? '' : t('Tip: connect Strava in Settings to upload rides automatically.')}</p>`, true);
   const sb = $('#sumStv', m), ss = $('#sumStvStatus', m);
   if (sb) {
     const upl = () => {
       sb.disabled = true;
       uploadToStrava(r, ss).then(() => sb.remove(), () => {
-        if (!stv.connected) { sb.disabled = false; sb.textContent = 'Reconnect Strava'; sb.onclick = () => { closeModal(); go('settings'); }; ss.innerHTML += '<br>The ride is saved: upload it later from History.'; }
-        else { sb.disabled = false; sb.textContent = 'Retry Strava upload'; }
+        if (!stv.connected) { sb.disabled = false; sb.textContent = t('Reconnect Strava'); sb.onclick = () => { closeModal(); go('settings'); }; ss.innerHTML += '<br>' + t('The ride is saved: upload it later from History.'); }
+        else { sb.disabled = false; sb.textContent = t('Retry Strava upload'); }
       });
     };
     sb.onclick = upl;
     const autoOk = r.dur >= 120 && r.avgP > 0;
-    if (S.stravaAuto !== false && !(stvOf(r) && stvOf(r).id)) { if (autoOk) upl(); else ss.textContent = 'Short or empty ride: not uploaded automatically.'; }
+    if (S.stravaAuto !== false && !(stvOf(r) && stvOf(r).id)) { if (autoOk) upl(); else ss.textContent = t('Short or empty ride: not uploaded automatically.'); }
   }
   $('#sumTcx', m).onclick = () => download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml');
   $('#sumClose', m).onclick = closeModal;
   $('#sumAna', m).onclick = () => { closeModal(); openRideAnalysis(r.id, r); };
-  const af = $('#applyFtp', m); if (af) af.onclick = () => { S.ftp = +af.dataset.v; saveSettings(); renderSettings(); refreshLibraries(); buildGauges(); toast(`FTP set to ${S.ftp} W`); af.disabled = true; };
+  const af = $('#applyFtp', m); if (af) af.onclick = () => { S.ftp = +af.dataset.v; saveSettings(); renderSettings(); refreshLibraries(); buildGauges(); toast(t('FTP set to {ftp} W', { ftp: S.ftp })); af.disabled = true; };
 }
 
 /* =====================================================================
