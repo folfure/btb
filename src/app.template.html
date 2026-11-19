@@ -143,8 +143,69 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .day .mini svg{width:100%;height:100%;display:block}
 
 /* ---------- ride ---------- */
-.ride{display:grid;grid-template-columns:minmax(300px,1.05fr) 2fr;gap:12px}
-.ride .ivl{padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+/* ---------- ride screen: one big power gauge, chosen tiles, step list; always fits the window ---------- */
+.ride{display:grid;gap:10px;min-height:0;
+  grid-template-columns:minmax(220px,300px) minmax(0,1fr) minmax(170px,250px);
+  grid-template-rows:auto minmax(0,1fr) minmax(90px,27%);
+  grid-template-areas:"ivl gauge tiles" "steps gauge tiles" "chart chart chart"}
+.ride.nochart{grid-template-rows:auto minmax(0,1fr);grid-template-areas:"ivl gauge tiles" "steps gauge tiles"}
+.ride.nosteps{grid-template-areas:"ivl gauge tiles" "ivl gauge tiles" "chart chart chart"}
+.ride.nosteps.nochart{grid-template-areas:"ivl gauge tiles" "ivl gauge tiles"}
+.ride.notiles{grid-template-areas:"ivl gauge gauge" "steps gauge gauge" "chart chart chart"}
+.ride.notiles.nochart{grid-template-areas:"ivl gauge gauge" "steps gauge gauge"}
+.ride.notiles.nosteps{grid-template-areas:"ivl gauge gauge" "ivl gauge gauge" "chart chart chart"}
+.ride.notiles.nosteps.nochart{grid-template-areas:"ivl gauge gauge" "ivl gauge gauge"}
+.ride.nosteps .steps,.ride.nochart .chartbox{display:none}
+.ride > *{min-height:0;min-width:0}
+.ride .ivl{grid-area:ivl} .ride .steps{grid-area:steps} .ride .gmain{grid-area:gauge} .ride .rtiles{grid-area:tiles} .ride .chartbox{grid-area:chart;margin-top:0}
+.ride:not(.nosteps) .ivl .next{display:none}
+.ride .ivl{gap:7px;padding:12px 14px 12px 16px} .ride .ivl .iname{font-size:19px} .ride .ivl .tgt .w{font-size:46px} .ride .ivl .left{font-size:38px}
+.ride:not(.nosteps) .ivl .kv{display:none}
+@media (min-width:641px) and (max-height:820px){
+  .ride .ivl{gap:4px;padding:10px 12px 10px 14px} .ride .ivl .iname{font-size:16px} .ride .ivl .tgt .w{font-size:36px} .ride .ivl .left{font-size:30px} .ride .ivl .wname{font-size:12px}
+}
+.steps{display:flex;flex-direction:column;padding:8px 6px 8px 8px;overflow:hidden}
+.steps .sh{display:flex;justify-content:space-between;gap:6px;font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 4px 6px}
+.steps ol{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1 1 0;min-height:0;position:relative;scrollbar-width:none}
+.steps ol::-webkit-scrollbar{display:none}
+.steps li{display:grid;grid-template-columns:4px 4.6em minmax(0,1fr) auto;align-items:center;gap:7px;padding:4px 6px 4px 0;margin-bottom:2px;border-radius:7px;font-size:13px;line-height:1.25;position:relative;white-space:nowrap}
+.steps li i{align-self:stretch;border-radius:2px;background:var(--sc)}
+.steps li .d{color:var(--muted);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.steps li .w{font-weight:750;color:var(--sc);overflow:hidden;text-overflow:ellipsis}
+.steps li .w small{font-size:.75em;margin-left:2px;opacity:.8}
+.steps li .c{font-size:11px;color:var(--dim)}
+.steps li.done{opacity:.4} .steps li.done .d::before{content:"✓ "}
+.steps li.cur{background:var(--panel2);box-shadow:inset 0 0 0 1px var(--sc)}
+.steps li.cur .d{color:var(--text);font-weight:800}
+.steps li.cur::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:var(--p,0%);background:var(--sc);border-radius:2px}
+.rtiles{display:grid;grid-template-columns:repeat(var(--tc,2),minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:8px}
+.rtile{padding:6px 10px;min-height:0;overflow:hidden;container-type:size;border-left:3px solid var(--tcol,transparent)}
+.rtile .in{height:100%;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.rtile .k{font-size:clamp(9px,17cqh,11.5px);color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtile .v{font-size:clamp(13px,44cqh,30px);font-weight:800;line-height:1.08;white-space:nowrap;overflow:hidden}
+.rtile .v small{font-size:.5em;color:var(--muted);font-weight:600;margin-left:3px}
+.rtile .s{font-size:clamp(9px,15cqh,11.5px);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@container (max-height:46px){ /* flat tile: label and value on one line */
+  .rtile .in{flex-direction:row;align-items:baseline;justify-content:space-between;gap:6px}
+  .rtile .k{font-size:10px;flex:0 1 auto;min-width:0} .rtile .v{font-size:clamp(12px,62cqh,18px);flex:none} .rtile .s{display:none}
+}
+.ride .chartbox{padding:8px;position:relative}
+.ride .chartbox canvas{position:absolute;left:8px;top:8px;width:calc(100% - 16px);height:calc(100% - 16px)}
+/* fitted to the window (set by fitRide): the page itself never scrolls while this screen is shown */
+body.ridefit{overflow:hidden}
+body.ridefit main{padding-bottom:0!important}
+body.ridefit #rideMain{display:flex;flex-direction:column;overflow:hidden}
+body.ridefit #rideMain .ride{flex:1 1 0;min-height:0}
+body.ridefit #rideMain .controls{flex:none;margin-top:8px}
+body.ridefit .kbdhint{display:none}
+.rvseg{display:flex;gap:6px;flex-wrap:wrap}
+.rvlist{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.rvlist li{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:9px;background:var(--bg2)}
+.rvlist li label{flex:1;display:flex;align-items:center;gap:9px;cursor:pointer}
+.rvlist li:not(.on){opacity:.65}
+.rvopts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+.rvopts label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.ride .ivl{display:flex;flex-direction:column;position:relative;overflow:hidden}
 .ivl .wname{font-size:13px;color:var(--muted);font-weight:650;display:flex;justify-content:space-between;gap:8px}
 .ivl .iname{font-size:22px;font-weight:800;line-height:1.15}
 .ivl .tgt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -160,12 +221,14 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .ivl .stripe{position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--z4)}
 .ivl.flash{animation:flash .6s 2}
 @keyframes flash{50%{background:var(--panel2)}}
-.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .gauge{padding:28px 8px 10px;position:relative;display:flex;flex-direction:column;align-items:center}
 .gauge svg{width:100%;max-width:240px;display:block}
 .gauge .gl{position:absolute;top:10px;left:12px;font-size:11.5px;font-weight:750;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
 .gauge .gs{font-size:12.5px;color:var(--muted);margin-top:-6px;text-align:center;min-height:18px}
 .gauge .gs b{color:var(--text)}
+.gmain{padding:28px 8px 6px;justify-content:center;overflow:hidden}
+.ride .gmain svg{flex:1 1 0;min-height:0;width:100%;height:100%;max-width:none}
+.gmain .gs{flex:none;margin-top:0}
 .g-arc{transition:stroke-dasharray .45s cubic-bezier(.3,.7,.3,1),stroke .3s}
 .g-tgt{transition:transform .45s cubic-bezier(.3,.7,.3,1)}
 .chartbox{margin-top:12px;padding:10px;position:relative}
@@ -188,9 +251,7 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .sprint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;letter-spacing:.04em;color:#fff;background:repeating-linear-gradient(-45deg,rgba(176,77,255,.35) 0 18px,rgba(176,77,255,.18) 18px 36px);pointer-events:none}
 .countdown{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;pointer-events:none;font-size:min(40vw,320px);font-weight:900;color:rgba(255,255,255,.12)}
 @media (max-width:1180px){.statsrow{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:1000px){.ride{grid-template-columns:1fr}}
 @media (max-width:640px){
-  .gauges{grid-template-columns:repeat(2,1fr);gap:8px}
   .ivl .tgt .w{font-size:46px} .ivl .left{font-size:36px}
   .statsrow{grid-template-columns:repeat(3,1fr)}
   .stat .v{font-size:18px}
@@ -248,13 +309,6 @@ body.riding #btBanner{display:none}
   main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
   .controls .grp .lab{display:none}
 }
-/* single-column ride view: keep the controls reachable without scrolling */
-@media (max-width:1000px){
-  #rideMain{display:flex;flex-direction:column}
-  #rideMain .ride{order:0} #rideMain .controls{order:1} #rideMain .statsrow{order:2} #rideMain .kbdhint{order:3}
-  #rideMain .controls{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));z-index:35;background:rgba(18,24,35,.96);backdrop-filter:blur(8px);box-shadow:var(--shadow)}
-}
-@media (max-width:860px){ #rideMain .controls{bottom:calc(70px + env(safe-area-inset-bottom))} }
 /* phones: compact two-row control bar */
 @media (max-width:640px), (max-height:520px) and (orientation:landscape){
   #rideMain .controls{gap:6px;padding:6px}
@@ -264,24 +318,70 @@ body.riding #btBanner{display:none}
   #cStart{padding-left:12px;padding-right:12px}
   #rideMain .controls .spacer{display:none}
 }
-@media (max-height:520px) and (orientation:landscape){
-  body.riding .gauge svg{max-height:112px}
-  body.riding .gauge .gs{display:none}
-  body.riding .gauge{padding:18px 4px 4px}
+/* tablets in portrait / narrow windows: two columns, the gauge on top of three-across tiles */
+@media (min-width:641px) and (max-width:1000px){
+  .ride{grid-template-columns:minmax(220px,36%) minmax(0,1fr);grid-template-rows:auto minmax(0,1.15fr) minmax(calc(var(--tr,1) * 26px + (var(--tr,1) - 1) * 8px),1fr) minmax(64px,19%);
+    grid-template-areas:"ivl gauge" "steps gauge" "steps tiles" "chart chart"}
+  .ride.nochart{grid-template-rows:auto minmax(0,1.15fr) minmax(calc(var(--tr,1) * 26px + (var(--tr,1) - 1) * 8px),1fr);grid-template-areas:"ivl gauge" "steps gauge" "steps tiles"}
+  .ride.nosteps{grid-template-areas:"ivl gauge" "ivl gauge" "ivl tiles" "chart chart"}
+  .ride.nosteps.nochart{grid-template-areas:"ivl gauge" "ivl gauge" "ivl tiles"}
+  .ride.notiles{grid-template-areas:"ivl gauge" "steps gauge" "steps gauge" "chart chart"}
+  .ride.notiles.nochart{grid-template-areas:"ivl gauge" "steps gauge" "steps gauge"}
+  .ride.notiles.nosteps{grid-template-areas:"ivl gauge" "ivl gauge" "ivl gauge" "chart chart"}
+  .ride.notiles.nosteps.nochart{grid-template-areas:"ivl gauge" "ivl gauge" "ivl gauge"}
+  .rtile{padding-top:3px;padding-bottom:3px}
 }
-/* phone in landscape while riding: hide chrome, two columns, essentials only */
+/* phones (portrait): interval bar on top, gauge + tiles on the left, the step list down the right side */
+@media (max-width:640px){
+  .ride{gap:6px;grid-template-columns:minmax(0,1fr) minmax(0,44%);
+    grid-template-rows:auto minmax(0,1.2fr) minmax(0,1fr) minmax(64px,17%);
+    grid-template-areas:"ivl ivl" "gauge steps" "tiles steps" "chart chart"}
+  .ride.nochart{grid-template-rows:auto minmax(0,1.2fr) minmax(0,1fr);grid-template-areas:"ivl ivl" "gauge steps" "tiles steps"}
+  .ride.nosteps{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"ivl ivl" "gauge gauge" "tiles tiles" "chart chart"}
+  .ride.nosteps.nochart{grid-template-areas:"ivl ivl" "gauge gauge" "tiles tiles"}
+  .ride.notiles{grid-template-areas:"ivl ivl" "gauge steps" "gauge steps" "chart chart"}
+  .ride.notiles.nochart{grid-template-areas:"ivl ivl" "gauge steps" "gauge steps"}
+  .ride.notiles.nosteps{grid-template-areas:"ivl ivl" "gauge gauge" "gauge gauge" "chart chart"}
+  .ride.notiles.nosteps.nochart{grid-template-areas:"ivl ivl" "gauge gauge" "gauge gauge"}
+  .ride .ivl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"wn wn" "in lf" "tg lf" "pg pg";column-gap:10px;row-gap:3px;padding:8px 12px 9px 14px}
+  .ride .ivl .wname{grid-area:wn;font-size:11.5px} .ride .ivl .iname{grid-area:in;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ride .ivl .tgt{grid-area:tg;gap:6px} .ride .ivl .tgt .w{font-size:30px} .ride .ivl .tgt .u{font-size:13px} .ride .ivl .tgt .pct{font-size:11.5px;padding:2px 7px}
+  .ride .ivl .left{grid-area:lf;align-self:center;text-align:right;font-size:30px} .ride .ivl .left small{display:block;font-size:10.5px;margin:2px 0 0}
+  .ride .ivl .prog{grid-area:pg;height:6px;margin-top:2px} .ride .ivl .kv,.ride .ivl .next,.ride .ivl #rTgtCad{display:none}
+  .gmain{padding:20px 4px 2px} .gmain .gs{font-size:11px}
+  .rtiles{gap:5px} .rtile{padding:3px 7px}
+  .steps{padding:6px 4px 6px 6px} .steps .sh{font-size:10px;padding-bottom:4px}
+  .steps li{font-size:12px;grid-template-columns:3px 4.2em minmax(0,1fr);gap:5px;padding:3px 4px 3px 0} .steps li .c{display:none}
+  body.ridefit #rideMain .controls{margin-top:6px}
+}
+/* small phones: smaller control buttons (two rows), no workout-name line, and on very short screens no tab bar while riding */
+@media (max-width:360px){
+  body.ridefit #rideMain .controls{gap:4px;padding:5px}
+  body.ridefit .controls .btn{min-height:40px;min-width:36px;padding:0 7px;font-size:14px}
+  body.ridefit .controls .grp .val{min-width:44px;font-size:14px}
+}
+@media (max-width:640px) and (max-height:700px){ .ride .ivl .wname{display:none} }
+@media (max-width:640px) and (max-height:640px){ body.ridefit nav.bottom{display:none} }
+/* phone in landscape while riding: no header / tab bar, three columns */
 @media (max-height:520px) and (orientation:landscape){
   body.riding header, body.riding nav.bottom{display:none}
   body.riding main{padding-top:8px;padding-bottom:8px!important}
-  body.riding #rideMain .controls{bottom:env(safe-area-inset-bottom);padding:6px}
-  body.riding .ride{display:grid;grid-template-columns:1fr 1.25fr;gap:8px}
-  body.riding .ivl{padding:10px 12px;gap:6px}
-  body.riding .ivl .tgt .w{font-size:40px} body.riding .ivl .left{font-size:30px}
-  body.riding .ivl .next, body.riding .ivl .kv{display:none}
-  body.riding .gauges{grid-template-columns:repeat(2,1fr);gap:6px}
-  body.riding .gauge{padding-top:20px}
-  body.riding .chartbox, body.riding .statsrow{display:none}
   body.riding .controls .btn{min-height:42px}
+  .ride,.ride.nochart{gap:6px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,.85fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"ivl gauge steps" "tiles gauge steps"}
+  .ride.nosteps,.ride.nosteps.nochart{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,.85fr);grid-template-areas:"ivl gauge gauge" "tiles gauge gauge"}
+  .ride.notiles,.ride.notiles.nochart{grid-template-areas:"ivl gauge steps" "ivl gauge steps"}
+  .ride.notiles.nosteps,.ride.notiles.nosteps.nochart{grid-template-areas:"ivl gauge gauge" "ivl gauge gauge"}
+  .ride .chartbox{display:none}
+  .ride .ivl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"in lf" "tg lf" "pg pg";column-gap:8px;row-gap:3px;padding:6px 10px 7px 12px}
+  .ride .ivl .wname,.ride .ivl #rTgtCad,.ride .ivl .tgt .pct{display:none}
+  .ride .ivl .iname{grid-area:in;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ride .ivl .tgt{grid-area:tg;gap:6px} .ride .ivl .tgt .w{font-size:26px}
+  .ride .ivl .left{grid-area:lf;align-self:center;text-align:right;font-size:24px} .ride .ivl .left small{display:block;font-size:10px;margin:2px 0 0}
+  .ride .ivl .prog{grid-area:pg;height:5px;margin-top:2px}
+  .rtiles{gap:5px} .rtile{padding:3px 7px}
+  .steps li{grid-template-columns:3px 4.2em minmax(0,1fr);gap:5px;font-size:12px} .steps li .c{display:none}
+  .ride .ivl .kv,.ride .ivl .next{display:none}
+  .gmain{padding:18px 4px 2px} .gmain .gs{display:none}
 }
 body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 /*__PARTS_CSS__*/
@@ -366,7 +466,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       </div>
     </div>
     <div id="rideMain" class="hidden">
-      <div class="ride">
+      <div class="ride" id="rideGrid">
         <div class="card ivl" id="ivl">
           <div class="stripe" id="ivlStripe"></div>
           <div class="wname"><span id="rWname"></span><span class="state-tag" id="rState">Ready</span></div>
@@ -378,26 +478,12 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
           <div class="next" id="rNext"></div>
           <div class="sprint hidden" id="rSprint">SPRINT!</div>
         </div>
-        <div>
-          <div class="gauges">
-            <div class="card gauge" id="gPower"></div>
-            <div class="card gauge" id="gWkg"></div>
-            <div class="card gauge" id="gCad"></div>
-            <div class="card gauge" id="gHr"></div>
-          </div>
-          <div class="card chartbox"><canvas id="chart"></canvas>
-            <div class="legend"><span><i style="background:var(--c-power,#fff)"></i>Power</span><span><i style="background:var(--c-hr,#ff4d6d)"></i>HR</span><span><i style="background:var(--c-cad,#4cc2ff)"></i>Cadence</span></div></div>
+        <div class="card steps" id="rSteps"><div class="sh"><span>Steps</span><span id="rStepsN"></span></div><ol id="rStepList"></ol></div>
+        <div class="card gauge gmain" id="gPower"></div>
+        <div class="rtiles" id="rTiles"></div>
+        <div class="card chartbox"><canvas id="chart"></canvas>
+          <div class="legend"><span><i style="background:var(--c-power,#fff)"></i>Power</span><span><i style="background:var(--c-hr,#ff4d6d)"></i>HR</span><span><i style="background:var(--c-cad,#4cc2ff)"></i>Cadence</span></div>
         </div>
-      </div>
-      <div class="statsrow">
-        <div class="card stat"><div class="k">Avg power</div><div class="v num" id="sAvg">–<small>W</small></div></div>
-        <div class="card stat"><div class="k">Norm. power</div><div class="v num" id="sNp">–<small>W</small></div></div>
-        <div class="card stat"><div class="k">TSS · IF</div><div class="v num" id="sTss">–</div></div>
-        <div class="card stat"><div class="k">Work ≈ kcal</div><div class="v num" id="sKj">–<small>kJ</small></div></div>
-        <div class="card stat"><div class="k">Interval avg</div><div class="v num" id="sIavg">–<small>W</small></div></div>
-        <div class="card stat"><div class="k">Avg HR</div><div class="v num" id="sHr">–<small>bpm</small></div></div>
-        <div class="card stat"><div class="k">Avg cadence</div><div class="v num" id="sCad">–<small>rpm</small></div></div>
-        <div class="card stat"><div class="k">Distance</div><div class="v num" id="sDist">–<small>km</small></div></div>
       </div>
       <div class="card controls">
         <button class="btn go lg" id="cStart">▶ Start</button>
@@ -406,6 +492,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
         <div class="grp" id="grpSkip"><button class="btn sm" id="cBack" title="Previous interval" aria-label="Previous interval">⏮</button><button class="btn sm" id="cSkip" title="Next interval (N)" aria-label="Next interval">⏭</button></div>
         <div class="grp" id="grpMode"><span class="lab">Mode</span><button class="btn sm" id="cErg">ERG</button><button class="btn sm" id="cSlope">Slope</button></div>
         <span class="spacer"></span>
+        <button class="btn ghost" id="cCustom" title="Customize the ride screen" aria-label="Customize the ride screen">⚙</button>
         <button class="btn ghost" id="cFull" title="Full screen">⛶</button>
         <button class="btn danger" id="cEnd">End &amp; save</button>
         <button class="btn primary" id="rideConnect">Connect trainer</button>
@@ -591,8 +678,25 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 /* =====================================================================
    SETTINGS & ZONES
    ===================================================================== */
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
+// ride screen: the small tiles next to the power gauge (in order) and the optional panels, for phones and for
+// computers / tablets; part of the synced settings
+const RIDE_TILE_IDS = ['hr', 'cad', 'wkg', 'speed', 'dist', 'el', 'rem', 'iavg', 'avg', 'np', 'tss', 'kj', 'avghr', 'avgcad', 'maxp'];
+const RIDE_VIEW_DEF = {
+  phone: { tiles: ['hr', 'cad', 'iavg', 'el', 'avg', 'rem'], steps: true, chart: false },
+  wide: { tiles: ['hr', 'cad', 'wkg', 'iavg', 'avg', 'np', 'tss', 'kj', 'el', 'rem'], steps: true, chart: true },
+};
+function cleanRideView(o) {
+  const out = {};
+  for (const L of ['phone', 'wide']) {
+    const x = o && typeof o === 'object' && o[L] && typeof o[L] === 'object' ? o[L] : {}, d = RIDE_VIEW_DEF[L];
+    const tiles = Array.isArray(x.tiles) ? [...new Set(x.tiles.filter(id => RIDE_TILE_IDS.includes(id)))].slice(0, 16) : d.tiles.slice();
+    out[L] = { tiles, steps: typeof x.steps === 'boolean' ? x.steps : d.steps, chart: typeof x.chart === 'boolean' ? x.chart : d.chart };
+  }
+  return out;
+}
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', rideView: RIDE_VIEW_DEF, sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
+S.rideView = cleanRideView(S.rideView);
 // weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
 const WLOG_MAX = 1000;
 function cleanWlog(a) {
@@ -1680,11 +1784,6 @@ let G = {};
 function buildGauges() {
   const ftp = S.ftp, maxP = Math.ceil(ftp * 1.6 / 50) * 50;
   G.power = makeGauge($('#gPower'), { label: t('Power'), unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
-  const wk = ftp / S.weight, maxW = Math.ceil(wk * 1.6 * 2) / 2;
-  G.wkg = makeGauge($('#gWkg'), { label: 'W/kg', unit: 'W/kg', min: 0, max: maxW, bands: PZ.map(z => ({ from: z.lo * wk, to: Math.min(z.hi, 9) * wk, col: z.col })), ticks: [0, +(wk * 0.75).toFixed(1), +wk.toFixed(1), maxW] });
-  G.cad = makeGauge($('#gCad'), { label: t('Cadence'), unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
-  const hrMin = 40, mx = S.maxHr;
-  G.hr = makeGauge($('#gHr'), { label: t('Heart rate@@gauge'), unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
 }
 function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
@@ -1698,14 +1797,157 @@ function smoothedPower() {
   const pts = live.powerHist.filter(x => now - x.t <= n);
   return pts.length ? pts.reduce((a, x) => a + x.p, 0) / pts.length : live.power;
 }
+// ---- small tiles next to the power gauge (chosen and ordered per layout in Customize)
+const RIDE_TILES = {
+  hr: { k: () => t('Heart rate'), get: c => { const hz = c.hr ? hZone(c.hr / S.maxHr) : null; return { v: c.hr ? Math.round(c.hr) : '–', u: 'bpm', col: hz && hz.col, s: c.hr ? t('{pct}% of max', { pct: Math.round(c.hr / S.maxHr * 100) }) : hrm.connected ? t('waiting…') : '' }; } },
+  cad: { k: () => t('Cadence'), get: c => ({ v: c.cad != null ? Math.round(c.cad) : '–', u: 'rpm', col: c.cad != null ? cadColor(c.cad) : null, s: c.tcad ? t('target {n}', { n: c.tcad }) : '' }) },
+  wkg: { k: () => 'W/kg', get: c => ({ v: c.p != null ? (c.p / S.weight).toFixed(1) : '–', s: 'FTP ' + (S.ftp / S.weight).toFixed(2) }) },
+  speed: { k: () => t('Speed'), get: c => ({ v: c.speed != null ? c.speed.toFixed(1) : '–', u: 'km/h' }) },
+  dist: { k: () => t('Distance'), get: () => ({ v: (R.dist / 1000).toFixed(1), u: 'km' }) },
+  el: { k: () => t('Elapsed'), get: () => ({ v: fmtTime(R.elapsed) }) },
+  rem: { k: () => t('Remaining'), get: () => ({ v: R.freeRide ? '—' : fmtTime(Math.max(0, R.total - R.t)) }) },
+  iavg: { k: () => t('Interval avg'), get: c => ({ v: c.ia && c.ia.n ? Math.round(c.ia.sumP / c.ia.n) : '–', u: 'W' }) },
+  avg: { k: () => t('Avg power'), get: c => ({ v: c.a && c.a.n ? Math.round(c.a.sumP / c.a.n) : '–', u: 'W' }) },
+  np: { k: () => t('Norm. power'), get: c => ({ v: c.a && c.a.n ? Math.round(aggNP(c.a)) : '–', u: 'W' }) },
+  tss: { k: () => 'TSS · IF', get: c => { if (!c.a || !c.a.n) return { v: '–' }; const IF = aggNP(c.a) / S.ftp; return { v: Math.round(c.a.n / 3600 * IF * IF * 100), u: '· ' + IF.toFixed(2) }; } },
+  kj: { k: () => t('Work ≈ kcal'), get: c => ({ v: c.a && c.a.n ? Math.round(c.a.kj) : '–', u: 'kJ' }) },
+  avghr: { k: () => t('Avg HR'), get: c => ({ v: c.a && c.a.nHr ? Math.round(c.a.sumHr / c.a.nHr) : '–', u: 'bpm' }) },
+  avgcad: { k: () => t('Avg cadence'), get: c => ({ v: c.a && c.a.nC ? Math.round(c.a.sumC / c.a.nC) : '–', u: 'rpm' }) },
+  maxp: { k: () => t('Max power'), get: c => ({ v: c.a && c.a.n ? Math.round(c.a.maxP) : '–', u: 'W' }) },
+};
+// phones (portrait, or landscape with little height) use their own layout and their own choice of tiles
+const rideLayout = () => matchMedia('(max-width:640px), (max-height:520px) and (orientation:landscape)').matches ? 'phone' : 'wide';
+let rideLayoutShown = null;
+const rideVariant = () => { const L = rideLayout(); return L === 'wide' && matchMedia('(max-width:1000px)').matches ? 'wide-m' : L; };
+function applyRideView() {
+  const L = rideLayout(), cfg = S.rideView[L], grid = $('#rideGrid');
+  rideLayoutShown = rideVariant();
+  grid.classList.toggle('nosteps', !cfg.steps || !!R.freeRide);
+  grid.classList.toggle('nochart', !cfg.chart);
+  const box = $('#rTiles'), ids = cfg.tiles;
+  box.classList.toggle('hidden', !ids.length);
+  grid.classList.toggle('notiles', !ids.length);
+  const tc = Math.min(rideVariant() === 'wide-m' ? Math.min(5, Math.max(3, Math.ceil(ids.length / 2))) : 2, ids.length) || 1; // wider rows under the gauge on tablets
+  box.style.setProperty('--tc', tc); grid.style.setProperty('--tr', Math.ceil(ids.length / tc) || 1);
+  box.innerHTML = ids.map(id => `<div class="card rtile" data-t="${id}"><div class="in"><div class="k">${esc(RIDE_TILES[id].k())}</div><div class="v num">–</div><div class="s"></div></div></div>`).join('');
+}
+function renderTiles(c) {
+  for (const el of $('#rTiles').children) {
+    const x = RIDE_TILES[el.dataset.t].get(c), v = el.firstChild.children[1], sub = el.firstChild.children[2];
+    const html = `${x.v}${x.u ? `<small>${x.u}</small>` : ''}`;
+    if (v.__h !== html) { v.innerHTML = html; v.__h = html; }
+    if (sub.textContent !== (x.s || '')) sub.textContent = x.s || '';
+    el.style.setProperty('--tcol', x.col || 'transparent');
+  }
+}
+// ---- workout steps, Zwift-style: done ones ticked and dimmed, the current one highlighted with its time left
+let stepsKey = '', stepsIdx = -1;
+function stepWatts(sg) {
+  const K = intensityK();
+  if (sg.kind === 'free') return 'MAX';
+  if (sg.kind === 'ramp') return `${Math.round(sg.p0 * S.ftp * K)}→${Math.round(sg.p1 * S.ftp * K)}<small>W</small>`;
+  return `${Math.round(sg.p0 * S.ftp * K)}<small>W</small>`;
+}
+function buildSteps() {
+  const list = $('#rStepList');
+  if (!R.w || R.freeRide) { list.innerHTML = ''; stepsKey = ''; return; }
+  const key = `${R.w.id}|${R.segs.length}|${S.ftp}|${intensityK()}`;
+  if (key === stepsKey) return;
+  stepsKey = key; stepsIdx = -1;
+  $('#rStepsN').textContent = String(R.segs.length);
+  list.innerHTML = R.segs.map((sg, i) => {
+    const col = sg.kind === 'free' ? PZ[6].col : pZone(Math.max(sg.p0, sg.p1) * intensityK()).col;
+    const extra = [sg.rep ? `${sg.rep.i}/${sg.rep.n}` : '', sg.c ? `@${sg.c}` : ''].filter(Boolean).join(' ');
+    return `<li data-i="${i}" style="--sc:${col}" title="${esc(segLabel(sg))}"><i></i><span class="d">${fmtSegDur(sg.d)}</span><span class="w">${stepWatts(sg)}</span><span class="c">${extra}</span></li>`;
+  }).join('');
+}
+function updateSteps() {
+  if (R.freeRide || !R.w) return;
+  buildSteps(); // rebuilt only when FTP or intensity changed the watts
+  const list = $('#rStepList'), rows = list.children, i = Math.min(R.idx, rows.length - 1);
+  if (i < 0) return;
+  if (i !== stepsIdx) {
+    $('#rStepsN').textContent = `${i + 1} / ${rows.length}`;
+    for (let k = 0; k < rows.length; k++) {
+      const r = rows[k]; r.classList.toggle('done', k < i); r.classList.toggle('cur', k === i);
+      if (k !== i) r.children[1].textContent = fmtSegDur(R.segs[k].d);
+    }
+    stepsIdx = i;
+    const cur = rows[i]; // keep one finished step visible above the current one
+    list.scrollTop = Math.max(0, cur.offsetTop - (rows[i - 1] ? rows[i - 1].offsetHeight + 4 : 0));
+  }
+  const sg = R.segs[i], cur = rows[i];
+  cur.style.setProperty('--p', `${clamp((R.t - sg.start) / sg.d * 100, 0, 100)}%`);
+  cur.children[1].textContent = fmtTime(Math.max(0, sg.start + sg.d - R.t));
+}
+// ---- the ride screen always fits the window: the page never scrolls, the gauge / tiles / chart shrink instead
+let fitTop = null;
+function fitRide(pass = 0) {
+  const on = $('#v-ride').classList.contains('on') && !!R.w, m = $('#rideMain');
+  document.body.classList.toggle('ridefit', on);
+  if (!on) { m.style.height = ''; return; }
+  if (rideLayoutShown && rideLayoutShown !== rideVariant()) { applyRideView(); stepsIdx = -1; }
+  window.scrollTo(0, 0);
+  const nav = $('nav.bottom'), navH = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect().height : 0;
+  const sab = navH ? 0 : parseFloat(getComputedStyle(document.body).paddingBottom) || 0; // home-indicator inset when the tab bar is hidden
+  const vh = document.documentElement.clientHeight || window.innerHeight; // layout-viewport px: unchanged by pinch zoom, toolbars counted
+  const top = m.getBoundingClientRect().top, h = Math.max(120, Math.floor(vh - top - navH - sab - 8));
+  fitTop = Math.round(top);
+  if (m.style.height !== h + 'px') {
+    m.style.height = h + 'px';
+    // measure again once the new height has laid out (the header / layout above can still move)
+    requestAnimationFrame(() => { if (pass < 2) fitRide(pass + 1); sizeChart(); drawChart(); stepsIdx = -1; updateSteps(); });
+  }
+}
+{ let ft = 0; const refit = () => { clearTimeout(ft); ft = setTimeout(() => fitRide(), 60); };
+  window.addEventListener('resize', refit); window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit); }
+// ---- Customize: pick and order the tiles, show or hide the step list and the chart, per layout; saved in the profile
+function openRideCustom() {
+  let L = rideLayout();
+  const m = openModal(`<h2>${t('Customize the ride screen')}</h2><div id="rvBody"></div>`, true);
+  const draw = () => {
+    const cfg = S.rideView[L], sel = cfg.tiles, rest = RIDE_TILE_IDS.filter(id => !sel.includes(id));
+    $('#rvBody', m).innerHTML = `<div class="rvseg" style="margin-top:10px">
+        <button class="btn sm ${L === 'phone' ? 'primary' : ''}" data-l="phone">${t('Phone')}</button>
+        <button class="btn sm ${L === 'wide' ? 'primary' : ''}" data-l="wide">${t('Computer and tablet')}</button></div>
+      <p class="muted" style="font-size:13px;margin:10px 0">${t('Tick the small tiles to show next to the power gauge; the arrows set their order. Saved in your profile.')}</p>
+      <ul class="rvlist">${sel.concat(rest).map(id => {
+        const on = sel.includes(id), i = sel.indexOf(id);
+        return `<li class="${on ? 'on' : ''}"><label><input type="checkbox" data-id="${id}" ${on ? 'checked' : ''}> ${esc(RIDE_TILES[id].k())}</label>${on ? `<button class="btn sm ghost" data-mv="${id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="${t('Move up')}">↑</button><button class="btn sm ghost" data-mv="${id}" data-d="1" ${i === sel.length - 1 ? 'disabled' : ''} aria-label="${t('Move down')}">↓</button>` : ''}</li>`;
+      }).join('')}</ul>
+      <div class="rvopts"><label><input type="checkbox" id="rvSteps" ${cfg.steps ? 'checked' : ''}> ${t('Workout steps list')}</label><label><input type="checkbox" id="rvChart" ${cfg.chart ? 'checked' : ''}> ${t('Workout chart')}</label></div>
+      <div class="row" style="gap:8px;margin-top:16px"><button class="btn ghost" id="rvReset">${t('Reset to default')}</button><span class="spacer"></span><button class="btn primary" id="rvDone">${t('Done')}</button></div>`;
+  };
+  const save = cfg => {
+    S.rideView = cleanRideView({ ...S.rideView, [L]: cfg }); saveSettings();
+    if (R.w) { applyRideView(); stepsIdx = -1; fitRide(); sizeChart(); renderRide(true); }
+    draw();
+  };
+  m.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const cfg = S.rideView[L];
+    if (b.dataset.l) { L = b.dataset.l; draw(); }
+    else if (b.dataset.mv) { const a = cfg.tiles.slice(), i = a.indexOf(b.dataset.mv), j = i + +b.dataset.d; if (j >= 0 && j < a.length) { [a[i], a[j]] = [a[j], a[i]]; save({ ...cfg, tiles: a }); } }
+    else if (b.id === 'rvReset') save({ ...RIDE_VIEW_DEF[L], tiles: RIDE_VIEW_DEF[L].tiles.slice() });
+    else if (b.id === 'rvDone') closeModal();
+  });
+  m.addEventListener('change', e => {
+    const x = e.target, cfg = S.rideView[L];
+    if (x.dataset.id) save({ ...cfg, tiles: x.checked ? cfg.tiles.concat(x.dataset.id) : cfg.tiles.filter(id => id !== x.dataset.id) });
+    else if (x.id === 'rvSteps') save({ ...cfg, steps: x.checked });
+    else if (x.id === 'rvChart') save({ ...cfg, chart: x.checked });
+  });
+  draw();
+}
 function showRide() {
   $('#rideEmpty').classList.toggle('hidden', !!R.w);
   $('#rideMain').classList.toggle('hidden', !R.w);
-  if (!R.w) return;
+  if (!R.w) { fitRide(); return; }
   $('#grpInt').classList.toggle('hidden', R.freeRide);
   $('#grpFree').classList.toggle('hidden', !R.freeRide);
   $('#grpSkip').classList.toggle('hidden', R.freeRide);
-  buildGauges(); sizeChart(); renderRide(true);
+  buildGauges(); applyRideView(); stepsKey = ''; buildSteps(); fitRide(); sizeChart(); renderRide(true);
 }
 function renderRide(force) {
   const now = performance.now();
@@ -1784,28 +2026,11 @@ function renderRide(force) {
   if (G.power) {
     const pz = p != null ? pZone(p / S.ftp) : null;
     G.power.set(p, { target: tgtW, color: pz ? pz.col : '#555', zoneText: pz ? `${pz.n} · ${pz.name.toUpperCase()}` : '', subHtml: p != null ? `<b>${Math.round(p / S.ftp * 100)}%</b> FTP${tgtW ? ` · Δ <b>${Math.round(p - tgtW) > 0 ? '+' : ''}${Math.round(p - tgtW)}</b> W` : ''}` : t('no power data') });
-    const wkg = p != null ? p / S.weight : null;
-    G.wkg.set(wkg, { target: tgtW ? tgtW / S.weight : null, color: pz ? pz.col : '#555', zoneText: pz ? pz.n : '', dec: 1, subHtml: `FTP <b>${(S.ftp / S.weight).toFixed(2)}</b> W/kg · ${S.weight} kg` });
-    const c = liveFresh('Cad') ? live.cadence : null;
-    const tc = !R.freeRide && seg && seg.c ? seg.c : null;
-    G.cad.set(c, { target: tc, color: c != null ? cadColor(c) : '#555', zoneText: c == null ? '' : c < 60 ? t('GRIND') : c < 75 ? t('LOW') : c < 100 ? t('SWEET') : c < 115 ? t('HIGH') : t('SPIN'), subHtml: tc ? t('target <b>{n}</b> rpm', { n: tc }) : (live.speed != null && liveFresh('Power') ? `<b>${live.speed.toFixed(1)}</b> km/h` : '') });
-    const hr = liveFresh('Hr', 6000) ? live.hr : null;
-    const hz = hr ? hZone(hr / S.maxHr) : null;
-    G.hr.set(hr, { color: hz ? hz.col : '#555', zoneText: hz ? `${hz.n} · ${hz.name.toUpperCase()}` : '', subHtml: hr ? t('<b>{pct}%</b> of max {max}', { pct: Math.round(hr / S.maxHr * 100), max: S.maxHr }) : (hrm.connected ? t('waiting…') : t('connect HR strap')) });
   }
-  // stats
-  const a = R.agg, ia = R.iagg;
-  if (a && a.n) {
-    $('#sAvg').innerHTML = `${Math.round(a.sumP / a.n)}<small>W</small>`;
-    const np = aggNP(a), IF = np / S.ftp;
-    $('#sNp').innerHTML = `${Math.round(np)}<small>W</small>`;
-    $('#sTss').innerHTML = `${Math.round(a.n / 3600 * IF * IF * 100)}<small>· ${IF.toFixed(2)}</small>`;
-    $('#sKj').innerHTML = `${Math.round(a.kj)}<small>kJ</small>`;
-    $('#sHr').innerHTML = a.nHr ? `${Math.round(a.sumHr / a.nHr)}<small>bpm</small>` : '–<small>bpm</small>';
-    $('#sCad').innerHTML = a.nC ? `${Math.round(a.sumC / a.nC)}<small>rpm</small>` : '–<small>rpm</small>';
-    $('#sDist').innerHTML = `${(R.dist / 1000).toFixed(1)}<small>km</small>`;
-  } else ['#sAvg', '#sNp', '#sTss', '#sKj', '#sHr', '#sCad', '#sDist', '#sIavg'].forEach(s => { const u = $(s).querySelector('small'); $(s).innerHTML = '–' + (u ? u.outerHTML : ''); });
-  if (ia && ia.n) $('#sIavg').innerHTML = `${Math.round(ia.sumP / ia.n)}<small>W</small>`;
+  const cad = liveFresh('Cad') ? live.cadence : null, hr = liveFresh('Hr', 6000) ? live.hr : null;
+  if (document.body.classList.contains('ridefit') && Math.round($('#rideMain').getBoundingClientRect().top) !== fitTop) fitRide(); // something above moved
+  renderTiles({ p, hr, cad, tcad: !R.freeRide && seg && seg.c ? seg.c : null, speed: liveFresh('Power') && live.speed != null ? live.speed : null, a: R.agg, ia: R.iagg });
+  updateSteps();
   if (force || now - lastChart > 1000) { lastChart = now; drawChart(); }
   updateTabLive();
 }
@@ -1923,6 +2148,7 @@ function go(id) {
   // keep an invitation/sign-in fragment intact until the auth library has read it
   if (!/(access_token|error_description|error_code)=/.test(location.hash)) { try { history.replaceState(null, '', '#' + id); } catch { } }
   window.scrollTo({ top: 0 });
+  fitRide();
 }
 
 /* ---- library ---- */
@@ -2536,6 +2762,7 @@ function applySettings(o) {
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
   if (!['', 'en', 'fr'].includes(S.lang)) S.lang = '';
+  S.rideView = cleanRideView(S.rideView);
   if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
   const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
   if (!(S.height >= 100 && S.height <= 250)) S.height = 0;
@@ -2839,7 +3066,7 @@ function langCheck(asked) {
   if (rideInProgress()) { if (asked) toast(t('The new language applies after your ride.')); return; }
   location.reload();
 }
-function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
+function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); applyRideView(); stepsIdx = -1; fitRide(); sizeChart(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
 
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
@@ -2937,6 +3164,7 @@ function bind() {
   $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm(t('End the ride and save it?'))) finishRide(false); };
   $('#rideConnect').onclick = () => chooseLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  $('#cCustom').onclick = openRideCustom;
   $('#cFull').classList.toggle('hidden', !fsOK);
   $('#cFull').onclick = () => { const d = document, el = d.documentElement;
     if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
