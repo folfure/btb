@@ -186,6 +186,7 @@ function makeEnv(dev) {
     toast: (m) => env.toasts.push(m), updateConnUI: () => { }, showBtHelp: () => { }, initAudio: () => { }, nudgeTick: () => { },
     applyControl: () => { env.applyCalls++; }, clamp: (v, lo, hi) => Math.min(hi, Math.max(lo, v)),
     S: { weight: 75 }, sim: { on: false, stop() { } }, hrm: { connected: false },
+    hasBt: () => true,
     navigator: { bluetooth: { requestDevice: async opts => { env.requests.push(opts); return dev; } } },
   };
   const names = Object.keys(stubs);

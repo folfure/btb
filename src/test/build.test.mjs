@@ -17,12 +17,12 @@ const variants = [
 for (const [name, env] of variants) {
   const out = join(mkdtempSync(join(tmpdir(), 'erglab-')), 'index.html');
   execFileSync(process.execPath, [build, '--out', out], { env: { ...process.env, ERGLAB_SUPABASE_URL: '', ERGLAB_SUPABASE_KEY: '', ...env } });
-  const html = readFileSync(out, 'utf8'), m = html.match(/<script>([\s\S]*?)<\/script>/);
-  check(`${name}: one inline script`, !!m);
+  const html = readFileSync(out, 'utf8'), all = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)], m = all.find(x => x[1].includes('function init()'));
+  check(`${name}: app script found (+ error reporter)`, !!m && all.length === 2);
+  check(`${name}: app script runs in its own scope`, !!m && /^\s*\(\(\) => \{/.test(m[1]) && /\}\)\(\);\s*$/.test(m[1]));
   try { new Function(m[1]); check(`${name}: script parses`, true); } catch (e) { check(`${name}: script parses`, false, e.message); }
   for (const g of ['const AN =', 'const BODY =', 'const ANUI =', 'const DEMO =', 'function makeGauge', 'function applyTheme', 'const TRAINER_PROTO =', 'const ANT =', 'const BTB_FONT =', 'function btbPath']) check(`${name}: has ${g}`, m[1].includes(g));
-  const hash = createHash('sha256').update(m[1], 'utf8').digest('base64');
-  check(`${name}: CSP hash matches`, html.includes(`'sha256-${hash}'`));
+  check(`${name}: CSP hash matches every inline script`, all.every(x => html.includes(`'sha256-${createHash('sha256').update(x[1], 'utf8').digest('base64')}'`)));
   check(`${name}: LF line endings`, !html.includes('\r'));
 }
 console.log(fails ? `\n${fails} failed` : '\nall passed'); process.exit(fails ? 1 : 0);
