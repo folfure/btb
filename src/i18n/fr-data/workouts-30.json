@@ -1,0 +1,65 @@
+{
+  "w": {
+    "q30-easy-legs": {
+      "name": "Jambes légères 30",
+      "desc": "Une demi-heure de roulage très facile en Zone 1, avec quatre petites hausses de cadence d'une minute pour garder les jambes souples. La puissance ne dépasse jamais environ 52% FTP : la séance n'ajoute presque aucune charge. Fais-la le lendemain d'une séance dure ou chaque fois que tu veux bouger sans te fatiguer.",
+      "src": "Récupération active en Zone 1 (Coggan) avec légères hausses de cadence"
+    },
+    "q30-zone2-half-hour": {
+      "name": "Demi-heure en Zone 2",
+      "desc": "Vingt minutes de Zone 2 stable après un court échauffement, en finissant vers le haut de la zone à 72% FTP. Ta respiration doit rester assez facile pour parler en phrases complètes. C'est court, mais répété souvent, ça construit le foncier aérobie sur lequel repose tout le reste de l'entraînement.",
+      "src": "Endurance Zone 2 de Coggan"
+    },
+    "q30-cadence-ladder": {
+      "name": "Échelle de cadence 30",
+      "desc": "Trois échelles à 65% FTP stable où seule la cadence change : deux minutes à 85, 95 puis 105 rpm, puis une minute de vélocité légère à 110 rpm. La puissance reste facile pour que tu puisses te concentrer sur un coup de pédale rond et fluide, sans rebondir sur la selle. Idéal pour l'efficacité de pédalage et pour ceux qui ont tendance à emmener de gros braquets.",
+      "src": "Exercices de cadence classiques (travail technique en vélocité) en Zone 2"
+    },
+    "q30-tempo-2x9": {
+      "name": "Tempo 2x9",
+      "desc": "Deux blocs de tempo de 9 minutes, à 83% puis 86% FTP, avec deux minutes faciles entre les deux. Le tempo doit être « dur mais confortable » : tu respires plus fort, mais tu peux encore dire quelques mots. Tu développes ton endurance musculaire et ta capacité à tenir une bonne allure longtemps.",
+      "src": "Intervalles en Zone 3 (tempo) de Coggan"
+    },
+    "q30-sweet-spot-2x8": {
+      "name": "Sweet Spot 2x8",
+      "desc": "Deux efforts de 8 minutes à 90% FTP avec trois minutes de pédalage facile entre les deux. Le sweet spot se situe juste sous le seuil : assez dur pour faire monter ta FTP, assez facile pour récupérer vite. Une façon efficace de caser du vrai travail de seuil dans une demi-heure.",
+      "src": "Entraînement sweet spot (88-94% FTP), popularisé par Coggan et Allen"
+    },
+    "q30-sweet-spot-20": {
+      "name": "Sweet Spot 20 sans pause",
+      "desc": "Un seul bloc de 20 minutes sans interruption à 89% FTP après une courte montée en puissance. Trouve ton rythme dès le début, garde le haut du corps relâché et une cadence autour de 90 rpm. Tenir le sweet spot sans pause entraîne la concentration et la résistance à la fatigue dont tu as besoin dans les longues montées et les contre-la-montre.",
+      "src": "Entraînement sweet spot (88-94% FTP), popularisé par Coggan et Allen"
+    },
+    "q30-threshold-2x8": {
+      "name": "Seuil 2x8",
+      "desc": "Deux intervalles de 8 minutes à 98% FTP avec trois minutes de récupération. C'est pile la puissance que tu peux tenir environ une heure : le deuxième intervalle doit être dur mais contrôlé, pas un combat. Le travail au seuil fait monter directement ta FTP ; si tu n'arrives pas à finir le deuxième intervalle, ta FTP est sans doute réglée trop haut.",
+      "src": "Intervalles en Zone 4 (seuil lactique) de Coggan"
+    },
+    "q30-over-unders-2x8": {
+      "name": "Over-Under 2x8",
+      "desc": "Deux blocs de 8 minutes qui alternent 90 secondes juste sous le seuil (95% FTP) et 30 secondes d'accélération juste au-dessus (110%), avec trois minutes faciles entre les blocs. Les accélérations font monter le lactate et les « unders » apprennent à ton corps à l'éliminer tout en roulant fort. Parfait pour préparer les courses et les sorties en groupe où l'allure change sans cesse autour du seuil.",
+      "src": "Intervalles over-under au seuil, un classique de l'entraînement au seuil façon Coggan/Allen"
+    },
+    "q30-thirty-thirty": {
+      "name": "30/30 express",
+      "desc": "Deux séries de huit efforts de 30 secondes à 120% FTP avec 30 secondes faciles entre chaque, et trois minutes de récupération entre les séries. Les repos courts gardent ta respiration et ta fréquence cardiaque hautes pendant toute la série : tu accumules du temps près de ta VO2max sans longs intervalles épuisants. Mouline un petit braquet vers 100 rpm pendant les efforts.",
+      "src": "Intervalles intermittents 30-30 de Billat, adaptés au vélo"
+    },
+    "q30-vo2-4x3": {
+      "name": "VO2max 4x3",
+      "desc": "Quatre efforts de 3 minutes à 115% FTP avec deux minutes et demie de pédalage facile entre chaque. Tu dois être bien essoufflé dès la deuxième minute ; garde une cadence élevée (95+ rpm) pour ne pas charger les jambes trop tôt. Les répétitions de 3 minutes sont une façon classique d'augmenter ta puissance aérobie maximale.",
+      "src": "Intervalles en Zone 5 (VO2max) de Coggan"
+    },
+    "q30-sprint-snacks": {
+      "name": "Sprints express 6x10s",
+      "desc": "Six sprints à bloc de 10 secondes, en alternant assis et en danseuse, chacun suivi de presque trois minutes de pédalage facile. Le mode ERG est relâché pendant les sprints : passe sur un gros braquet et donne tout. Les longs repos gardent chaque sprint à pleine qualité : tu travailles ta puissance de pointe et le recrutement des fibres rapides, pas l'endurance.",
+      "src": "Entraînement de la puissance neuromusculaire (Zone 7 de Coggan)"
+    },
+    "q30-quick-climbs": {
+      "name": "Montées express 4x3",
+      "desc": "Quatre courtes montées : deux minutes et demie assis à 95% FTP et à basse cadence (65 rpm), puis 30 secondes en danseuse à 120% pour passer le sommet, suivies de deux minutes faciles. La basse cadence développe ta force en montée et la fin en danseuse t'apprend à relancer au sommet. Passe sur un braquet plus facile avant la fin de chaque récupération.",
+      "src": "Intervalles de force en montée assis à basse cadence, avec fin en danseuse"
+    }
+  },
+  "lbl": {}
+}

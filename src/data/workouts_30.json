@@ -1,0 +1,691 @@
+[
+ {
+  "id": "q30-easy-legs",
+  "name": "Easy Legs 30",
+  "cat": "Recovery",
+  "desc": "Half an hour of very easy Zone 1 riding with four light one-minute cadence pickups to keep the legs supple. Power never goes above about 52% FTP, so this adds almost no training stress. Use it the day after a hard session or whenever you need to move without tiring yourself.",
+  "src": "Coggan Zone 1 active recovery with light cadence pickups",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.4,
+    "p1": 0.5,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.5,
+      "c": 90,
+      "lbl": "Easy spin"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.52,
+      "c": 100,
+      "lbl": "Light cadence pickup"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 240,
+    "p": 0.5,
+    "c": 90,
+    "lbl": "Smooth spin"
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.5,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-zone2-half-hour",
+  "name": "Zone 2 Half-Hour",
+  "cat": "Endurance",
+  "desc": "Twenty minutes of steady Zone 2 after a short warm-up, finishing near the top of the zone at 72% FTP. Breathing should stay easy enough to talk in full sentences. Short, but repeated often it still builds the aerobic base that every other kind of training sits on.",
+  "src": "Coggan Zone 2 endurance",
+  "seg": [
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.68,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.72,
+    "c": 90,
+    "lbl": "Zone 2 high"
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.62,
+    "p1": 0.45,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-cadence-ladder",
+  "name": "Cadence Ladder 30",
+  "cat": "Endurance",
+  "desc": "Three ladders at a steady 65% FTP where only the cadence changes: two minutes each at 85, 95 and 105 rpm, then a minute of light spinning at 110 rpm. The power stays easy so all your attention can go to smooth, round pedalling without bouncing in the saddle. Good for pedalling efficiency and for riders who tend to push big gears.",
+  "src": "Classic cadence drills (high-cadence pedalling-skill work) in Zone 2",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.62,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.65,
+      "c": 85,
+      "lbl": "Cadence 85"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.65,
+      "c": 95,
+      "lbl": "Cadence 95"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.65,
+      "c": 105,
+      "lbl": "Cadence 105"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.6,
+      "c": 110,
+      "lbl": "Spin-up 110 rpm"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.45,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-tempo-2x9",
+  "name": "Tempo 2x9",
+  "cat": "Tempo",
+  "desc": "Two 9-minute tempo blocks at 83% and then 86% FTP with two easy minutes between. Tempo should feel \"comfortably hard\": breathing deeper, but you could still say a few words. It builds muscular endurance and the ability to hold a strong pace for long stretches.",
+  "src": "Coggan Zone 3 (tempo) intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 540,
+    "p": 0.83,
+    "c": 90,
+    "lbl": "Tempo"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Recovery spin"
+   },
+   {
+    "t": "s",
+    "d": 540,
+    "p": 0.86,
+    "c": 90,
+    "lbl": "Tempo"
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-sweet-spot-2x8",
+  "name": "Sweet Spot 2x8",
+  "cat": "Sweet Spot",
+  "desc": "Two 8-minute efforts at 90% FTP with three minutes of easy spinning between. Sweet spot sits just under threshold: hard enough to raise your FTP, easy enough to recover from quickly. A time-efficient way to fit real threshold-building work into half an hour.",
+  "src": "Sweet spot training (88-94% FTP), popularised by Coggan and Allen",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.8,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.9,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "lbl": "Recovery spin"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.9,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-sweet-spot-20",
+  "name": "Sweet Spot 20 Nonstop",
+  "cat": "Sweet Spot",
+  "desc": "One unbroken 20-minute block at 89% FTP after a short build. Settle into a rhythm early, keep your upper body relaxed and your cadence around 90 rpm. Holding sweet spot without a break trains the sustained focus and fatigue resistance you need for long climbs and time trials.",
+  "src": "Sweet spot training (88-94% FTP), popularised by Coggan and Allen",
+  "seg": [
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.8,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 1200,
+    "p": 0.89,
+    "c": 90,
+    "lbl": "Sweet spot"
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-threshold-2x8",
+  "name": "Threshold 2x8",
+  "cat": "Threshold",
+  "desc": "Two 8-minute intervals at 98% FTP with three minutes of recovery. This is right at the power you can hold for about an hour, so the second interval should feel hard but controlled, not a fight. Threshold work raises your FTP directly; if you cannot finish the second interval, your FTP is probably set too high.",
+  "src": "Coggan Zone 4 (lactate threshold) intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.85,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.98,
+    "c": 90,
+    "lbl": "Threshold 8 min"
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.5,
+    "lbl": "Recovery spin"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.98,
+    "c": 90,
+    "lbl": "Threshold 8 min"
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-over-unders-2x8",
+  "name": "Over-Unders 2x8",
+  "cat": "Over-Under",
+  "desc": "Two 8-minute blocks that alternate 90 seconds just under threshold (95% FTP) with 30-second surges just over it (110%), with three minutes easy between blocks. The surges push lactate up and the \"unders\" teach your body to clear it while still riding hard. Great preparation for races and group rides where the pace keeps changing around threshold.",
+  "src": "Over-under threshold intervals, a standard in Coggan/Allen-style threshold training",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.85,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 95,
+      "lbl": "Over"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.5,
+    "lbl": "Recovery between sets"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.95,
+      "c": 90,
+      "lbl": "Under"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 95,
+      "lbl": "Over"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-thirty-thirty",
+  "name": "30/30s Express",
+  "cat": "VO2max",
+  "desc": "Two sets of eight 30-second efforts at 120% FTP with 30 seconds easy between, and three minutes of recovery between the sets. The short rests keep your breathing and heart rate high across each set, so you build time near VO2max without long, crushing intervals. Spin a light gear at about 100 rpm on the efforts.",
+  "src": "Billat 30-30 intermittent intervals, adapted for cycling",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.85,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 8,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "30s ON"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.5,
+      "lbl": "30s off"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.5,
+    "lbl": "Recovery between sets"
+   },
+   {
+    "t": "x",
+    "n": 8,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "30s ON"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 0.5,
+      "lbl": "30s off"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-vo2-4x3",
+  "name": "VO2max 4x3",
+  "cat": "VO2max",
+  "desc": "Four 3-minute efforts at 115% FTP with two and a half minutes of easy spinning between. Each effort should leave you breathing hard by the second minute; keep the cadence high (95+ rpm) so your legs do not load up too early. Three-minute repeats are a classic way to raise maximal aerobic power.",
+  "src": "Coggan Zone 5 (VO2max) intervals",
+  "seg": [
+   {
+    "t": "r",
+    "d": 270,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 30,
+    "p": 1.1,
+    "c": 100,
+    "lbl": "Opener"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 180,
+      "p": 1.15,
+      "c": 95,
+      "lbl": "VO2max"
+     },
+     {
+      "t": "s",
+      "d": 150,
+      "p": 0.5,
+      "lbl": "Active recovery"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 1.15,
+    "c": 95,
+    "lbl": "VO2max"
+   },
+   {
+    "t": "r",
+    "d": 270,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-sprint-snacks",
+  "name": "Sprint Snacks 6x10s",
+  "cat": "Sprint",
+  "desc": "Six 10-second all-out sprints, alternating seated and standing, each followed by nearly three minutes of easy spinning. ERG is released during the sprints, so shift to a big gear and give everything you have. The long rests keep every sprint at full quality: this trains peak power and fast-twitch recruitment, not endurance.",
+  "src": "Neuromuscular power training (Coggan Zone 7)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 10,
+      "p": 1.3,
+      "c": 110,
+      "lbl": "Spin-up opener"
+     },
+     {
+      "t": "s",
+      "d": 50,
+      "p": 0.55,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.6,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "f",
+      "d": 10,
+      "lbl": "Seated max sprint",
+      "c": 110
+     },
+     {
+      "t": "s",
+      "d": 170,
+      "p": 0.5,
+      "lbl": "Easy spin"
+     },
+     {
+      "t": "f",
+      "d": 10,
+      "lbl": "Standing max sprint",
+      "c": 100
+     },
+     {
+      "t": "s",
+      "d": 170,
+      "p": 0.5,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "q30-quick-climbs",
+  "name": "Quick Climbs 4x3",
+  "cat": "Hills",
+  "desc": "Four short climbs: two and a half minutes seated at 95% FTP and a low 65 rpm, then 30 seconds out of the saddle at 120% to crest the top, followed by two easy minutes. The low cadence builds climbing strength and the standing finish teaches you to accelerate over a summit. Shift to an easier gear before the end of each recovery.",
+  "src": "Low-cadence seated climbing (force) intervals with a standing finish",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.85,
+    "c": 95,
+    "lbl": "Build"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 150,
+      "p": 0.95,
+      "c": 65,
+      "lbl": "Seated climb 65rpm"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 75,
+      "lbl": "Standing to the top"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.5,
+      "c": 90,
+      "lbl": "Descend / easy spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 240,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ }
+]
