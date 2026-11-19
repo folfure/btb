@@ -1,0 +1,85 @@
+/* ---- ride-screen extras: flames canvas, cadence mini gauge, countdowns, coach messages, text size ---- */
+#rideGrid{position:relative}
+#rideMain{position:relative}
+#rideFx{position:absolute;left:-6px;top:-6px;width:calc(100% + 12px);height:calc(100% + 12px);pointer-events:none;z-index:4}
+.ride .gmain{container-type:size;will-change:transform}
+
+/* cadence: a small dial in the corner of the power gauge, the target mark (90 rpm) standing straight up */
+.ride .gmain .gcad{position:absolute;right:8px;bottom:8px;width:84px;width:clamp(58px,min(21cqw,40cqh),136px);z-index:2;pointer-events:none}
+.ride .gmain.nocad .gcad{display:none}
+.ride .gmain .gcad svg{display:block;flex:none;width:100%;height:auto;max-width:none}
+.gcad .gc-tr{fill:none;stroke:rgba(255,255,255,.13);stroke-width:7;stroke-linecap:round}
+.gcad .gc-v{fill:none;stroke:var(--cc,#555);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .4s ease,stroke .3s;filter:drop-shadow(0 0 3px var(--cc,#555))}
+.gcad .gc-tg{transition:transform .4s ease}
+.gcad .gc-tg path{stroke:#fff;stroke-width:2.8;stroke-linecap:round;filter:drop-shadow(0 0 2px #000)}
+.gcad .gc-tg text{fill:var(--muted);font-size:10px;font-weight:800}
+.gcad .gc-n{fill:var(--cc,#fff);font-size:25px;font-weight:850}
+.gcad .gc-u{fill:var(--muted);font-size:9.5px;font-weight:700;letter-spacing:.08em}
+/* narrow or square gauge card: the power dial shrinks a little and leaves the bottom-right corner to the cadence dial */
+@container (max-aspect-ratio: 13/10){
+  .ride .gmain:not(.nocad) svg.ng{margin-bottom:clamp(24px,min(22cqw,17cqh),88px)}
+  .ride .gmain:not(.nocad) .gs{text-align:left;padding-right:min(34cqw,150px);padding-left:4px}
+  .ride .gmain .gcad{width:72px;width:clamp(54px,min(30cqw,26cqh),118px);right:4px;bottom:4px}
+}
+
+/* countdown: big outlined digits low on the screen (over the chart / table, never over the power number), a solid label under them */
+.rcue{position:fixed;left:50%;top:auto;bottom:max(13vh,96px);z-index:85;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;pointer-events:none;text-align:center;max-width:94vw}
+.rcue.on{display:flex}
+body:not(.ridefit) .rcue{display:none!important} /* only on the ride screen (a ride keeps running behind other tabs) */
+.rcue b{display:block;font-size:min(30vw,22vh,240px);line-height:.92;font-weight:900;font-style:normal;color:transparent;-webkit-text-stroke:3px var(--cc);
+  text-shadow:0 0 36px var(--cc);opacity:.6;font-variant-numeric:tabular-nums}
+.rcue b.sm{font-size:min(20vw,22vh,180px);color:var(--cc);opacity:.85}
+.rcue span{margin-top:8px;font-size:calc(22px * var(--rfs,1));font-weight:850;color:#fff;background:rgba(8,5,20,.78);border:2px solid var(--cc);padding:6px 18px;border-radius:999px;
+  box-shadow:0 0 22px var(--cc);white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
+.rcue.tick b{animation:cueTick .9s ease-out}
+.rcue.end b{-webkit-text-stroke-width:4px}
+.rcue.zero b,.rcue.go b{animation:cueBoom 1.4s ease-out forwards}
+@keyframes cueTick{0%{transform:scale(1.3);opacity:.95}100%{transform:scale(1);opacity:.6}}
+@keyframes cueBoom{0%{transform:scale(.7);opacity:1}60%{transform:scale(1.25);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+:root[data-theme="neon"] .rcue b{font-family:var(--font-display);font-style:italic}
+
+/* coach messages: a pill at the top of the ride screen */
+.rcoach{position:absolute;left:50%;top:4px;z-index:6;max-width:min(92%,640px);transform:translate(-50%,-10px);opacity:0;pointer-events:none;
+  font-size:calc(16px * var(--rfs,1));font-weight:800;line-height:1.3;color:#fff;text-align:center;background:rgba(8,5,20,.86);border:2px solid var(--cc);
+  border-radius:18px;padding:8px 18px;box-shadow:0 0 26px -4px var(--cc);transition:opacity .35s ease,transform .35s ease}
+.rcoach.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){ .rcue b{animation:none!important} .rcoach{transition:none} }
+
+/* bigger labels on the step list (left) and the stats table (right); everything follows the text-size button (--rfs) */
+#rideMain .steps .sh{font-size:calc(12.5px * var(--rfs,1))}
+#rideMain .steps li{font-size:calc(15px * var(--rfs,1));grid-template-columns:4px 4.4em minmax(0,1fr) auto}
+#rideMain .steps li .w{min-width:3.6em}
+#rideMain .steps li .c{font-size:calc(12px * var(--rfs,1))}
+#rideMain .rrow .k{font-size:clamp(calc(11px * var(--rfs,1)),calc(27cqh * var(--rfs,1)),calc(14.5px * var(--rfs,1)))}
+#rideMain .rrow .v{font-size:clamp(calc(13px * var(--rfs,1)),calc(48cqh * var(--rfs,1)),calc(27px * var(--rfs,1)))}
+#rideMain .rrow .s{font-size:clamp(calc(9.5px * var(--rfs,1)),calc(18cqh * var(--rfs,1)),calc(12px * var(--rfs,1)))}
+#rideMain .gmain .gtimes small{font-size:calc(11px * min(var(--rfs,1),1.15))}
+#rideMain .gmain .gtimes b{font-size:calc(clamp(16px,2.4vw,24px) * min(var(--rfs,1),1.2))}
+#rideMain .gauge .gs{font-size:calc(12.5px * min(var(--rfs,1),1.1));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rideMain .ivl .wname{font-size:calc(13px * var(--rfs,1))}
+#rideMain .ivl .iname{font-size:calc(19px * var(--rfs,1))}
+#rideMain .ivl .tgt .w{font-size:calc(46px * var(--rfs,1))}
+#rideMain .ivl .tgt .u{font-size:calc(18px * var(--rfs,1))}
+#rideMain .ivl .tgt .pct{font-size:calc(15px * var(--rfs,1))}
+#rideMain .ivl .left{font-size:calc(38px * var(--rfs,1))}
+#rideMain .ivl .left small{font-size:calc(14px * var(--rfs,1))}
+#rideMain .ivl .next{font-size:calc(13.5px * var(--rfs,1))}
+@media (min-width:641px) and (max-height:820px){
+  #rideMain .ivl .iname{font-size:calc(16px * var(--rfs,1))} #rideMain .ivl .tgt .w{font-size:calc(36px * var(--rfs,1))}
+  #rideMain .ivl .left{font-size:calc(30px * var(--rfs,1))} #rideMain .ivl .wname{font-size:calc(12px * var(--rfs,1))}
+}
+@media (max-width:640px){
+  #rideMain .steps .sh{font-size:calc(11px * var(--rfs,1))}
+  #rideMain .steps li{font-size:calc(13.5px * var(--rfs,1));grid-template-columns:3px 3.7em minmax(0,1fr)}
+  #rideMain .gauge .gs{font-size:calc(11px * min(var(--rfs,1),1.1))}
+  #rideMain .ivl .wname{font-size:calc(11.5px * min(var(--rfs,1),1.15))} #rideMain .ivl .iname{font-size:calc(15px * min(var(--rfs,1),1.15))}
+  #rideMain .ivl .tgt .w{font-size:calc(30px * min(var(--rfs,1),1.15))} #rideMain .ivl .tgt .u{font-size:calc(13px * min(var(--rfs,1),1.15))} #rideMain .ivl .tgt .pct{font-size:calc(11.5px * min(var(--rfs,1),1.15))}
+  #rideMain .ivl .left{font-size:calc(30px * min(var(--rfs,1),1.15))} #rideMain .ivl .left small{font-size:calc(10.5px * min(var(--rfs,1),1.15))}
+  .rcoach{font-size:calc(14px * var(--rfs,1));padding:6px 12px;top:2px}
+  .rcue span{font-size:calc(17px * var(--rfs,1))}
+}
+@media (max-height:520px) and (orientation:landscape){
+  #rideMain .ivl .iname{font-size:calc(14px * var(--rfs,1))} #rideMain .ivl .tgt .w{font-size:calc(26px * var(--rfs,1))}
+  #rideMain .ivl .left{font-size:calc(24px * var(--rfs,1))} #rideMain .ivl .left small{font-size:calc(10px * var(--rfs,1))}
+  #rideMain .steps li{font-size:calc(13px * var(--rfs,1));grid-template-columns:3px 3.7em minmax(0,1fr)}
+}

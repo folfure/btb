@@ -196,23 +196,20 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .gmain .gtimes b{font-size:clamp(16px,2.4vw,24px);font-weight:850}
 .gmain.t-el .gl{display:none}
 .ride .gmain .ng .ng-val{fill:var(--gc)}
-/* from yellow (threshold) up: the number glows, then colours flicker, then the dial shakes */
-.gmain[data-fx] svg{transform-origin:50% 55%}
+/* from yellow (threshold) up: the number glows, then the colours flicker and go wild (flames and shaking: parts/z3-ridefx.js) */
 .gmain[data-fx="4"] .ng-val{animation:fxPulse 1.1s ease-in-out infinite}
 .gmain[data-fx="5"] .ng-val{animation:fxPulse .6s ease-in-out infinite}
-.gmain[data-fx="5"] svg{animation:fxHue 1.4s linear infinite}
-.gmain[data-fx="6"] svg{animation:fxShake .14s linear infinite,fxHue .9s linear infinite}
+.gmain[data-fx="5"] svg.ng{animation:fxHue 1.4s linear infinite}
+.gmain[data-fx="6"] svg.ng{animation:fxHue .9s linear infinite}
 .gmain[data-fx="6"] .ng-val{animation:fxPulse .35s ease-in-out infinite}
-.gmain[data-fx="7"] svg{animation:fxShake2 .09s linear infinite,fxCrazy .5s linear infinite}
+.gmain[data-fx="7"] svg.ng{animation:fxCrazy .5s linear infinite}
 .gmain[data-fx="7"] .ng-val{animation:fxPulse .22s ease-in-out infinite}
 .gmain[data-fx="6"],.gmain[data-fx="7"]{box-shadow:0 0 28px -6px var(--gc),inset 0 0 22px -12px var(--gc)}
 .ng .ng-val{transform-box:fill-box;transform-origin:center}
 @keyframes fxPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px var(--gc))}50%{transform:scale(1.07);filter:drop-shadow(0 0 9px var(--gc))}}
 @keyframes fxHue{0%,100%{filter:hue-rotate(0)}50%{filter:hue-rotate(-28deg) saturate(1.4)}}
-@keyframes fxShake{0%{transform:translate(0,0)}25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1.5px,1px)}75%{transform:translate(1px,1.5px)}100%{transform:translate(0,0)}}
-@keyframes fxShake2{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-2px) rotate(.8deg)}50%{transform:translate(-3px,2px) rotate(-.8deg)}75%{transform:translate(2px,3px) rotate(.5deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes fxCrazy{0%{filter:hue-rotate(0) saturate(1.6) brightness(1.15)}100%{filter:hue-rotate(360deg) saturate(1.6) brightness(1.15)}}
-@media (prefers-reduced-motion:reduce){ .gmain[data-fx] svg,.gmain[data-fx] .ng-val{animation:none!important} }
+@media (prefers-reduced-motion:reduce){ .gmain[data-fx] svg.ng,.gmain[data-fx] .ng-val{animation:none!important} }
 .ride .chartbox{padding:8px;position:relative}
 .ride .chartbox canvas{position:absolute;left:8px;top:8px;width:calc(100% - 16px);height:calc(100% - 16px)}
 /* fitted to the window (set by fitRide): the page itself never scrolls while this screen is shown */
@@ -297,7 +294,11 @@ body.ridefit .kbdhint{display:none}
 .pad{padding:16px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;background:var(--panel2);border:1px solid var(--line2);padding:10px 16px;border-radius:12px;box-shadow:var(--shadow);font-weight:600;font-size:14px;max-width:calc(100vw - 32px)}
 @media (max-width:860px){.toast{bottom:92px}}
-.hist{padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:10px}
+.hist{padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin-bottom:10px}
+.hist > .row{justify-content:flex-end;gap:6px}
+.hist .kv{gap:4px 14px}
+/* phones: the buttons go under the ride's figures instead of squeezing them into a narrow column */
+@media (max-width:700px){ .hist{grid-template-columns:minmax(0,1fr)} .hist > .row{justify-content:flex-start} }
 .hist .mini{grid-column:1/-1;height:40px;background:var(--bg2);border-radius:8px;overflow:hidden}
 .hist .mini svg{width:100%;height:100%;display:block}
 kbd{background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:12px}
@@ -336,7 +337,7 @@ body.riding #btBanner{display:none}
 /* phones: compact two-row control bar */
 @media (max-width:640px), (max-height:520px) and (orientation:landscape){
   #rideMain .controls{gap:6px;padding:6px}
-  #cIntDn5,#cIntUp5,#cFreeDn5,#cFreeUp5,#cBack,#cFull,.kbdhint{display:none!important}
+  #cIntDn5,#cIntUp5,#cFreeDn5,#cFreeUp5,#cBack,#cFull,#cFont,.kbdhint{display:none!important}
   .controls .grp{padding:2px;gap:4px;border:0}
   .controls .grp .val{min-width:58px}
   #cStart{padding-left:12px;padding-right:12px}
@@ -515,6 +516,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
         <div class="grp" id="grpSkip"><button class="btn sm" id="cBack" title="Previous interval" aria-label="Previous interval">⏮</button><button class="btn sm" id="cSkip" title="Next interval (N)" aria-label="Next interval">⏭</button></div>
         <div class="grp" id="grpMode"><span class="lab">Mode</span><button class="btn sm" id="cErg">ERG</button><button class="btn sm" id="cSlope">Slope</button></div>
         <span class="spacer"></span>
+        <button class="btn ghost" id="cFont" title="Text size" aria-label="Text size"><span style="font-size:.8em">A</span>A</button>
         <button class="btn ghost" id="cCustom" title="Customize the ride screen" aria-label="Customize the ride screen">⚙</button>
         <button class="btn ghost" id="cFull" title="Full screen">⛶</button>
         <button class="btn danger" id="cEnd">End &amp; save</button>
@@ -566,6 +568,8 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <div class="form">
         <div class="field"><label>Language</label><select id="sLang"><option value="">Automatic (browser language)</option><option value="en">English</option><option value="fr">Français</option></select></div>
         <div class="field"><label>Theme</label><select id="sTheme"><option value="neon">Neon Miami</option><option value="classic">Classic</option></select></div>
+        <div class="field"><label>Panel transparency</label><select id="sPanelA"><option value="0.96">None (solid)</option><option value="0.82">Light</option><option value="0.68">Medium</option><option value="0.54">Strong</option><option value="0.4">Maximum</option></select></div>
+        <div class="field"><label>Ride screen text size</label><select id="sRideFont"><option value="0.85">85%</option><option value="1">100%</option><option value="1.15">115%</option><option value="1.3">130%</option><option value="1.5">150%</option></select></div>
         <div class="field"><label>Power display smoothing</label><select id="sSmooth"><option value="1">Instant</option><option value="3">3 s average</option><option value="5">5 s average</option><option value="10">10 s average</option></select></div>
         <div class="field"><label>Auto-pause</label><select id="sAutoPause"><option value="1">On (pause when you stop pedalling)</option><option value="0">Off</option></select></div>
         <div class="field"><label>Sound cues</label><select id="sSound"><option value="1">On (countdown beeps)</option><option value="0">Off</option></select></div>
@@ -714,18 +718,34 @@ const RIDE_VIEW_DEF = {
   phone: { tiles: ['hr', 'cad', 'iavg', 'el', 'avg', 'rem'], steps: true, chart: false },
   wide: { tiles: ['hr', 'cad', 'wkg', 'iavg', 'avg', 'np', 'tss', 'kj', 'el', 'rem'], steps: true, chart: true },
 };
+// cadence dial, flames and countdowns/coach per layout: a key of its own, which older app versions leave alone when they sync
+const RIDE_FX_DEF = { phone: { cad: true, fx: true, coach: true }, wide: { cad: true, fx: true, coach: true } };
+function cleanRideFx(o) {
+  const out = {};
+  for (const L of ['phone', 'wide']) {
+    const x = o && typeof o === 'object' && o[L] && typeof o[L] === 'object' ? o[L] : {};
+    out[L] = {}; for (const k of ['cad', 'fx', 'coach']) out[L][k] = typeof x[k] === 'boolean' ? x[k] : RIDE_FX_DEF[L][k];
+  }
+  return out;
+}
+const RIDE_FONTS = [0.85, 1, 1.15, 1.3, 1.5]; // text sizes of the ride screen (the Aa button cycles through them)
+const PANEL_AS = [0.96, 0.82, 0.68, 0.54, 0.4]; // panel opacity steps (Settings › Panel transparency)
 function cleanRideView(o) {
   const out = {};
   for (const L of ['phone', 'wide']) {
     const x = o && typeof o === 'object' && o[L] && typeof o[L] === 'object' ? o[L] : {}, d = RIDE_VIEW_DEF[L];
     const tiles = Array.isArray(x.tiles) ? [...new Set(x.tiles.filter(id => RIDE_TILE_IDS.includes(id)))].slice(0, 16) : d.tiles.slice();
-    out[L] = { tiles, steps: typeof x.steps === 'boolean' ? x.steps : d.steps, chart: typeof x.chart === 'boolean' ? x.chart : d.chart };
+    out[L] = { tiles };
+    for (const k of ['steps', 'chart']) out[L][k] = typeof x[k] === 'boolean' ? x[k] : d[k];
   }
   return out;
 }
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', rideView: RIDE_VIEW_DEF, sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '', seenOn: {} };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', rideView: RIDE_VIEW_DEF, sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '', seenOn: {}, rideFont: 1, panelA: 0.82, rideFx: RIDE_FX_DEF };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
+S.rideFx = cleanRideFx(S.rideFx);
 S.rideView = cleanRideView(S.rideView);
+if (!RIDE_FONTS.includes(S.rideFont)) S.rideFont = 1;
+if (!PANEL_AS.includes(S.panelA)) S.panelA = DEFAULTS.panelA;
 S.seenOn = cleanSeen(S.seenOn);
 // weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
 const WLOG_MAX = 1000;
@@ -1721,6 +1741,7 @@ function tick() {
     if (R.idx !== prevIdx) { R.iagg = newAgg(); onIntervalChange(); }
     recordUntil();
     cueBeeps();
+    rideCueTick();
   }
   applyControl();
   renderRide();
@@ -1743,6 +1764,7 @@ function onIntervalChange() {
   const seg = R.segs[R.idx];
   const el = $('#ivl'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
   if (S.sound) beep(seg && seg.kind === 'free' ? 1200 : 880, 0.35, 0.25);
+  rideCueChange();
   renderRide(true);
 }
 function cueBeeps() {
@@ -1754,7 +1776,7 @@ function cueBeeps() {
   const bigNext = nxt && (nxt.kind === 'free' || Math.max(nxt.p0, nxt.p1) >= 1.2);
   if (k >= 1 && k <= 3 && (seg.d >= 15 || bigNext) && R.beeped !== key) {
     R.beeped = key; if (S.sound) beep(660, 0.12, 0.18);
-    if (nxt) showCountdown(k);
+    if (nxt && !rideCueActive()) showCountdown(k); // the 15 / 10 s countdowns show these seconds themselves
   }
 }
 let cdTimer = null;
@@ -1927,7 +1949,8 @@ function buildGauges() {
     scale: [[0, 0], [lo, 0.1], [red, 0.8], [hi, 0.9], [Math.max(maxP, hi + 200), 1]],
     bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi * ftp, Math.max(maxP, hi + 200)), col: z.col })),
     ticks: [0, r5(lo), r5(ftp * 0.75), ftp, r5(ftp * 1.2), r5(red), hi, 1000, Math.max(maxP, hi + 200)] });
-  $('#gPower').insertAdjacentHTML('beforeend', `<div class="gtimes"><span id="gtEl"><small>${t('Elapsed')}</small><b class="num">0:00</b></span><span id="gtRem"><small>${t('Remaining')}</small><b class="num">–</b></span></div>`);
+  $('#gPower').insertAdjacentHTML('beforeend', `<div class="gtimes"><span id="gtEl"><small>${t('Elapsed')}</small><b class="num">0:00</b></span><span id="gtRem"><small>${t('Remaining')}</small><b class="num">–</b></span></div>` + cadGaugeHtml());
+  CAD.last = ''; CAD.tk = null;
 }
 function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
@@ -1975,7 +1998,8 @@ function applyRideView() {
   box.style.setProperty('--tc', tc); grid.style.setProperty('--tr', Math.ceil(ids.length / tc) || 1);
   box.innerHTML = ids.map(id => `<div class="rrow" data-t="${id}"><span class="k">${esc(RIDE_TILES[id].k())}</span><span class="v num">–</span><span class="s"></span></div>`).join('');
   const gp = $('#gPower');
-  if (gp) { gp.classList.toggle('t-el', cfg.tiles.includes('el')); gp.classList.toggle('t-rem', cfg.tiles.includes('rem')); }
+  if (gp) { gp.classList.toggle('t-el', cfg.tiles.includes('el')); gp.classList.toggle('t-rem', cfg.tiles.includes('rem')); gp.classList.toggle('nocad', !S.rideFx[L].cad); }
+  document.documentElement.style.setProperty('--rfs', String(S.rideFont || 1));
 }
 const RIDE_TIMES = ['el', 'rem'];
 function renderTiles(c) {
@@ -1994,6 +2018,8 @@ function gaugeFx(p) {
   const g = $('#gPower'); if (!g) return;
   const z = p != null && R.state === 'running' ? PZ.indexOf(pZone(p / S.ftp)) + 1 : 0, fx = z >= 4 ? String(z) : '';
   if (g.dataset.fx !== fx) g.dataset.fx = fx;
+  rideFxSet(p);
+  if (R.state !== 'running' && rideCueActive()) cueHide();
 }
 // ---- workout steps, Zwift-style: done ones ticked and dimmed, the current one highlighted with its time left
 let stepsKey = '', stepsIdx = -1;
@@ -2057,12 +2083,19 @@ function fitRide(pass = 0) {
 { let ft = 0; const refit = () => { clearTimeout(ft); ft = setTimeout(() => fitRide(), 60); };
   window.addEventListener('resize', refit); window.addEventListener('orientationchange', refit);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', refit); }
+function setRideFont(f, say) {
+  S.rideFont = RIDE_FONTS.includes(f) ? f : 1; saveSettings();
+  document.documentElement.style.setProperty('--rfs', String(S.rideFont));
+  if (R.w) { stepsIdx = -1; fitRide(); updateSteps(); }
+  if (say) toast(t('Text size {n}%', { n: Math.round(S.rideFont * 100) }), 1500);
+  const sel = $('#sRideFont'); if (sel) sel.value = String(S.rideFont);
+}
 // ---- Customize: pick and order the tiles, show or hide the step list and the chart, per layout; saved in the profile
 function openRideCustom() {
   let L = rideLayout();
   const m = openModal(`<h2>${t('Customize the ride screen')}</h2><div id="rvBody"></div>`, true);
   const draw = () => {
-    const cfg = S.rideView[L], sel = cfg.tiles, rest = RIDE_TILE_IDS.filter(id => !sel.includes(id));
+    const cfg = S.rideView[L], fx = S.rideFx[L], sel = cfg.tiles, rest = RIDE_TILE_IDS.filter(id => !sel.includes(id));
     $('#rvBody', m).innerHTML = `<div class="rvseg" style="margin-top:10px">
         <button class="btn sm ${L === 'phone' ? 'primary' : ''}" data-l="phone">${t('Phone')}</button>
         <button class="btn sm ${L === 'wide' ? 'primary' : ''}" data-l="wide">${t('Computer and tablet')}</button></div>
@@ -2071,7 +2104,12 @@ function openRideCustom() {
         const on = sel.includes(id), i = sel.indexOf(id);
         return `<li class="${on ? 'on' : ''}"><label><input type="checkbox" data-id="${id}" ${on ? 'checked' : ''}> ${esc(RIDE_TILES[id].k())}${RIDE_TIMES.includes(id) ? ` <span class="dim" style="font-size:12px">${t('(top of the gauge)')}</span>` : ''}</label>${on ? `<button class="btn sm ghost" data-mv="${id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="${t('Move up')}">↑</button><button class="btn sm ghost" data-mv="${id}" data-d="1" ${i === sel.length - 1 ? 'disabled' : ''} aria-label="${t('Move down')}">↓</button>` : ''}</li>`;
       }).join('')}</ul>
-      <div class="rvopts"><label><input type="checkbox" id="rvSteps" ${cfg.steps ? 'checked' : ''}> ${t('Workout steps list')}</label><label><input type="checkbox" id="rvChart" ${cfg.chart ? 'checked' : ''}> ${t('Workout chart')}</label></div>
+      <div class="rvopts"><label><input type="checkbox" id="rvSteps" ${cfg.steps ? 'checked' : ''}> ${t('Workout steps list')}</label><label><input type="checkbox" id="rvChart" ${cfg.chart ? 'checked' : ''}> ${t('Workout chart')}</label>
+        <label><input type="checkbox" id="rvCad" ${fx.cad ? 'checked' : ''}> ${t('Cadence gauge')}</label><label><input type="checkbox" id="rvFx" ${fx.fx ? 'checked' : ''}> ${t('Flames and shaking on hard efforts')}</label>
+        <label><input type="checkbox" id="rvCoach" ${fx.coach ? 'checked' : ''}> ${t('Countdowns and coach messages')}</label></div>
+      <div class="row" style="gap:8px;margin-top:12px;align-items:center"><span>${t('Text size')}</span><span class="spacer"></span>
+        <button class="btn sm ghost" id="rvFontDn" aria-label="${t('Smaller text')}" ${S.rideFont <= RIDE_FONTS[0] ? 'disabled' : ''}>A−</button><b class="num" style="min-width:3.2em;text-align:center">${Math.round(S.rideFont * 100)}%</b>
+        <button class="btn sm ghost" id="rvFontUp" aria-label="${t('Larger text')}" ${S.rideFont >= RIDE_FONTS.at(-1) ? 'disabled' : ''}>A+</button></div>
       <div class="row" style="gap:8px;margin-top:16px"><button class="btn ghost" id="rvReset">${t('Reset to default')}</button><span class="spacer"></span><button class="btn primary" id="rvDone">${t('Done')}</button></div>`;
   };
   const save = cfg => {
@@ -2086,18 +2124,23 @@ function openRideCustom() {
     else if (b.dataset.mv) { const a = cfg.tiles.slice(), i = a.indexOf(b.dataset.mv), j = i + +b.dataset.d; if (j >= 0 && j < a.length) { [a[i], a[j]] = [a[j], a[i]]; save({ ...cfg, tiles: a }); } }
     else if (b.id === 'rvReset') save({ ...RIDE_VIEW_DEF[L], tiles: RIDE_VIEW_DEF[L].tiles.slice() });
     else if (b.id === 'rvDone') closeModal();
+    else if (b.id === 'rvFontDn' || b.id === 'rvFontUp') { const i = RIDE_FONTS.indexOf(S.rideFont); setRideFont(RIDE_FONTS[clamp(i + (b.id === 'rvFontUp' ? 1 : -1), 0, RIDE_FONTS.length - 1)]); draw(); }
   });
   m.addEventListener('change', e => {
     const x = e.target, cfg = S.rideView[L];
     if (x.dataset.id) save({ ...cfg, tiles: x.checked ? cfg.tiles.concat(x.dataset.id) : cfg.tiles.filter(id => id !== x.dataset.id) });
     else if (x.id === 'rvSteps') save({ ...cfg, steps: x.checked });
     else if (x.id === 'rvChart') save({ ...cfg, chart: x.checked });
+    else if (x.id === 'rvCad' || x.id === 'rvFx' || x.id === 'rvCoach') {
+      S.rideFx = cleanRideFx({ ...S.rideFx, [L]: { ...S.rideFx[L], [x.id.slice(2).toLowerCase()]: x.checked } }); save(cfg);
+    }
   });
   draw();
 }
 function showRide() {
   $('#rideEmpty').classList.toggle('hidden', !!R.w);
   $('#rideMain').classList.toggle('hidden', !R.w);
+  rideCueReset();
   if (!R.w) { fitRide(); return; }
   $('#grpInt').classList.toggle('hidden', R.freeRide);
   $('#grpFree').classList.toggle('hidden', !R.freeRide);
@@ -2185,6 +2228,7 @@ function renderRide(force) {
   const cad = liveFresh('Cad') ? live.cadence : null, hr = liveFresh('Hr', 6000) ? live.hr : null;
   if (document.body.classList.contains('ridefit') && Math.round($('#rideMain').getBoundingClientRect().top) !== fitTop) fitRide(); // something above moved
   gaugeFx(p);
+  cadGaugeSet(cad, !R.freeRide && seg && seg.c ? seg.c : 90);
   renderTiles({ p, hr, cad, tcad: !R.freeRide && seg && seg.c ? seg.c : null, speed: liveFresh('Power') && live.speed != null ? live.speed : null, a: R.agg, ia: R.iagg });
   updateSteps();
   if (force || now - lastChart > 1000) { lastChart = now; drawChart(); }
@@ -2918,7 +2962,10 @@ function applySettings(o) {
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
   if (!['', 'en', 'fr'].includes(S.lang)) S.lang = '';
+  S.rideFx = cleanRideFx(S.rideFx);
   S.rideView = cleanRideView(S.rideView);
+  if (!RIDE_FONTS.includes(S.rideFont)) S.rideFont = 1;
+  if (!PANEL_AS.includes(S.panelA)) S.panelA = DEFAULTS.panelA;
   S.seenOn = cleanSeen(S.seenOn);
   if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
   const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
@@ -3271,7 +3318,7 @@ function bindCloud() {
 
 /* ---- settings ---- */
 function renderSettings() {
-  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang;
+  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang; $('#sPanelA').value = String(S.panelA); $('#sRideFont').value = String(S.rideFont);
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
   $('#sAgeHint').textContent = age ? t('Age {n}', { n: age }) : '';
@@ -3287,6 +3334,8 @@ function bindSettings() {
   num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60); num('#sWprime', 'wprime', 5000, 60000);
   $('#sLang').onchange = e => { S.lang = e.target.value; saveSettings(); langCheck(true); };
   $('#sTheme').onchange = e => { S.theme = e.target.value; saveSettings(); afterSettings(); renderHistory(); };
+  $('#sPanelA').onchange = e => { S.panelA = PANEL_AS.includes(+e.target.value) ? +e.target.value : DEFAULTS.panelA; saveSettings(); setTheme(); };
+  $('#sRideFont').onchange = e => setRideFont(+e.target.value);
   $('#sWeight').addEventListener('change', () => { if (+$('#sWeight').value === S.weight) { const t = todayKey(), e = S.wlog.find(x => x.d === t); if (!e || e.kg !== S.weight) addWeightLog(t, S.weight, e && e.rhr); } });
   const opt = (id, key, ok, conv = v => v) => $(id).addEventListener('change', e => { const v = conv(e.target.value); if (ok(v)) { S[key] = v; saveSettings(); afterSettings(); } else renderSettings(); });
   opt('#sSex', 'sex', v => ['', 'f', 'm'].includes(v));
@@ -3322,7 +3371,10 @@ function bindSettings() {
     } catch (err) { toast(t('Restore failed: {msg}', { msg: t(err.message) })); }
   };
 }
-function setTheme() { if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon'); }
+function setTheme() {
+  if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon');
+  const st = document.documentElement.style; st.setProperty('--pa', String(S.panelA)); st.setProperty('--rfs', String(S.rideFont || 1)); // panel opacity, ride text size
+}
 // the interface language is fixed for the page's lifetime: switch by reloading (never in the middle of a ride)
 function langCheck(asked) {
   if (resolveLang(S.lang) === LANG || (load('erglab.settings', {}).lang || '') !== S.lang) return; // unchanged, or not stored (no reload loop)
@@ -3428,6 +3480,7 @@ function bind() {
   $('#rideConnect').onclick = () => connectLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cCustom').onclick = openRideCustom;
+  $('#cFont').onclick = () => setRideFont(RIDE_FONTS[(RIDE_FONTS.indexOf(S.rideFont) + 1) % RIDE_FONTS.length], true);
   $('#sCal').onclick = openCalibration;
   $('#cFull').classList.toggle('hidden', !fsOK);
   $('#cFull').onclick = () => { const d = document, el = d.documentElement;

@@ -172,11 +172,9 @@ function makeGauge(host, o) {
   <svg class="ng" viewBox="-4 -3 208 189" role="img" aria-label="${txt(o.label)}">
     <defs>
       <radialGradient id="${id}f" cx="50%" cy="36%" r="64%"><stop offset="0" class="ng-f1"/><stop offset="1" class="ng-f2"/></radialGradient>
-      <linearGradient id="${id}c" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity=".03"/><stop offset="1" stop-color="#fff" stop-opacity=".28"/></linearGradient>
       <filter id="${id}g" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="3"/></filter>
     </defs>
     <circle class="ng-face" cx="${CX}" cy="${CY}" r="72" fill="url(#${id}f)"/>
-    <circle class="ng-chrome" cx="${CX}" cy="${CY}" r="72.5" fill="none" stroke="url(#${id}c)" stroke-width="1.2"/>
     <path class="ng-track" d="${full}" stroke-width="12" fill="none" stroke-linecap="round"/>
     <g class="ng-tint" stroke-width="12" fill="none">${tint}</g>
     <g class="ng-bglow" filter="url(#${id}g)" stroke-width="6" fill="none">${ring}</g>
@@ -188,7 +186,6 @@ function makeGauge(host, o) {
       <path class="ng-g2" d="${full}" stroke-width="25"/>
       <path class="ng-g1" d="${full}" stroke-width="17"/>
       <path class="ng-v" d="${full}" stroke-width="11"/>
-      <path class="ng-hl" d="${full}" stroke-width="2.2" transform="translate(${CX} ${CY}) scale(.955) translate(-${CX} -${CY})"/>
     </g>
     ${tgt}${tip}
     <text class="ng-vglow" x="${CX}" y="${CY + 13}" text-anchor="middle">–</text>
@@ -202,7 +199,7 @@ function makeGauge(host, o) {
   const el = { vg: q('.ng-vg'), tip: q('.ng-tip'), tgt: q('.ng-tgt'), val: q('.ng-val'), glow: q('.ng-vglow'), zone: q('.ng-zone'), sub: q('.gs') };
   const last = { ok: false, off: null, col: '#555', txt: '–', long: false, zt: '', tk: null, sub: '' };
   return {
-    o,
+    o, frac, // frac(v): 0..1 position of a value on the dial (used by the ride-screen flames)
     set(v, { target = null, color = '#888', zoneText = '', subHtml = '', dec = 0 } = {}) {
       const ok = v != null && isFinite(v);
       if (ok !== last.ok) {

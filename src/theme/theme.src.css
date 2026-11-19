@@ -23,7 +23,7 @@
   --font-display:"Avenir Next Condensed","Futura","Bahnschrift","DIN Condensed","Roboto Condensed","Arial Narrow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --neon-pink:#ff2e88; --neon-hot:#ff3dae; --neon-orange:#ff8a2a; --neon-gold:#ffd23f; --neon-cyan:#22e6ff; --neon-violet:#b03bff;
   --sunset:linear-gradient(135deg,#ff2e88 0%,#ff4f6a 45%,#ff7a2e 100%);
-  --glass:linear-gradient(165deg,rgba(44,22,92,.94) 0%,rgba(26,12,58,.95) 55%,rgba(17,7,40,.96) 100%);
+  --glass:linear-gradient(165deg,rgba(44,22,92,var(--pa,.82)) 0%,rgba(26,12,58,var(--pa,.82)) 55%,rgba(17,7,40,var(--pa,.82)) 100%);
   --edge:rgba(184,120,255,.22);
   --ng-track:#1b0b3a; --ng-face1:#2a1458; --ng-face2:#0e0526; --ng-tick:#f3e6ff; --ng-label:#c7b4ec; --ng-unit:#bba8de; --ng-val:#ffffff;
   scrollbar-color:#4a2c7e #0c0520;
@@ -178,6 +178,7 @@
 :root[data-theme="neon"] nav.bottom button.on svg{color:#ff6fbf;filter:drop-shadow(0 0 4px rgba(255,61,174,.95))}
 
 /* ---------- surfaces ---------- */
+:root[data-theme="neon"] .rtiles{background:var(--glass);border-color:var(--edge)}
 :root[data-theme="neon"] .card{background:var(--glass);border-color:var(--edge);
   box-shadow:0 14px 34px -16px rgba(3,0,14,.9),inset 0 1px 0 rgba(255,255,255,.06)}
 :root[data-theme="neon"] .banner{border-color:rgba(255,61,174,.4);background:linear-gradient(120deg,rgba(255,46,136,.18),rgba(255,138,42,.10) 45%,rgba(34,230,255,.10));box-shadow:0 0 22px -10px rgba(255,46,136,.6)}
@@ -188,7 +189,7 @@
 /* hero cards: sunset gradient edge (pink top-left -> cyan bottom-right) */
 :root[data-theme="neon"] .ride .ivl,:root[data-theme="neon"] .gauge,:root[data-theme="neon"] .noride,:root[data-theme="neon"] .gate .gbox{
   border:1px solid transparent;
-  background:linear-gradient(165deg,#2a1559 0%,#1a0b3d 52%,#12072e 100%) padding-box,
+  background:linear-gradient(165deg,rgba(42,21,89,var(--pa,.82)) 0%,rgba(26,11,61,var(--pa,.82)) 52%,rgba(18,7,46,var(--pa,.82)) 100%) padding-box,
              linear-gradient(140deg,rgba(255,61,174,.75),rgba(150,80,255,.22) 38%,rgba(150,80,255,.14) 62%,rgba(34,230,255,.6)) border-box;
   box-shadow:0 18px 40px -18px rgba(3,0,14,.95),0 0 26px -16px rgba(255,46,136,.7)}
 
@@ -288,7 +289,7 @@
 :root[data-theme="neon"] .controls .grp .val{font-family:var(--font-display);font-style:italic;font-weight:900;font-stretch:condensed;font-size:1.15em;letter-spacing:.02em}
 :root[data-theme="neon"] .controls .grp .lab{color:#c3afe6}
 @media (max-width:1000px){
-  :root[data-theme="neon"] #rideMain .controls{background:linear-gradient(180deg,rgba(34,16,74,.96),rgba(18,8,42,.97));border-color:rgba(255,61,174,.35);box-shadow:0 12px 40px -6px rgba(3,0,14,.9),0 0 26px -12px rgba(255,46,136,.8)}
+  :root[data-theme="neon"] #rideMain .controls{background:linear-gradient(180deg,rgba(34,16,74,max(var(--pa,.82),.7)),rgba(18,8,42,max(var(--pa,.82),.7)));border-color:rgba(255,61,174,.35);box-shadow:0 12px 40px -6px rgba(3,0,14,.9),0 0 26px -12px rgba(255,46,136,.8)}
 }
 
 /* ---------- history, settings ---------- */
