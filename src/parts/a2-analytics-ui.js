@@ -1,4 +1,4 @@
-// ERGlab analytics UI (intervals.icu-style): the Progress tab (renderProgress) and the per-ride analysis overlay
+// BTB analytics UI (intervals.icu-style): the Progress tab (renderProgress) and the per-ride analysis overlay
 // (openRideAnalysis). Hand-written canvas charts (devicePixelRatio aware, pointer events, tooltips), no libraries.
 // Needs AN (a1-analysis.js) and the app helpers: esc, fmtTime, load, store, toast, S, PZ, HZ, rideStreams,
 // saveSettings/afterSettings. Optional: BODY (a3-body.js) and addWeightLog/removeWeightLog for the Body & energy section.

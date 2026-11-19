@@ -1,4 +1,4 @@
-# ERGlab: smart-trainer workouts in one HTML file
+# BTB (Bouge Ton Body): smart-trainer workouts in one HTML file
 
 `index.html` is the whole app: workouts, plans, live dashboard, ride analytics and ERG control for smart trainers over Bluetooth or ANT+. No install, no server code.
 
@@ -24,7 +24,7 @@ Local test: `python -m http.server 8765`, then open http://localhost:8765.
 ## Install as an app
 
 The hosted site (GitHub Pages build) ships a web app manifest and icons, so it can be installed:
-- **Windows / macOS / Android (Chrome, Edge):** Settings › *Install as an app* › **Install ERGlab**, or the install icon in the address bar. Bluetooth keeps working in the installed app.
+- **Windows / macOS / Android (Chrome, Edge):** Settings › *Install as an app* › **Install BTB**, or the install icon in the address bar. Bluetooth keeps working in the installed app.
 - **iPhone / iPad:** in Safari or Chrome, Share › **Add to Home Screen**. Apple does not allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and rides; to **ride**, keep using **Bluefy**. The home-screen app has its own storage: sign in there once with the emailed **code** (tapping the email link opens the browser instead).
 
 The single-file `index.html` in the repo has no manifest and is not installable.
@@ -56,6 +56,8 @@ Rides upload as TCX (gzipped) with power, HR and cadence, automatically after ea
 - `src/data/workouts_*.json`, `src/data/plans.json`: workout library and plans (power as a fraction of FTP, durations in seconds)
 - `node src/build.mjs` validates the data and writes `index.html`; `--out dist/index.html` writes a hosted build plus `manifest.webmanifest` and the icons from `src/assets/`
 - `src/protocol_notes.md`: FTMS smart-trainer protocol research the Bluetooth code is based on
-- `src/parts/`: inlined into the page by the build: analysis maths (`a1-analysis.js`), Progress / ride analysis views (`a2-*`), body & energy maths (`a3-body.js`), demo rider for Sim mode (`b1-demo.js`), Neon Miami theme and gauges (`z1-theme.css`, `z2-gauges.js`)
+- `src/parts/`: inlined into the page by the build: analysis maths (`a1-analysis.js`), Progress / ride analysis views (`a2-*`), body & energy maths (`a3-body.js`), demo rider for Sim mode (`b1-demo.js`), BTB logo lettering (`z0-btb-font.js`), Neon Miami theme, logo and gauges (`z1-theme.css`, `z2-gauges.js`)
 - `src/theme/`: source art for the theme; regenerate with `cd src/theme && node gen-art.mjs theme.src.css ../parts/z1-theme.css art`
+- `src/theme/icons.mjs`: the app icons. `node src/theme/icons.mjs png` re-renders `src/assets/*.png` with headless Chrome or Edge; `node src/theme/icons.mjs preview out.html` writes a comparison page.
+- The BTB logo and the "BOUGE TON BODY" tagline are simplified outlines of the **Cyber Brush** typeface by HansCo (Burhan Afif), which is free for personal / non-commercial use only; any commercial use of BTB needs its commercial licence (hanscostudio.com). The font file itself is not in this repo.
 - Tests: `node src/test/analysis.test.mjs`, `node src/test/body.test.mjs`, `node src/test/build.test.mjs`

@@ -1,6 +1,6 @@
-# Hosting ERGlab with private cloud storage (Supabase, EU)
+# Hosting BTB with private cloud storage (Supabase, EU)
 
-What you get: an invite-only app at `https://folfure.github.io/erglab/`. Each rider signs in with a one-time code by email. Their settings, rides (incl. heart rate), plan progress and Strava connection are stored in your Supabase project in Frankfurt, and nobody can read another rider's data (Row Level Security). Strava credentials and tokens never reach the browser or GitHub.
+What you get: an invite-only app at `https://folfure.github.io/btb/`. Each rider signs in with a one-time code by email. Their settings, rides (incl. heart rate), plan progress and Strava connection are stored in your Supabase project in Frankfurt, and nobody can read another rider's data (Row Level Security). Strava credentials and tokens never reach the browser or GitHub.
 
 | Secret / setting | Lives in | Never in |
 |---|---|---|
@@ -24,13 +24,13 @@ In **Authentication**:
 - **Sessions / JWT**: access-token expiry 1800 s or less; keep refresh-token reuse detection on.
 - **Emails › Templates › Magic Link** *and* **Confirm signup**: replace the body with
   ```html
-  <h2>Your ERGlab sign-in code</h2>
-  <p>Enter this code in ERGlab: <strong style="font-size:22px">{{ .Token }}</strong></p>
+  <h2>Your BTB sign-in code</h2>
+  <p>Enter this code in BTB: <strong style="font-size:22px">{{ .Token }}</strong></p>
   <p>It expires in 10 minutes. If you didn't ask for it, ignore this email.</p>
   ```
-- **Emails › Templates › Invite user**: keep the link, e.g. `<p>You have been invited to ERGlab.</p><p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p><p>After that, sign in at https://folfure.github.io/erglab/ with a code sent to this address.</p>`. Accepting confirms the account (until then, code sign-in is refused because sign-ups are off) and signs the rider straight in.
+- **Emails › Templates › Invite user**: keep the link, e.g. `<p>You have been invited to BTB.</p><p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p><p>After that, sign in at https://folfure.github.io/btb/ with a code sent to this address.</p>`. Accepting confirms the account (until then, code sign-in is refused because sign-ups are off) and signs the rider straight in.
 - **Emails › SMTP settings**: Supabase's built-in mailer only delivers to members of your Supabase team and only a few emails per hour. To invite other riders, plug in an SMTP provider (Resend, Brevo, Postmark…; all have free tiers).
-- **URL Configuration**: *Site URL* = `https://folfure.github.io/erglab/`; *Redirect URLs* add `https://folfure.github.io/erglab/` and `http://localhost:8765/`.
+- **URL Configuration**: *Site URL* = `https://folfure.github.io/btb/`; *Redirect URLs* add `https://folfure.github.io/btb/` and `http://localhost:8765/`.
 
 ## 3. Create the tables + deploy the Strava function
 In a terminal in this folder (Node is enough, `npx` fetches the CLI):
@@ -62,7 +62,7 @@ npx supabase db push
    - `ERGLAB_SUPABASE_URL` = `https://<ref>.supabase.co`
    - `ERGLAB_SUPABASE_KEY` = the `sb_publishable_…` key (the build refuses secret keys)
 2. Repo **Settings › Pages** → *Source* = **GitHub Actions**.
-3. Push to `main` (or *Actions › Deploy ERGlab › Run workflow*). The page is rebuilt with cloud sign-in enabled.
+3. Push to `main` (or *Actions › Deploy BTB › Run workflow*). The page is rebuilt with cloud sign-in enabled.
 
 ## 6. Invite riders
 **Authentication › Users › Invite user** → their email. They open the site, type that email, receive a code, done.
@@ -71,9 +71,9 @@ npx supabase db push
 
 To **block** someone without losing their data: *Ban user*. It takes effect immediately, because the database checks on every request. To **erase** someone and all their rides/HR data: *Delete user*.
 
-**Riders on iPhone:** they ride in **Bluefy** (sign in there with a code). They can also add ERGlab to the home screen (Safari › Share › Add to Home Screen) to browse plans and rides, but Apple gives home-screen apps no Bluetooth, and the icon needs its own sign-in with a code (the email link opens the browser, not the icon).
+**Riders on iPhone:** they ride in **Bluefy** (sign in there with a code). They can also add BTB to the home screen (Safari › Share › Add to Home Screen) to browse plans and rides, but Apple gives home-screen apps no Bluetooth, and the icon needs its own sign-in with a code (the email link opens the browser, not the icon).
 
-## 7. Recommended: give ERGlab its own domain
+## 7. Recommended: give BTB its own domain
 Every GitHub Pages site of the `folfure` account shares the origin `https://folfure.github.io`. Pages on one origin can read each other's browser storage, which includes a rider's login session. As long as you publish **no other** Pages sites on this account that's fine. For a clean separation, use a custom domain (e.g. `erglab.yourdomain.be`): repo *Settings › Pages › Custom domain* + *Enforce HTTPS*, then update the Supabase Site/Redirect URLs, `ALLOWED_ORIGINS` and the Strava callback domain to it.
 
 ## Local testing against the cloud
@@ -85,4 +85,4 @@ then `node src/build.mjs` and open http://localhost:8765. Without that file the 
 
 ## Notes
 - Heart-rate data is health data under GDPR. Keep the project in the EU, invite only people who agreed, and delete users who leave.
-- Riders' login sessions live in their own browser and are wiped on *Sign out*. Other pages on the same origin (`folfure.github.io`, i.e. your other GitHub Pages projects) can read browser storage. A custom domain for ERGlab removes that exposure.
+- Riders' login sessions live in their own browser and are wiped on *Sign out*. Other pages on the same origin (`folfure.github.io`, i.e. your other GitHub Pages projects) can read browser storage. A custom domain for BTB removes that exposure.

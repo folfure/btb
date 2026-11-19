@@ -61,59 +61,53 @@ function nmDecor(on) {
       if (!nmDecor.orig.has(el)) nmDecor.orig.set(el, el.innerHTML);
       const id = () => 'nmL' + (nmDecor.seq = (nmDecor.seq || 0) + 1) + '-';
       // gate: big logo with tagline; header: full logo + a wordmark-only variant that CSS shows on phones
-      el.innerHTML = el.closest('.gate') ? nmLogoSvg(id(), 'gate') : nmLogoSvg(id(), 'full') + nmLogoSvg(id(), 'compact');
+      el.innerHTML = el.closest('.gate') ? nmLogoSvg(id(), 'gate') : nmLogoSvg(id(), 'full') + nmLogoSvg(id(), 'stack');
     } else if (!on && swapped && nmDecor.orig.has(el)) el.innerHTML = nmDecor.orig.get(el);
   });
 }
 nmDecor.orig = new WeakMap();
 
-// Original cyberpunk wordmark: hexagon emblem with the power-wave line + angular slanted "ERGLAB"
-// letters drawn as polygons, cyan/magenta ghost copies (chromatic aberration), scanlines and two
-// glitch slices that the CSS flashes for a few frames every ~7 s. p = unique id prefix,
-// mode = 'full' (emblem + wordmark), 'compact' (wordmark only) or 'gate' (full + tagline).
+// BTB logo: "BTB" in the Cyber Brush lettering (parts/z0-btb-font.js), chrome B's and an ice-blue T, cyan/magenta
+// ghost copies (chromatic aberration), scanlines and two glitch slices that the CSS flashes for a few frames
+// every ~7 s, plus the "BOUGE TON BODY" tagline in the same lettering.
+// p = unique id prefix, mode = 'full' (BTB + two-line tagline beside it, header), 'stack' (tagline under a smaller
+// BTB, phone header) or 'gate' (big BTB with the tagline underneath, sign-in screen). The viewBox follows the ink.
 function nmLogoSvg(p, mode) {
-  const tagline = mode === 'gate', vb = mode === 'compact' ? '40 -3 204 46' : '-2 -3 246 ' + (tagline ? 64 : 46);
-  const G = {
-    E: [0, 'M5 0H26V9H9V15.5H22V24.5H9V31H26V40H0V5Z'],
-    R: [30, 'M0 0H22L28 6V17L23 22L29 40H19.5L14.5 25H9V40H0ZM9 8V17H19V8Z'],
-    G: [63, 'M6 0H28V9H10V31H18V26H14V18H28V40H6L0 34V6Z'],
-    L: [97, 'M0 0H9V31H24V40H4L0 36Z'],
-    A: [125, 'M6 0H24L30 6V40H21V30H9V40H0V6ZM9 9V21H21V9Z'],
-    B: [159, 'M0 0H22L28 6V15L25 20L28 25V34L22 40H0ZM9 8V16H19V8ZM9 24V32H19V24Z'],
-  };
-  const sh = c => G[c][1].replace(/([MHL])([\d. ]+)/g, (m, k, a) => {
-    const n = a.trim().split(/\s+/).map(Number);
-    return k + (k === 'H' ? n.map(x => x + G[c][0]) : n.map((v, i) => i % 2 ? v : v + G[c][0])).join(' ');
-  });
-  const wave = 'M6 44h10l6-20 8 30 8-38 6 28h14', u = id => `url(#${p}${id})`;
-  const emb = `<path d="M19 0L37 9.5V30.5L19 40L1 30.5V9.5Z" fill="${u('f')}" stroke="${u('h')}" stroke-width="2.2" stroke-linejoin="round"/>
-<path d="M19 5.5L32.2 12.5V27.5L19 34.5L5.8 27.5V12.5Z" fill="none" stroke="#ff2e88" stroke-opacity=".35" stroke-width=".8"/>
-<g transform="translate(3 3) scale(.5)" fill="none" stroke-linejoin="round" stroke-linecap="round">
-<path d="${wave}" stroke="#ff2e88" stroke-opacity=".6" stroke-width="10" filter="${u('b')}"/>
-<path d="${wave}" stroke="${u('w')}" stroke-width="5"/><path d="${wave}" stroke="#fff" stroke-opacity=".55" stroke-width="1.3"/></g>`;
-  const both = (a, b = a) => `<use href="#${p}erg" ${a}/><use href="#${p}lab" ${b}/>`;
-  return `<svg class="nm-logo nm-${mode}" viewBox="${vb}" role="img" aria-label="ERGlab"><defs>
-<linearGradient id="${p}e" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".44" stop-color="#ffd3ec"/><stop offset=".47" stop-color="#ff3d9a"/><stop offset=".8" stop-color="#ff6a3d"/><stop offset="1" stop-color="#ffc23f"/></linearGradient>
-<linearGradient id="${p}l" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2ffff"/><stop offset=".44" stop-color="#9cf7ff"/><stop offset=".47" stop-color="#1fc8ff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient>
-<linearGradient id="${p}h" x1="0" y1="0" x2="38" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff2e88"/><stop offset=".5" stop-color="#b03bff"/><stop offset="1" stop-color="#22e6ff"/></linearGradient>
-<linearGradient id="${p}w" x1="6" y1="0" x2="58" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb03a"/><stop offset=".45" stop-color="#ff2e88"/><stop offset="1" stop-color="#22e6ff"/></linearGradient>
-<radialGradient id="${p}f" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#3a1272"/><stop offset="1" stop-color="#0d0424"/></radialGradient>
+  const u = id => `url(#${p}${id})`, G = BTB_FONT.g, K = BTB_FONT.kern;
+  const xT = G.B[0] + K.BT, xB2 = xT + G.T[0] + K.TB;
+  const b1 = btbPath('B', 40, 0), t = btbPath('T', 40, xT), b2 = btbPath('B', 40, xB2);
+  const bx = [b1.box[0], Math.min(b1.box[1], t.box[1], b2.box[1]), b2.box[2], Math.max(b1.box[3], t.box[3], b2.box[3])]; // BTB bounds
+  const both = (a, b = a) => `<use href="#${p}chr" ${a}/><use href="#${p}ice" ${b}/>`;
+  const at = (r, x, y) => `transform="translate(${+(x - r.box[0]).toFixed(2)} ${+(y - r.box[1]).toFixed(2)})"`; // put a path's top-left ink at (x, y)
+  let tag = '', vb = [bx[0], bx[1], bx[2], bx[3]];
+  if (mode === 'full') {
+    const l1 = btbPath('BOUGE TON', 21), l2 = btbPath('BODY', 21), x = bx[2] + 5, h = bx[3] - bx[1];
+    tag = `<g class="nm-tagl"><path d="${l1.d}" ${at(l1, x, bx[1] + 1)} fill="${u('i')}"/><path class="nm-tag2" d="${l2.d}" ${at(l2, x + 2, bx[1] + h * 0.52)}/></g>`;
+    vb[2] = Math.max(x + l1.box[2] - l1.box[0], x + 2 + l2.box[2] - l2.box[0]);
+  } else if (mode === 'gate' || mode === 'stack') {
+    const w0 = btbPath('BOUGE TON BODY').box, size = 40 * (mode === 'gate' ? 168 : 236) / (w0[2] - w0[0]), l = btbPath('BOUGE TON BODY', size), cx = (bx[0] + bx[2]) / 2, w = l.box[2] - l.box[0];
+    const gap = mode === 'gate' ? 3 : 1;
+    tag = `<g class="nm-tagl"><path d="${l.d}" ${at(l, cx - w / 2, bx[3] + gap)} fill="${u('i')}"/></g>`;
+    vb = [Math.min(bx[0], cx - w / 2), bx[1], Math.max(bx[2], cx + w / 2), bx[3] + gap + l.box[3] - l.box[1]];
+  }
+  const pad = 3, VB = [vb[0] - pad, vb[1] - pad, vb[2] - vb[0] + 2 * pad, vb[3] - vb[1] + 2 * pad].map(v => +v.toFixed(1));
+  return `<svg class="nm-logo nm-${mode}" viewBox="${VB.join(' ')}" style="aspect-ratio:${VB[2]}/${VB[3]}" role="img" aria-label="BTB – Bouge Ton Body"><defs>
+<linearGradient id="${p}e" x1="0" y1="${bx[1]}" x2="0" y2="${bx[3]}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".44" stop-color="#ffd3ec"/><stop offset=".5" stop-color="#ff3d9a"/><stop offset=".8" stop-color="#ff6a3d"/><stop offset="1" stop-color="#ffc23f"/></linearGradient>
+<linearGradient id="${p}l" x1="0" y1="${bx[1]}" x2="0" y2="${bx[3]}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2ffff"/><stop offset=".44" stop-color="#9cf7ff"/><stop offset=".5" stop-color="#1fc8ff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient>
+<linearGradient id="${p}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2ffff"/><stop offset=".55" stop-color="#9cf7ff"/><stop offset="1" stop-color="#3fd0ff"/></linearGradient>
 <pattern id="${p}p" width="4" height="2.2" patternUnits="userSpaceOnUse"><rect width="4" height=".8" fill="#0c0520" fill-opacity=".34"/></pattern>
-<path id="${p}erg" fill-rule="evenodd" d="${sh('E') + sh('R') + sh('G')}"/>
-<path id="${p}lab" fill-rule="evenodd" d="${sh('L') + sh('A') + sh('B')}"/>
-<clipPath id="${p}c"><use href="#${p}erg" clip-rule="evenodd"/><use href="#${p}lab" clip-rule="evenodd"/></clipPath>
-<clipPath id="${p}c1"><rect x="-20" y="10" width="240" height="6"/></clipPath>
-<clipPath id="${p}c2"><rect x="-20" y="26" width="240" height="5"/></clipPath>
-<filter id="${p}b" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>
-</defs>${mode === 'compact' ? '' : '<g class="nm-emb">' + emb + '</g>'}
-
-<g transform="translate(52 0) skewX(-12)">
+<path id="${p}chr" d="${b1.d + b2.d}"/>
+<path id="${p}ice" d="${t.d}"/>
+<clipPath id="${p}c"><use href="#${p}chr"/><use href="#${p}ice"/></clipPath>
+<clipPath id="${p}c1"><rect x="${bx[0] - 10}" y="8" width="${bx[2] - bx[0] + 20}" height="6"/></clipPath>
+<clipPath id="${p}c2"><rect x="${bx[0] - 10}" y="25" width="${bx[2] - bx[0] + 20}" height="5"/></clipPath>
+</defs>
 <g class="nm-ga">${both('x="-1.8" fill="#22e6ff" fill-opacity=".8"')}</g>
 <g class="nm-gb">${both('x="1.8" y=".5" fill="#ff2e88" fill-opacity=".85"')}</g>
-<g class="nm-wm">${both(`fill="${u('e')}"`, `fill="${u('l')}"`)}<rect x="-10" y="0" width="210" height="40" fill="${u('p')}" clip-path="${u('c')}"/></g>
+<g class="nm-wm">${both(`fill="${u('e')}"`, `fill="${u('l')}"`)}<rect x="${bx[0]}" y="${bx[1]}" width="${bx[2] - bx[0]}" height="${bx[3] - bx[1]}" fill="${u('p')}" clip-path="${u('c')}"/></g>
 <g class="nm-s1" clip-path="${u('c1')}">${both('fill="#ffffff"', 'fill="#8ff6ff"')}</g>
-<g class="nm-s2" clip-path="${u('c2')}">${both('fill="#22e6ff"', 'fill="#ff4fb0"')}</g></g>
-${tagline ? '<text class="nm-tag" x="46" y="57" textLength="188" lengthAdjust="spacing"><tspan>//</tspan> INDOOR POWER LAB</text>' : ''}</svg>`;
+<g class="nm-s2" clip-path="${u('c2')}">${both('fill="#22e6ff"', 'fill="#ff4fb0"')}</g>
+${tag}</svg>`;
 }
 
 // Cadence colour of the active theme (same bands as the template's cadColor).

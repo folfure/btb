@@ -1,4 +1,4 @@
-name: Deploy ERGlab to GitHub Pages
+name: Deploy BTB to GitHub Pages
 
 on:
   push:

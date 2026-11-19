@@ -659,7 +659,7 @@ const ANT = (() => {
   function unsupportedMsg() {
     const p = platform();
     if (p === 'ios') return 'ANT+ USB sticks can\'t be used on iPhone or iPad (Apple gives web pages no USB access). Use Bluetooth in Bluefy instead.';
-    if (typeof navigator !== 'undefined' && navigator.usb && typeof isSecureContext !== 'undefined' && !isSecureContext) return 'ANT+ needs a secure page: open ERGlab over https:// or localhost.';
+    if (typeof navigator !== 'undefined' && navigator.usb && typeof isSecureContext !== 'undefined' && !isSecureContext) return 'ANT+ needs a secure page: open BTB over https:// or localhost.';
     return 'This browser can\'t use USB devices. For an ANT+ stick use Chrome or Edge (Windows, macOS, Linux, Android).';
   }
   function explain(e) {
@@ -672,7 +672,7 @@ const ANT = (() => {
       return 'The browser was not allowed to open the ANT+ stick: ' + m;
     }
     if (/claim|busy|in use/i.test(m) || n === 'NetworkError' || n === 'InvalidStateError')
-      return 'Could not open the ANT+ stick: another program is probably using it (Garmin Express, Zwift, another ERGlab tab). Close it, then unplug and replug the stick.' + (p === 'win' ? ' On Windows the stick also needs the WinUSB driver (Settings › ANT+).' : '');
+      return 'Could not open the ANT+ stick: another program is probably using it (Garmin Express, Zwift, another BTB tab). Close it, then unplug and replug the stick.' + (p === 'win' ? ' On Windows the stick also needs the WinUSB driver (Settings › ANT+).' : '');
     return 'ANT+: ' + m;
   }
 
@@ -699,7 +699,7 @@ const ANT = (() => {
       <li>Open the <a href="https://www.thisisant.com/developer/ant-plus/ant-plus-basics/network-keys" target="_blank" rel="noopener noreferrer">ANT+ network keys</a> page and copy the <b>ANT+ Managed Network</b> key (8 bytes).</li>
       <li>Paste it above (spaces, commas or 0x are fine) and tap <b>Save</b>.</li>
     </ol>
-    <p>The key is licensed to ANT+ adopters, so ERGlab can't include it for you. It is stored on <b>this device only</b> and is never synced to your account.</p>
+    <p>The key is licensed to ANT+ adopters, so BTB can't include it for you. It is stored on <b>this device only</b> and is never synced to your account.</p>
   </details>
   <details class="ant-help">
     <summary>Setting up the USB stick</summary>
@@ -710,7 +710,7 @@ const ANT = (() => {
       <li><b>Android:</b> Chrome with a USB OTG adapter (USB-C or micro-USB). Allow access when Android asks.</li>
       <li><b>iPhone / iPad:</b> not possible (no USB access for web pages): use Bluetooth in Bluefy.</li>
     </ul>
-    <p>Only <b>one program</b> can use the stick at a time: close Garmin Express, Zwift and other ERGlab tabs first. The first time, ERGlab pairs with the first trainer / strap / power meter it hears, so keep other people's devices asleep or away.</p>
+    <p>Only <b>one program</b> can use the stick at a time: close Garmin Express, Zwift and other BTB tabs first. The first time, BTB pairs with the first trainer / strap / power meter it hears, so keep other people's devices asleep or away.</p>
   </details>
 </div>`;
   }

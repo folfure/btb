@@ -89,7 +89,7 @@ if (qs.get('still')) { for (let i = 0; i < 20; i++) tick(); } else { tick(); set
   [['--c-power', 0.9, 60], ['--c-hr', 0.6, 30], ['--c-cad', 0.5, 15]].forEach(([v, b, a]) => { x.strokeStyle = cs.getPropertyValue(v).trim(); x.lineWidth = 1.6; x.beginPath(); for (let i = 0; i < W - 34; i += 3) x.lineTo(30 + i, H - 16 - (b + Math.sin(i / 23) * .2 + Math.random() * .05) * a); x.stroke(); });
 })();
 `;
-const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a0d13"><title>ERGlab theme demo</title><style>${css.replace('/*__PARTS_CSS__*/', theme)}</style></head><body>${body}<script>'use strict';${demo}</script></body></html>`;
+const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a0d13"><title>BTB theme demo</title><style>${css.replace('/*__PARTS_CSS__*/', theme)}</style></head><body>${body}<script>'use strict';${demo}</script></body></html>`;
 mkdirSync(repo + '/dist', { recursive: true });
 writeFileSync(repo + '/dist/theme-demo.html', html);
 console.log('demo', html.length);

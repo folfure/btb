@@ -1,6 +1,6 @@
 # Smart trainers + Web Bluetooth: protocol notes (researched 2026-11-18, generalised 2026-11-19)
 
-How ERGlab talks to an indoor trainer, for any brand. "Connect trainer" opens the browser's Bluetooth chooser with
+How BTB talks to an indoor trainer, for any brand. "Connect trainer" opens the browser's Bluetooth chooser with
 service filters only (no brand or name filters), connects, then picks the protocol from what the device exposes:
 
 | Order | Protocol | How it is detected | Control | Adapter |
@@ -185,7 +185,7 @@ tunnels ANT+ FE-C data pages. Firmware from about 2020 onwards adds FTMS; the ap
 - Service `6e40fec1-b5a3-f393-e0a9-e50e24dcca9e` (a Nordic-UART-style layout):
   - `6e40fec2-…` (notify): trainer to app, ANT broadcast messages carrying FE-C data pages.
   - `6e40fec3-…` (write / write without response): app to trainer, ANT acknowledged messages carrying control pages.
-    GoldenCheetah writes without response; ERGlab does the same when the characteristic allows it.
+    GoldenCheetah writes without response; BTB does the same when the characteristic allows it.
 - **ANT message framing** (one per notification / write, 13 bytes):
   `[0xA4 sync, 0x09 length, msgId, channel, page[8], checksum]`, checksum = XOR of the 12 preceding bytes.
   `msgId` 0x4E = broadcast data (what the trainer sends), 0x4F = acknowledged data (what apps send). The channel byte
@@ -220,7 +220,7 @@ GoldenCheetah (`BT40Device.cpp`) and qdomyos-zwift (`wahookickrsnapbike`), which
 
 - Characteristic `a026e005-0a7d-4ab3-97fa-f1500f9feb8b` (write + **indicate**) in service `0x1818`. Power and crank
   cadence come from the normal Cycling Power Measurement `0x2A63`. Some firmware also has the vendor service
-  `a026ee01-…`; ERGlab probes it only as a fallback location for the characteristic.
+  `a026ee01-…`; BTB probes it only as a fallback location for the characteristic.
 - Enable indications first (CCCD `02 00`), then:
 
 | Op | Name | Parameters (LE) |
@@ -236,7 +236,7 @@ GoldenCheetah (`BT40Device.cpp`) and qdomyos-zwift (`wahookickrsnapbike`), which
 | `0x48` | Wheel circumference | uint16 mm x 10 |
 
 - Replies arrive as indications `[0x01 = success, opcode, ...]` (qdomyos-zwift: ERG reply `01 42 01 00 lo hi`).
-  ERGlab matches replies by opcode and treats any first byte other than `0x01` as a failure.
+  BTB matches replies by opcode and treats any first byte other than `0x01` as a failure.
 - A grade only applies in simulation mode, so the app sends `0x43` before the first `0x46` after ERG; `0x42` switches
   back to ERG. On disconnect it sends simulation mode + grade 0 so the flywheel spins freely.
 - **Unverified on hardware:** that every pre-FTMS firmware needs (and accepts) the unlock; one community note mentions

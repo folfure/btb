@@ -109,8 +109,8 @@ if (pwa) {
   const dir = dirname(target);
   for (const f of ['apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png']) copyFileSync(join(here, 'assets', f), join(dir, f));
   writeFileSync(join(dir, 'manifest.webmanifest'), JSON.stringify({
-    id: './', name: 'ERGlab', short_name: 'ERGlab',
-    description: 'Structured indoor cycling workouts with ERG control for smart trainers.',
+    id: './', name: 'BTB – Bouge Ton Body', short_name: 'BTB',
+    description: 'Bouge Ton Body: structured indoor cycling workouts with ERG control for smart trainers.',
     start_url: './', scope: './', display: 'standalone', orientation: 'any',
     background_color: '#0a0d13', theme_color: '#0a0d13', lang: 'en', categories: ['sports', 'health', 'fitness'],
     icons: [

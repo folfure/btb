@@ -1,4 +1,4 @@
-// ERGlab analysis engine (intervals.icu-style metrics). Pure functions, no DOM, no globals except AN.
+// BTB analysis engine (intervals.icu-style metrics). Pure functions, no DOM, no globals except AN.
 // Uses the template's PZ / HZ zone tables when present (falls back to the same fractions otherwise).
 // Never throws on odd input: bad samples (NaN, null, negative) count as 0, impossible results are null.
 const AN = (() => {

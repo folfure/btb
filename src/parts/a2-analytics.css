@@ -1,4 +1,4 @@
-/* ERGlab analytics (Progress tab + ride analysis overlay). Colours come from theme variables only. */
+/* BTB analytics (Progress tab + ride analysis overlay). Colours come from theme variables only. */
 .anx{
   --an-power:var(--c-power,#ff9f2e); --an-curve:var(--c-curve,var(--neon-pink,var(--z5,#ff8a1f))); --an-hr:var(--c-hr,#ff4d6d); --an-cad:var(--c-cad,#4cc2ff); --an-tgt:var(--c-target,#e9edf5);
   --an-ctl:var(--c-ctl,var(--accent,#4cc2ff)); --an-atl:var(--c-atl,var(--neon-violet,#d65cff)); --an-wbal:var(--c-wbal,#8f7bff); --an-cmp:var(--c-cmp,var(--muted,#8c96ab));

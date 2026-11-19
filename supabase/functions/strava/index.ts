@@ -1,4 +1,4 @@
-// ERGlab ↔ Strava bridge (Supabase Edge Function, Deno).
+// BTB ↔ Strava bridge (Supabase Edge Function, Deno).
 // Holds the Strava Client Secret and every rider's Strava tokens server-side.
 // The browser only ever sends its own Supabase session; it never sees a Strava token.
 //
@@ -53,7 +53,7 @@ async function requireRider(req: Request): Promise<string> {
   if (!jwt || jwt === PUBLIC_KEY) throw new HttpError(401, 'Sign in first');
   const { data, error } = await admin.auth.getUser(jwt);
   if (error || !data?.user?.id) throw new HttpError(401, 'Session expired, sign in again');
-  if (!isRider(data.user)) throw new HttpError(403, 'This account is not an invited ERGlab rider');
+  if (!isRider(data.user)) throw new HttpError(403, 'This account is not an invited BTB rider');
   return data.user.id;
 }
 
@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
         user_id: uid, athlete, access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at,
         scope: String(scope).slice(0, 200), refreshing_until: null, updated_at: new Date().toISOString(),
       });
-      if (error?.code === '23505') { await deauthorize(j.access_token); throw new HttpError(409, 'This Strava account is already linked to another ERGlab rider'); }
+      if (error?.code === '23505') { await deauthorize(j.access_token); throw new HttpError(409, 'This Strava account is already linked to another BTB rider'); }
       if (error) throw new HttpError(500, 'Could not store the Strava connection');
       // switched to a different Strava athlete: revoke the old grant so it doesn't linger
       if (prev && prev.athlete?.id && prev.athlete.id !== athlete.id) await deauthorize(prev.access_token);

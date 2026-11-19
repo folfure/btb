@@ -1,4 +1,4 @@
-// ERGlab body metrics: age, BMR, max HR, ride calories, VO2max, weight trend / target, energy balance,
+// BTB body metrics: age, BMR, max HR, ride calories, VO2max, weight trend / target, energy balance,
 // eFTP / resting HR / VO2max history. Pure functions, no DOM, no globals except BODY (reads AN when present).
 // Never throws: missing or odd inputs give null (scalars) or an empty / null-filled structure (series).
 // Days are local calendar days 'YYYY-MM-DD'; day arithmetic runs on UTC day numbers so DST never shifts a day.

@@ -102,27 +102,45 @@
 :root[data-theme="neon"] .brand b{background:linear-gradient(180deg,#f1feff 0%,#7ff3ff 45%,#22b8ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.12em}
 :root[data-theme="neon"] .brand svg:not(.nm-logo){filter:drop-shadow(0 0 6px rgba(255,61,174,.7))}
 :root[data-theme="neon"] .brand svg:not(.nm-logo) rect{fill:#1d0a40}
-:root[data-theme="neon"] .brand svg:not(.nm-logo) path{stroke:#ff4fb0}
-/* cyberpunk wordmark + emblem (markup from nmLogoSvg in parts/z2-gauges.js, swapped in by applyTheme) */
-:root[data-theme="neon"] .brand .nm-logo{display:block;flex:none;height:30px;width:calc(30px * 246 / 46);overflow:visible;
+:root[data-theme="neon"] .brand svg:not(.nm-logo) path:first-of-type{fill:#ff4fb0}
+/* BTB logo + "Bouge Ton Body" tagline (markup from nmLogoSvg in parts/z2-gauges.js, swapped in by applyTheme) */
+:root[data-theme="neon"] .brand .nm-logo{display:block;flex:none;height:46px;width:auto;overflow:visible;
   filter:drop-shadow(0 0 4px rgba(255,46,136,.55)) drop-shadow(0 0 12px rgba(34,230,255,.16))}
-:root[data-theme="neon"] .gate .brand .nm-logo{width:min(290px,100%);height:auto;aspect-ratio:246/64;margin:2px auto 6px}
-:root[data-theme="neon"] .brand .nm-compact{display:none}
-/* phones: wordmark only (the header also carries the labelled connection pills); it may shrink a little */
+:root[data-theme="neon"] .gate .brand .nm-logo{width:min(280px,100%);height:auto;margin:2px auto 8px}
+:root[data-theme="neon"] .brand .nm-stack{display:none}
+/* phones: the tagline goes under a smaller BTB so the labelled connection pills still fit beside it */
 @media (max-width:640px){
   :root[data-theme="neon"] header .brand{min-width:0;flex:0 1 auto}
-  :root[data-theme="neon"] header .brand .nm-full{display:none}
-  :root[data-theme="neon"] header .brand .nm-compact{display:block;width:112px;max-width:100%;min-width:72px;height:auto;aspect-ratio:204/46}
+  :root[data-theme="neon"] header .brand .nm-full{height:38px}
 }
-.nm-logo .nm-tag{font:700 8.4px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#8ff6ff}
-.nm-logo .nm-tag tspan{fill:#ff4fb0}
+@media (max-width:440px){
+  :root[data-theme="neon"] header .brand{flex:none}
+  :root[data-theme="neon"] header .brand .nm-full{display:none}
+  :root[data-theme="neon"] header .brand .nm-stack{display:block;height:40px}
+  :root[data-theme="neon"] header .conn{min-width:0}
+}
+@media (max-width:360px){ :root[data-theme="neon"] header .pill .lbl{max-width:3.6em} }
+.nm-logo .nm-tagl path{paint-order:stroke;stroke:#14052e;stroke-width:1.4px;stroke-linejoin:round}
+.nm-logo .nm-tag2{fill:#ff9fd0}
+/* narrow phones: the logo keeps its size (the tagline must stay readable), the pill labels give way */
+@media (max-width:420px){
+  :root[data-theme="neon"] header .brand{flex:none}
+  :root[data-theme="neon"] header .brand .nm-full{height:33px}
+  :root[data-theme="neon"] header .conn{min-width:0}
+  :root[data-theme="neon"] header .pill .lbl{max-width:4.2em}
+}
+@media (max-width:370px){ :root[data-theme="neon"] header .pill .lbl{display:none} }
+@media (max-width:279px){
+  :root[data-theme="neon"] header .brand .nm-full{display:none}
+  :root[data-theme="neon"] header .brand .nm-compact{display:block;height:34px}
+}
 @media (prefers-reduced-motion:no-preference){
   .nm-logo .nm-ga{animation:nm-glA 7.3s steps(1,end) infinite}
   .nm-logo .nm-gb{animation:nm-glB 7.3s steps(1,end) infinite}
   .nm-logo .nm-wm{animation:nm-flick 7.3s steps(1,end) infinite}
   .nm-logo .nm-s1{animation:nm-glS1 7.3s steps(1,end) infinite}
   .nm-logo .nm-s2{animation:nm-glS2 7.3s steps(1,end) infinite}
-  .nm-logo .nm-emb{animation:nm-flick 7.3s steps(1,end) -.12s infinite}
+  .nm-logo .nm-tagl{animation:nm-flick 7.3s steps(1,end) -.12s infinite}
   .gate .nm-logo *{animation-delay:-2.6s}
 }
 .nm-logo .nm-s1,.nm-logo .nm-s2{opacity:0}
