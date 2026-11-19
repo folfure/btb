@@ -5,7 +5,6 @@
   "Customize the ride screen": "Personnaliser l'écran de sortie",
   "Phone": "Téléphone",
   "Computer and tablet": "Ordinateur et tablette",
-  "Tick the small tiles to show next to the power gauge; the arrows set their order. Saved in your profile.": "Coche les petites tuiles à afficher à côté de la jauge de puissance ; les flèches règlent leur ordre. Enregistré dans ton profil.",
   "Move up": "Monter",
   "Move down": "Descendre",
   "Workout steps list": "Liste des étapes de la séance",
@@ -21,5 +20,7 @@
   "Don't pair it in the phone's Bluetooth settings: if it shows there as connected, tap ⓘ › Forget this device.": "Ne l'associe pas dans les réglages Bluetooth du téléphone : s'il y apparaît comme connecté, touche ⓘ › Oublier cet appareil.",
   "Still not listed? Show every Bluetooth device nearby and pick it by name.": "Toujours absent ? Affiche tous les appareils Bluetooth à proximité et choisis-le par son nom.",
   "Show all Bluetooth devices": "Afficher tous les appareils Bluetooth",
-  "Search again": "Chercher à nouveau"
+  "Search again": "Chercher à nouveau",
+  "Tick the figures to show next to the power gauge; the arrows set their order. Saved in your profile.": "Coche les valeurs à afficher à côté de la jauge de puissance ; les flèches règlent leur ordre. Enregistré dans ton profil.",
+  "(top of the gauge)": "(en haut de la jauge)"
 }

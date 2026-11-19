@@ -116,13 +116,20 @@ function themeCad(c) {
   return t.cad[c < 60 ? 0 : c < 75 ? 1 : c < 100 ? 2 : c < 115 ? 3 : 4];
 }
 
-// o = { label, unit, min, max, bands: [{from, to, col}], ticks: [numbers] }
+// o = { label, unit, min, max, bands: [{from, to, col}], ticks: [numbers], scale?: [[value, arcFraction], ...] (piecewise,
+//       increasing: squeeze the ends, widen the useful middle), colorTicks?: tick labels in the colour of their band }
 // returns { o, set(v, { target, color, zoneText, subHtml, dec }) }
 function makeGauge(host, o) {
   const id = 'ng' + (makeGauge.seq = (makeGauge.seq || 0) + 1) + '-';
   const CX = 100, CY = 100, R = 80, RB = 91, A0 = 135, SW = 270;
   const span = (o.max - o.min) || 1;
-  const frac = v => Math.min(1, Math.max(0, (v - o.min) / span));
+  const K = Array.isArray(o.scale) && o.scale.length > 1 ? o.scale : null;
+  const frac = v => {
+    if (!K) return Math.min(1, Math.max(0, (v - o.min) / span));
+    if (!(v > K[0][0])) return K[0][1];
+    for (let i = 1; i < K.length; i++) if (v <= K[i][0]) return K[i - 1][1] + (K[i][1] - K[i - 1][1]) * (v - K[i - 1][0]) / ((K[i][0] - K[i - 1][0]) || 1);
+    return K[K.length - 1][1];
+  };
   const ang = v => A0 + SW * frac(v);
   const xy = (r, a) => { const t = a * Math.PI / 180; return [(CX + r * Math.cos(t)).toFixed(2), (CY + r * Math.sin(t)).toFixed(2)]; };
   const arc = (r, a0, a1) => { const [x0, y0] = xy(r, a0), [x1, y1] = xy(r, a1); return `M${x0} ${y0}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1} ${y1}`; };
@@ -149,7 +156,8 @@ function makeGauge(host, o) {
     if (lastA - a < 21 && i !== 0) continue;
     if (lastA - a < 21 && i === 0) lb = lb.replace(/<text[^>]*>[^<]*<\/text>$/, '');
     const [tx, ty] = xy(52, a);
-    lb += `<text class="ng-lb" x="${tx}" y="${(+ty + 4).toFixed(2)}" text-anchor="middle">${txt(+v.toFixed(2))}</text>`;
+    const band = o.colorTicks && (o.bands || []).find(b => v >= b.from && v < b.to) || (o.colorTicks && v >= (o.bands || []).at(-1)?.from ? o.bands.at(-1) : null);
+    lb += `<text class="ng-lb" x="${tx}" y="${(+ty + 4).toFixed(2)}" text-anchor="middle"${band ? ` style="fill:${txt(band.col)}"` : ''}>${txt(+v.toFixed(2))}</text>`;
     lastA = a;
   }
   const tip = `<g class="ng-tip" style="transform-origin:${CX}px ${CY}px;transform:rotate(${A0}deg);opacity:0">
