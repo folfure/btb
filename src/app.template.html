@@ -498,7 +498,7 @@ body.riding #btBanner{display:none}
       <button type="button" class="btn ghost sm" style="width:100%;margin-top:8px" id="gateBack">Use another email</button>
     </form>
     <div id="gateOffline" class="hidden" style="margin-top:12px"><button class="btn" style="width:100%" id="gateOfflineBtn">Ride offline (sync later)</button></div>
-    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0">Invite-only. Ask the owner for access.</p>
+    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0">Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
   </div>
 </div>
 <div id="modalRoot"></div>
@@ -1769,7 +1769,8 @@ function go(id) {
   if (id === 'ride') { showRide(); }
   if (id === 'plans') renderPlans();
   if (id === 'history') renderHistory();
-  try { history.replaceState(null, '', '#' + id); } catch { }
+  // keep an invitation/sign-in fragment intact until the auth library has read it
+  if (!/(access_token|error_description|error_code)=/.test(location.hash)) { try { history.replaceState(null, '', '#' + id); } catch { } }
   window.scrollTo({ top: 0 });
 }
 
@@ -2310,14 +2311,19 @@ const cloud = {
     gate('loading');
     try {
       await this.loadLib();
-      this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'erglab-auth' } });
+      // the "Accept invitation" link returns here with the session (or an error) in the URL fragment
+      const frag = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      const linkErr = frag.get('error_description') || frag.get('error');
+      const fromLink = frag.has('access_token') || !!linkErr;
+      this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'erglab-auth' } });
       this.sb.auth.onAuthStateChange((ev, session) => {
         if (ev === 'SIGNED_OUT' && this.user && !this._leaving) { this._leaving = true; wipeLocal(); location.replace(location.pathname); return; }
         if (session && session.user) this.user = session.user;
       });
       const { data } = await this.sb.auth.getSession();
-      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); }
-      else gate('email');
+      if (fromLink) { try { history.replaceState(null, '', location.pathname + location.search + '#workouts'); } catch { } }
+      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast('Welcome to ERGlab! Next time, sign in with a code sent to your email.', 6000); }
+      else gate('email', linkErr ? 'That link has expired or was already used. Enter your email to get a sign-in code instead.' : undefined);
     } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message || 'Cannot reach the server.'); }
   },
   async afterLogin() {

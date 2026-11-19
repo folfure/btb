@@ -28,7 +28,7 @@ In **Authentication**:
   <p>Enter this code in ERGlab: <strong style="font-size:22px">{{ .Token }}</strong></p>
   <p>It expires in 10 minutes. If you didn't ask for it, ignore this email.</p>
   ```
-- **Emails › Templates › Invite user**: something like *"You've been invited to ERGlab. Open https://folfure.github.io/erglab/ and sign in with this email address."*
+- **Emails › Templates › Invite user**: keep the link, e.g. `<p>You have been invited to ERGlab.</p><p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p><p>After that, sign in at https://folfure.github.io/erglab/ with a code sent to this address.</p>`. Accepting confirms the account (until then, code sign-in is refused because sign-ups are off) and signs the rider straight in.
 - **Emails › SMTP settings**: Supabase's built-in mailer only delivers to members of your Supabase team and only a few emails per hour. To invite other riders, plug in an SMTP provider (Resend, Brevo, Postmark…; all have free tiers).
 - **URL Configuration**: *Site URL* = `https://folfure.github.io/erglab/`; *Redirect URLs* add `https://folfure.github.io/erglab/` and `http://localhost:8765/`.
 
