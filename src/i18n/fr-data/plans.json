@@ -192,6 +192,21 @@
         "Fraîcheur + test",
         "Valider la nouvelle FTP"
       ]
+    },
+    "relay-24h-cambre-6wk": {
+      "name": "Relais 24h : Bois de la Cambre",
+      "level": "Débutant",
+      "goal": "Des relais forts et répétables pendant 24 heures",
+      "desc": "Six semaines pour préparer une équipe scoute aux 24h vélo du Bois de la Cambre à Bruxelles, un relais de 24 heures où chaque coureur prend des relais de 1 à 4 tours (environ 5 à 15 minutes à fond), encore et encore, de jour comme de nuit. Trois séances de 30 à 60 minutes par semaine, compatibles avec l'école : des efforts de la durée d'un tour avec un départ dur et une fin forte, des simulations de relais qui t'apprennent à repartir fort après une pause, des accélérations courtes et des sorties faciles en Zone 2 pour récupérer et construire ton foncier. La semaine 1 commence par un test rampe pour régler ta FTP, la semaine 4 est plus légère et la semaine 6 est un affûtage qui se termine par un court déblocage un ou deux jours avant le week-end de course. Gérer ton relais : pars fort mais pas à bloc sur le premier tour (sprinte 20-30 secondes après le passage de relais, puis stabilise), tiens une allure régulière que tu peux garder tout le relais, et ne vide le réservoir que dans les dernières centaines de mètres avant de passer la main. Entre deux relais : bois, mange quelque chose, mets tout de suite des vêtements chauds et, la nuit, dors un peu dès que ton prochain relais est à plus de deux heures environ. Fais les séances dans l'ordre et garde un jour de repos entre les deux séances dures de la semaine.",
+      "src": "Préparation spécifique course (intervalles au seuil de la durée d'un tour, simulations de relais) ; semaine 4 plus légère et une semaine d'affûtage",
+      "focus": [
+        "Trouve ta FTP",
+        "Relais d'un tour",
+        "Relais plus longs",
+        "Semaine légère",
+        "Simulation de course",
+        "Affûtage + déblocage"
+      ]
     }
   }
 }

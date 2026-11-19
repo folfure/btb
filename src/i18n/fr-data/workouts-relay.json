@@ -1,0 +1,67 @@
+{
+  "w": {
+    "relay-z2-30": {
+      "name": "Base relais Z2 30",
+      "desc": "Une sortie aérobie courte et facile pour les journées d'école chargées ou le lendemain d'une séance dure. Roule à 63-68% FTP, en pouvant encore parler en phrases complètes, avec deux petites minutes à cadence haute pour garder des jambes vives. C'est ce moteur aérobie qui te permet de récupérer entre deux relais et de bien rouler encore des heures plus tard.",
+      "src": "Endurance Zone 2 de Coggan ; base aérobie pour des efforts de course répétés"
+    },
+    "relay-z2-45": {
+      "name": "Base relais Z2 45",
+      "desc": "Quarante-cinq minutes de Zone 2 stable à 65-68% FTP avec trois hausses de cadence d'une minute. Reste assez facile pour respirer par le nez la plupart du temps : ça doit sembler presque trop facile. Ces sorties construisent la base aérobie qui t'aide à récupérer entre les relais pendant 24 heures, sans ajouter beaucoup de fatigue.",
+      "src": "Endurance Zone 2 de Coggan ; base aérobie pour des efforts de course répétés"
+    },
+    "relay-quick-laps-30": {
+      "name": "Tours rapides 3x3",
+      "desc": "Trois efforts courts de 3 minutes, la durée d'un petit tour, dans une séance de 30 minutes : un départ dur de 20 secondes comme quand tu prends le relais d'un équipier, environ 102% FTP pour le tour, puis 30 dernières secondes fortes. Récupère 3 minutes en pédalant facile entre les efforts. Une première approche en douceur de l'allure de relais, qui tient dans une soirée d'école.",
+      "src": "Intervalles seuil à VO2 (zones 4-5 de Coggan) en forme de relais"
+    },
+    "relay-one-lap-4x4": {
+      "name": "Relais d'un tour 4x4",
+      "desc": "Quatre efforts de 4 minutes, chacun à peu près un tour du circuit du Bois de la Cambre : 20 secondes dures pour lancer après le passage de relais, un peu au-dessus de la FTP (103%) pendant le tour, puis 30 dernières secondes fortes pour passer la main à pleine vitesse. Récupère 4 minutes facile entre les efforts. Tu apprends à partir vite sans exploser et à finir ton relais fort.",
+      "src": "Intervalles seuil/VO2 (zones 4-5 de Coggan) ; gestion d'un relais"
+    },
+    "relay-overtake-surges-45": {
+      "name": "Accélérations pour dépasser 3x6",
+      "desc": "Trois blocs de 6 minutes juste sous le seuil (92% FTP) avec une accélération de 20 secondes à 140% toutes les 2 minutes, comme pour dépasser des coureurs plus lents ou boucher un trou après un virage. Récupère 4 minutes facile entre les blocs. Tu apprends à accélérer puis à reprendre tout de suite une allure tenable, sans t'arrêter pour souffler.",
+      "src": "Intervalles over-under / accélérations (pratique courante d'entraînement pour la course)"
+    },
+    "relay-two-lap-3x8": {
+      "name": "Relais de deux tours 3x8",
+      "desc": "Trois efforts de 8 minutes, environ deux tours chacun : 30 secondes dures au passage de relais, stabilise à la FTP (100%) et tiens-la, puis monte à 107% pour la dernière minute. Récupère 5 minutes facile entre les efforts. La clé, c'est un premier tour contrôlé : si tu es à bout de souffle après deux minutes, tu es parti trop fort.",
+      "src": "Intervalles au seuil classiques (zone 4 de Coggan) avec départ dur et fin forte"
+    },
+    "relay-multi-lap-2x12": {
+      "name": "Relais de plusieurs tours 2x12",
+      "desc": "Deux efforts de 12 minutes, la durée d'un relais de trois à quatre tours : un départ dur de 30 secondes, 10 minutes à 96% FTP, puis 90 secondes à 105% pour finir fort. Récupère 6 minutes facile entre les deux. Roule la partie du milieu à une allure que tu pourrais tenir un peu plus longtemps, et garde une cadence régulière autour de 90 rpm.",
+      "src": "Intervalles au seuil (zone 4 de Coggan) ; gestion d'un long relais"
+    },
+    "relay-sim-4x5": {
+      "name": "Simulation de relais 4x5",
+      "desc": "Quatre relais de course de 5 minutes (départ dur, allure du tour à 103% FTP, fin forte) avec 8 minutes de roulage très facile entre eux, comme quand tu attends ton prochain relais. Utilise ces minutes faciles comme le jour de la course : bois, mange un peu et reste au chaud. Tu t'entraînes à repartir fort après une pause, et c'est tout l'enjeu d'un relais de 24 heures.",
+      "src": "Simulation de course ; efforts seuil/VO2 répétés avec longues récupérations"
+    },
+    "relay-sim-3x10": {
+      "name": "Simulation de relais 3x10",
+      "desc": "Trois relais de course de 10 minutes, deux à trois tours (30 secondes dures, 98% FTP, puis 106% pour les 90 dernières secondes) avec 8 minutes de roulage très facile entre eux. Fais de ces minutes faciles ta tente de relais : bois, mange et reste au chaud. Le dernier relais doit être aussi bon que le premier ; sinon, roule le premier un peu moins fort.",
+      "src": "Simulation de course ; efforts au seuil répétés avec longues récupérations"
+    },
+    "relay-accelerations-30": {
+      "name": "Accélérations de relais 30",
+      "desc": "Du travail court et tranchant pour les moments qui font la différence en relais : six pointes de 15 secondes à 150% FTP, puis quatre accélérations de 30 secondes à 125%, avec du pédalage facile entre chaque. Mouline vite (100+ rpm) et garde le haut du corps relâché. Tu gagnes du punch pour relancer après le passage de relais, dépasser et boucher les trous, avec peu de fatigue au total.",
+      "src": "Intervalles anaérobies courts (zone 6 de Coggan) ; pratique courante de préparation à la course"
+    },
+    "relay-opener-30": {
+      "name": "Déblocage avant la course 30",
+      "desc": "Une courte séance à faire un ou deux jours avant la course. Surtout du roulage facile, avec deux courtes répétitions de tour (20 secondes dures, puis la FTP pendant moins de 2 minutes) et trois pointes de 10 secondes pour réveiller les jambes. Tu dois finir frais et vif, pas fatigué.",
+      "src": "Routine classique de déblocage avant la course (pratique courante d'entraînement)"
+    }
+  },
+  "lbl": {
+    "Relay change - hard start": "Passage de relais - départ dur",
+    "Lap pace": "Allure du tour",
+    "Strong finish": "Fin forte",
+    "Hand over - easy": "Relais passé - facile",
+    "Between turns - eat, drink, stay warm": "Entre les relais - mange, bois, reste au chaud",
+    "Overtake surge": "Accélération pour dépasser"
+  }
+}
