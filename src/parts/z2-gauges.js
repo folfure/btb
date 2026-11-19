@@ -7,7 +7,7 @@
    ===================================================================== */
 const THEMES = {
   neon: {
-    label: 'Neon Miami',
+    label: t('Neon Miami'),
     //   Z1 recovery  Z2 endurance Z3 tempo   Z4 threshold Z5 VO2max  Z6 anaerobic Z7 neuromuscular
     pz: ['#9a94c8', '#3d9bff', '#1ef2a6', '#ffd23f', '#ff8a2a', '#ff2e63', '#c13bff'],
     hz: ['#9a94c8', '#3d9bff', '#1ef2a6', '#ff8a2a', '#ff2e63'],
@@ -16,7 +16,7 @@ const THEMES = {
     meta: '#0c0520',
   },
   classic: {
-    label: 'Classic',
+    label: t('Classic'),
     pz: ['#8b95a7', '#3d8bfd', '#2fbf71', '#f5c518', '#ff8a1f', '#ff3b3b', '#b04dff'],
     hz: ['#8b95a7', '#3d8bfd', '#2fbf71', '#ff8a1f', '#ff3b3b'],
     cad: ['#ff3b3b', '#ff8a1f', '#2fbf71', '#3d8bfd', '#b04dff'],
