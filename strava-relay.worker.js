@@ -34,6 +34,9 @@ export default {
 
     const input = new URLSearchParams(await req.text());
     const grant = input.get('grant_type');
+    const json = (o, status) => new Response(JSON.stringify(o), { status, headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+    if (input.get('client_id') && input.get('client_id') !== String(env.STRAVA_CLIENT_ID))
+      return json({ message: `This relay serves Strava app ${env.STRAVA_CLIENT_ID}. Enter that Client ID in ERGlab Settings.` }, 409);
     const out = new URLSearchParams({ client_id: env.STRAVA_CLIENT_ID, client_secret: env.STRAVA_CLIENT_SECRET, grant_type: grant || '' });
     if (grant === 'authorization_code' && input.get('code')) out.set('code', input.get('code'));
     else if (grant === 'refresh_token' && input.get('refresh_token')) out.set('refresh_token', input.get('refresh_token'));

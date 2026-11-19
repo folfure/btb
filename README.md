@@ -26,6 +26,14 @@ Local test: `python -m http.server 8765`, then open http://localhost:8765.
 - Heart rate comes from a separate Bluetooth strap (the "HR" button). The Direto X doesn't relay HR.
 - In ERG: small chainring, middle cog, and start pedalling before the first interval.
 
+## Strava upload
+
+Settings › Strava. Strava requires an API app's **Client Secret** for login (it has no PKCE), so either:
+- **Each rider brings their own app**: create one at strava.com/settings/api, set *Authorization Callback Domain* to the host the page runs on (e.g. `you.github.io` or `localhost`), and paste the Client ID + Secret in Settings. They stay in that browser.
+- **Host a token relay** (`strava-relay.worker.js`, a free Cloudflare Worker) holding the secret. Riders then only need the Client ID. New Strava apps accept 1 athlete; raise to 10 on the API settings page, more needs Strava review.
+
+Rides upload as TCX (gzipped) with power, HR and cadence, automatically after each ride (rides under 2 minutes or without power are skipped) or from History.
+
 ## Editing / rebuilding
 
 - `src/app.template.html`: app code (HTML/CSS/JS)
