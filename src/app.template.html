@@ -453,6 +453,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     <div class="card pad" style="margin-top:12px">
       <h3 style="margin-bottom:12px">Ride behaviour</h3>
       <div class="form">
+        <div class="field"><label>Language</label><select id="sLang"><option value="">Automatic (browser language)</option><option value="en">English</option><option value="fr">Français</option></select></div>
         <div class="field"><label>Theme</label><select id="sTheme"><option value="neon">Neon Miami</option><option value="classic">Classic</option></select></div>
         <div class="field"><label>Power display smoothing</label><select id="sSmooth"><option value="1">Instant</option><option value="3">3 s average</option><option value="5">5 s average</option><option value="10">10 s average</option></select></div>
         <div class="field"><label>Auto-pause</label><select id="sAutoPause"><option value="1">On (pause when you stop pedalling)</option><option value="0">Off</option></select></div>
@@ -538,11 +539,13 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 
 <script>
 'use strict';
+/*__I18N__*/
 /* =====================================================================
    DATA (injected at build time)
    ===================================================================== */
 const LIBRARY = /*__WORKOUTS__*/[];
 const PLANS = /*__PLANS__*/[];
+i18nData(LIBRARY, PLANS); // French names, descriptions and labels when the interface is in French
 
 /* =====================================================================
    UTILITIES
@@ -586,7 +589,7 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 /* =====================================================================
    SETTINGS & ZONES
    ===================================================================== */
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
 // weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
 const WLOG_MAX = 1000;
@@ -2525,6 +2528,7 @@ function applySettings(o) {
   for (const k of Object.keys(DEFAULTS)) { const v = o[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v; }
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
+  if (!['', 'en', 'fr'].includes(S.lang)) S.lang = '';
   if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
   const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
   if (!(S.height >= 100 && S.height <= 250)) S.height = 0;
@@ -2770,7 +2774,7 @@ function renderAntCard() {
 }
 function renderSettings() {
   renderAntCard();
-  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme;
+  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang;
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
   $('#sAgeHint').textContent = age ? `Age ${age}` : '';
@@ -2784,6 +2788,7 @@ function bindSettings() {
   const num = (id, key, lo, hi) => $(id).addEventListener('change', e => { const v = +e.target.value; if (isFinite(v) && v >= lo && v <= hi) { S[key] = v; saveSettings(); afterSettings(); } else e.target.value = S[key]; });
   num('#sFtp', 'ftp', 50, 700); num('#sWeight', 'weight', 25, 250); num('#sMaxHr', 'maxHr', 100, 240); num('#sRestHr', 'restHr', 25, 120);
   num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60); num('#sWprime', 'wprime', 5000, 60000);
+  $('#sLang').onchange = e => { S.lang = e.target.value; saveSettings(); langCheck(true); };
   $('#sTheme').onchange = e => { S.theme = e.target.value; saveSettings(); afterSettings(); renderHistory(); };
   $('#sWeight').addEventListener('change', () => { if (+$('#sWeight').value === S.weight) { const t = todayKey(), e = S.wlog.find(x => x.d === t); if (!e || e.kg !== S.weight) addWeightLog(t, S.weight, e && e.rhr); } });
   const opt = (id, key, ok, conv = v => v) => $(id).addEventListener('change', e => { const v = conv(e.target.value); if (ok(v)) { S[key] = v; saveSettings(); afterSettings(); } else renderSettings(); });
@@ -2821,7 +2826,13 @@ function bindSettings() {
   };
 }
 function setTheme() { if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon'); }
-function afterSettings() { setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
+// the interface language is fixed for the page's lifetime: switch by reloading (never in the middle of a ride)
+function langCheck(asked) {
+  if (resolveLang(S.lang) === LANG || (load('erglab.settings', {}).lang || '') !== S.lang) return; // unchanged, or not stored (no reload loop)
+  if (rideInProgress()) { if (asked) toast(t('The new language applies after your ride.')); return; }
+  location.reload();
+}
+function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
 
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
@@ -2947,6 +2958,7 @@ function bind() {
 /*__PARTS_JS__*/
 
 function init() {
+  i18nStart();
   setTheme();
   buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false); renderInstall();
   const oauthReturn = /[?&]state=/.test(location.search) && /[?&](code|error)=/.test(location.search);

@@ -12,7 +12,23 @@ const dataDir = join(here, 'data');
 const partsDir = join(here, 'parts');
 const parts = ext => existsSync(partsDir) ? readdirSync(partsDir).filter(f => f.endsWith(ext)).sort()
   .map(f => `/* ---- parts/${f} ---- */\n` + readFileSync(join(partsDir, f), 'utf8').replace(/<\/(script|style)/gi, '<\\/$1')).join('\n') : '';
+// French: src/i18n/fr/*.json are UI dictionaries keyed by the English text (merged; a key may only appear twice
+// with the same translation), src/i18n/fr-data/*.json the workout / plan translations. Inlined with the i18n
+// core at the top of the script, so t() works everywhere, even in the template's top-level code.
+const i18nDir = join(here, 'i18n'), readJsons = d => existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.json')).sort().map(f => [f, JSON.parse(readFileSync(join(d, f), 'utf8'))]) : [];
+const FR = {}, frErr = [];
+for (const [f, o] of readJsons(join(i18nDir, 'fr'))) for (const [k, v] of Object.entries(o)) {
+  if (typeof v !== 'string' || !v.trim()) frErr.push(`${f}: empty translation for ${JSON.stringify(k)}`);
+  else if (k in FR && FR[k] !== v) frErr.push(`${f}: ${JSON.stringify(k)} translated twice differently: ${JSON.stringify(FR[k])} / ${JSON.stringify(v)}`);
+  else FR[k] = v;
+}
+const FR_DATA = { w: {}, p: {}, lbl: {} };
+for (const [, o] of readJsons(join(i18nDir, 'fr-data'))) for (const k of ['w', 'p', 'lbl']) Object.assign(FR_DATA[k], o[k] || {});
+if (frErr.length) { console.error(frErr.join('\n')); process.exit(1); }
+const jsSafe = v => JSON.stringify(v).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+const i18nJs = `const I18N_FR = ${jsSafe(FR)};\nconst I18N_FR_DATA = ${jsSafe(FR_DATA)};\n` + readFileSync(join(i18nDir, 'i18n.js'), 'utf8').replace(/<\/(script|style)/gi, '<\\/$1');
 const tpl = readFileSync(join(here, 'app.template.html'), 'utf8')
+  .replace('/*__I18N__*/', () => i18nJs)
   .replace('/*__PARTS_CSS__*/', () => parts('.css'))
   .replace('/*__PARTS_JS__*/', () => parts('.js'))
   // Browsers turn CRLF into LF before hashing an inline script for the CSP, so the output must be LF-only
