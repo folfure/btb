@@ -92,7 +92,7 @@
   "Functional Threshold Power. Unknown? Ride the Ramp Test or 20-min test.": "Puissance au seuil fonctionnel. Tu ne la connais pas ? Fais le test rampe ou le test de 20 min.",
   "Weight (kg)": "Poids (kg)",
   "Max heart rate (bpm)": "Fréquence cardiaque max (bpm)",
-  "Used for heart-rate zones.": "Sert aux zones de fréquence cardiaque.",
+  "Used for heart-rate zones.": "Sert à calculer les zones de fréquence cardiaque.",
   "Resting heart rate (bpm)": "Fréquence cardiaque au repos (bpm)",
   "Used by the simulator.": "Utilisée par le simulateur.",
   "W′ anaerobic capacity (J)": "Capacité anaérobie W′ (J)",
