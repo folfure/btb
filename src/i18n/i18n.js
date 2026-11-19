@@ -60,6 +60,7 @@ function translateText(n) {
 }
 function i18nStart() {
   document.documentElement.lang = LANG;
+  if (/[?&]i18n-debug/.test(location.search)) window.BTB_I18N_MISS = I18N_MISS; // coverage check: ?i18n-debug
   if (!I18N) return;
   translateDom(document.body);
   new MutationObserver(list => {

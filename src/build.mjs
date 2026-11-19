@@ -98,15 +98,15 @@ let out = tpl
   .replace('/*__PLANS__*/[]', () => js(plans))
   .replace(/\/\*__CLOUD__\*\/\{[^}]*\}/, () => js(cloud));
 
-// Content-Security-Policy: only this page's own inline script (by hash) and the pinned supabase-js may run,
+// Content-Security-Policy: only this page's own inline scripts (by hash) and the pinned supabase-js may run,
 // and the page may only talk to the configured Supabase project and Strava.
-const inline = out.match(/<script>([\s\S]*?)<\/script>/);
-if (!inline) { console.error('inline script not found'); process.exit(1); }
-const hash = createHash('sha256').update(inline[1], 'utf8').digest('base64');
+const inline = [...out.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+if (!inline.length) { console.error('inline script not found'); process.exit(1); }
+const hashes = inline.map(m => `'sha256-${createHash('sha256').update(m[1], 'utf8').digest('base64')}'`).join(' ');
 const connect = cloud.url ? `${cloud.url} https://www.strava.com` : 'https: http://localhost:* http://127.0.0.1:*';
 const csp = [
   "default-src 'none'",
-  `script-src 'sha256-${hash}'${cloud.url ? ' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js' : ''}`,
+  `script-src ${hashes}${cloud.url ? ' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js' : ''}`,
   "style-src 'unsafe-inline'",
   "img-src 'self' data: blob:",
   ...(pwa ? ["manifest-src 'self'"] : []),
