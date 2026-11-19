@@ -1,6 +1,6 @@
 # BTB (Bouge Ton Body): smart-trainer workouts in one HTML file
 
-`index.html` is the whole app: workouts, plans, live dashboard, ride analytics and ERG control for smart trainers over Bluetooth or ANT+. No install, no server code.
+`index.html` is the whole app: workouts, plans, live dashboard, ride analytics and ERG control for smart trainers over Bluetooth. No install, no server code.
 
 ## Where it runs
 
@@ -32,9 +32,7 @@ The single-file `index.html` in the repo has no manifest and is not installable.
 ## Trainers
 
 - **Bluetooth** (Chrome/Edge on Windows, macOS, Android, ChromeOS; Bluefy on iPhone/iPad): the protocol is detected after connecting. Standard **FTMS** (almost every current smart trainer), **Tacx FE-C over Bluetooth** (older Tacx firmware) and **Wahoo legacy ERG** (older KICKR firmware) all control ERG and slope; a plain **power meter** connects read-only.
-- **ANT+** (Chrome/Edge on a computer or Android with OTG; not iPhone): plug in an ANT+ USB stick, then pick *ANT+ USB stick* when connecting. Trainers use ANT+ FE-C (ERG and slope), and heart-rate straps work too. Set it up once in **Settings › ANT+**:
-  - paste the **ANT+ network key** (free from thisisant.com after registering as an ANT+ adopter; it may not be published, so it is not in the code and stays only in that browser);
-  - **Windows**: install the WinUSB driver for the stick with Zadig (Garmin Express / Zwift can't use the stick until you switch the driver back); **Linux**: add a udev rule; **macOS**: works as is.
+- Trainer not listed when connecting? It is probably still connected to another app (Zwift, the maker's app…, on any device nearby): close those first. The chooser also lists trainers by name, and *Show all Bluetooth devices* lists everything nearby (useful in Bluefy).
 - Not tested on every trainer model: report what works on yours.
 
 ## Before riding

@@ -12,5 +12,14 @@
   "Workout chart": "Graphique de la séance",
   "Reset to default": "Réinitialiser",
   "Done": "Terminé",
-  "Steps": "Étapes"
+  "Steps": "Étapes",
+  "Don't see your heart-rate strap?": "Tu ne vois pas ta ceinture cardio ?",
+  "Don't see your trainer?": "Tu ne vois pas ton home trainer ?",
+  "Wet the strap contacts and put it on: it only wakes up on your chest.": "Humidifie les électrodes et mets la ceinture : elle ne se réveille que sur ta poitrine.",
+  "Pedal a few turns to wake the trainer up.": "Donne quelques coups de pédale pour réveiller le home trainer.",
+  "A Bluetooth device talks to <b>one app at a time</b>. Close Zwift, MyWhoosh, the maker’s app (Elite, Wahoo, Tacx…) and other training apps on <b>every</b> phone, tablet, computer or Apple TV nearby, or turn their Bluetooth off.": "Un appareil Bluetooth ne parle qu'à <b>une seule app à la fois</b>. Ferme Zwift, MyWhoosh, l'app du fabricant (Elite, Wahoo, Tacx…) et les autres apps d'entraînement sur <b>tous</b> les téléphones, tablettes, ordinateurs ou Apple TV à proximité, ou coupe leur Bluetooth.",
+  "Don't pair it in the phone's Bluetooth settings: if it shows there as connected, tap ⓘ › Forget this device.": "Ne l'associe pas dans les réglages Bluetooth du téléphone : s'il y apparaît comme connecté, touche ⓘ › Oublier cet appareil.",
+  "Still not listed? Show every Bluetooth device nearby and pick it by name.": "Toujours absent ? Affiche tous les appareils Bluetooth à proximité et choisis-le par son nom.",
+  "Show all Bluetooth devices": "Afficher tous les appareils Bluetooth",
+  "Search again": "Chercher à nouveau"
 }

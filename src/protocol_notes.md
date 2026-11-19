@@ -12,7 +12,7 @@ service filters only (no brand or name filters), connects, then picks the protoc
 | 5 | **Power meter** (Cycling Power only) | `0x1818` only | none: power + cadence read-only, the app says ERG is not available | `ReadOnlyTrainer` |
 
 Current firmware on almost every trainer sold since about 2019 speaks FTMS; the Tacx and Wahoo paths are for older
-firmware that was never updated. ANT+ FE-C (USB stick, section 7) is a separate connection path in `parts/c1-ant.js`.
+firmware that was never updated.
 
 Code map: byte encoders/decoders are pure helpers in `src/parts/c0-trainer-proto.js` (`TRAINER_PROTO`), unit-tested in
 `src/test/protocols.test.mjs`, which also drives the `Trainer` class against fake FTMS / FE-C / Wahoo / power-meter
@@ -248,15 +248,6 @@ A device with only the Cycling Power service (a pedal / crank power meter, or a 
 control) connects read-only: power from `0x2A63`, cadence from its crank data when present. The app says "power data
 only, ERG is not available on this device" and never sends control commands. An FTMS device without a control point is
 handled the same way.
-
-## 7. ANT+ FE-C (overview)
-
-ANT+ FE-C uses the same data pages as section 4, sent over ANT radio instead of BLE: a USB ANT stick, a slave channel
-with device type **17** (fitness equipment), channel period **8192** (4 Hz), RF frequency 57 (2457 MHz) and the ANT+
-network key (licensed to ANT+ adopters, not public). The app opens a channel, receives pages 16 / 25 broadcast by the
-trainer and sends pages 48-51 as acknowledged messages (`0x4F`), retrying when the acknowledgement fails. Unlike
-Bluetooth, ANT+ allows several receivers at once (a head unit can listen while the app controls). In the browser it
-needs WebUSB (Chrome / Edge on desktop and Android, not iOS). Implementation: `src/parts/c1-ant.js`.
 
 ## 8. Web Bluetooth platform support (Nov 2026)
 

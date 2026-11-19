@@ -555,7 +555,6 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <p class="muted" style="margin:6px 0 10px;font-size:14px">Signed in as <b id="acctEmail"></b>. Settings, custom workouts, plan progress and rides are saved to your private cloud space (EU) and follow you to any device.</p>
       <div class="row"><button class="btn sm" id="acctSync">Sync now</button><span class="spacer"></span><button class="btn sm danger" id="acctOut">Sign out</button></div>
     </div>
-    <div id="antHost" style="margin-top:12px"></div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
       <div class="row"><h3 data-i18n><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
@@ -1159,15 +1158,17 @@ class Trainer {
   get features() { return this.ad?.features || null; }
   get range() { return this.ad?.range || { min: 0, max: 2000, inc: 1 }; }
   setStatus(s, msg) { this.status = s; updateConnUI(msg); }
-  async connect() {
+  async connect(all = false) {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
-    const U = TRAINER_PROTO.UUID;
+    const U = TRAINER_PROTO.UUID, optionalServices = [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.HRS, 'device_information', 'battery_service'];
     try {
-      // must be the first await in the click handler (user-gesture requirement). No name filters: any brand.
-      const dev = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }],
-        optionalServices: [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.HRS, 'device_information', 'battery_service'],
+      // must be the first await in the click handler (user-gesture requirement). Any brand: trainers advertising a
+      // trainer service, plus common trainer names (some browsers, e.g. Bluefy on iPhone, miss service-only filters),
+      // or, after "Show all Bluetooth devices", every device nearby (the protocol is detected after connecting).
+      const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices } : {
+        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }, ...TRAINER_NAMES.map(namePrefix => ({ namePrefix }))],
+        optionalServices,
       });
       if (this.dev && this.dev !== dev) this.disconnect();
       clearTimeout(this.reconnTimer); this.reconnTimer = null;
@@ -1178,6 +1179,7 @@ class Trainer {
     } catch (e) {
       if (e && e.name === 'NotFoundError') {
         if (/adapter|not available|unavailable/i.test(e.message || '')) toast(t('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.'), 7000);
+        else if (!this.connected) notFoundHelp('trainer');
         this.setStatus(this.dev && this.dev.gatt.connected && this.ad ? 'connected' : 'idle'); return;
       }
       console.error(e); this.setStatus('error', e.message);
@@ -1330,18 +1332,20 @@ class Trainer {
 class HrStrap {
   constructor() { this.dev = null; this.status = 'idle'; this.name = ''; this._v = e => this.onHR(e.target.value); this._d = () => this.onDisc(); this.user = false; this.timer = null; this.gen = 0; }
   get connected() { return this.status === 'connected'; }
-  async connect() {
+  async connect(all = false) {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
     try {
-      const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [UUID.HRS] }], optionalServices: ['battery_service'] });
+      const optionalServices = [UUID.HRS, 'battery_service'];
+      const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices }
+        : { filters: [{ services: [UUID.HRS] }, ...HR_NAMES.map(namePrefix => ({ namePrefix }))], optionalServices });
       clearTimeout(this.timer); this.timer = null;
       if (this.dev && this.dev !== dev) { this.dev.removeEventListener('gattserverdisconnected', this._d); try { this.dev.gatt.disconnect(); } catch { } }
       this.dev = dev; this.name = dev.name || t('HR'); this.user = false;
       dev.removeEventListener('gattserverdisconnected', this._d); dev.addEventListener('gattserverdisconnected', this._d);
       await this.setup(++this.gen);
     } catch (e) {
-      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast(t('No Bluetooth adapter found.'), 6000); return; }
+      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast(t('No Bluetooth adapter found.'), 6000); else if (!this.connected) notFoundHelp('hr'); return; }
       this.status = 'error'; updateConnUI(); toast(t('HR: {msg}', { msg: e.message }));
     }
   }
@@ -1370,27 +1374,30 @@ class HrStrap {
   }
   disconnect() { this.user = true; clearTimeout(this.timer); this.timer = null; this.gen++; try { this.dev?.gatt?.disconnect(); } catch { } this.status = 'idle'; updateConnUI(); }
 }
-// the active trainer / HR source: Bluetooth by default, an ANT+ USB stick when the rider picks it
-const bleTrainer = new Trainer(), bleHr = new HrStrap();
-let trainer = bleTrainer, hrm = bleHr, antTrainer = null, antHr = null;
-const antUsable = () => typeof ANT !== 'undefined' && ANT.supported();
-// connect: Bluetooth directly, or a small chooser when this browser can also use an ANT+ USB stick (WebUSB)
-function chooseLink(kind) {
-  const isHr = kind === 'hr', cur = isHr ? hrm : trainer;
-  if (cur.connected) { if (confirm(t('Disconnect {name}?', { name: cur.name }))) cur.disconnect(); return; }
-  const ble = () => { if (isHr) { hrm = bleHr; bleHr.connect(); } else { trainer = bleTrainer; bleTrainer.connect(); } };
-  if (!antUsable()) { ble(); return; }
-  const m = openModal(`<h2>${isHr ? t('Connect heart rate') : t('Connect your trainer')}</h2>
-    <p class="muted" style="margin:6px 0 14px">${isHr ? t('Pick how your heart-rate strap talks to this computer.') : t('Pick how your smart trainer talks to this computer. Both control ERG.')}</p>
-    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">${t('ANT+ USB stick')}</button><span class="spacer"></span><button class="btn ghost" id="lkX">${t('Cancel')}</button></div>
-    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? t('ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).') : t('ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.')}</p>`, true);
-  $('#lkX', m).onclick = closeModal;
-  $('#lkBle', m).onclick = () => { closeModal(); ble(); };
-  $('#lkAnt', m).onclick = () => {
-    closeModal();
-    if (isHr) { antHr ||= new AntHr(); hrm = antHr; antHr.connect(); }
-    else { antTrainer ||= new AntFeC(); trainer = antTrainer; antTrainer.connect(); }
-  };
+// the trainer and the heart-rate strap (Bluetooth)
+const trainer = new Trainer(), hrm = new HrStrap();
+function connectLink(kind) {
+  const d = kind === 'hr' ? hrm : trainer;
+  if (d.connected) { if (confirm(t('Disconnect {name}?', { name: d.name }))) d.disconnect(); return; }
+  d.connect();
+}
+// The Bluetooth chooser closed without a device: most often the trainer is still connected to another app (it then
+// stops advertising), or the browser's filter missed it (Bluefy on iPhone matches advertised services less reliably
+// than Chrome). Explain, and offer a chooser that lists every Bluetooth device nearby.
+function notFoundHelp(kind) {
+  const isHr = kind === 'hr';
+  const m = openModal(`<h2>${isHr ? t("Don't see your heart-rate strap?") : t("Don't see your trainer?")}</h2>
+    <ul style="margin:10px 0 0;padding-left:20px;line-height:1.55">
+      ${isHr ? `<li>${t('Wet the strap contacts and put it on: it only wakes up on your chest.')}</li>` : `<li>${t('Pedal a few turns to wake the trainer up.')}</li>`}
+      <li>${t('A Bluetooth device talks to <b>one app at a time</b>. Close Zwift, MyWhoosh, the maker’s app (Elite, Wahoo, Tacx…) and other training apps on <b>every</b> phone, tablet, computer or Apple TV nearby, or turn their Bluetooth off.')}</li>
+      <li>${t("Don't pair it in the phone's Bluetooth settings: if it shows there as connected, tap ⓘ › Forget this device.")}</li>
+      <li>${t('Still not listed? Show every Bluetooth device nearby and pick it by name.')}</li>
+    </ul>
+    <div class="row" style="gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn primary" id="nfAll">${t('Show all Bluetooth devices')}</button><button class="btn" id="nfAgain">${t('Search again')}</button><span class="spacer"></span><button class="btn ghost" id="nfX">${t('Close')}</button></div>`, true);
+  const d = isHr ? hrm : trainer;
+  $('#nfAll', m).onclick = () => { closeModal(); d.connect(true); };
+  $('#nfAgain', m).onclick = () => { closeModal(); d.connect(); };
+  $('#nfX', m).onclick = closeModal;
 }
 
 /* =====================================================================
@@ -1441,6 +1448,11 @@ function speedFromPower(P, mass = S.weight + 9) { // m/s, flat road, newton iter
 }
 // Bluefy provides navigator.bluetooth through a getter that can throw: never read it bare
 const hasBt = () => { try { return !!navigator.bluetooth; } catch { return false; } };
+// Advertised-name prefixes of common smart trainers and HR straps, used next to the service filters
+const TRAINER_NAMES = ['DIRETO', 'Direto', 'SUITO', 'Suito', 'ZUMO', 'Zumo', 'TUO', 'Tuo', 'JUSTO', 'Justo', 'AVANTI', 'Elite', 'KICKR', 'Wahoo', 'Tacx', 'TACX', 'NEO', 'Neo', 'FLUX', 'Flux',
+  'Saris', 'H3', 'H2', 'CycleOps', 'Hammer', 'Zwift Hub', 'HUB', 'Wattbike', 'ATOM', 'Magene', 'MAGENE', 'Thinkrider', 'THINKRIDER', 'Xplova', 'XPLOVA', 'Van Rysel', 'D100', 'D500',
+  'JetBlack', 'Kinetic', 'Stages', 'Bkool', 'BKOOL', 'Volt', 'Sole'];
+const HR_NAMES = ['Polar', 'HRM', 'TICKR', 'Garmin', 'COOSPO', 'CooSpo', 'HW', 'H10', 'H9', 'Wahoo', 'Decathlon', 'Kalenji', 'Suunto', 'Coros', 'Magene', 'MAGENE', 'Whoop', 'WHOOP', 'Scosche', 'Rhythm'];
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 // Running as an installed app (home-screen icon on iPhone/iPad, installed app in Chrome/Edge)?
 const isStandalone = () => navigator.standalone === true || ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'].some(m => matchMedia(`(display-mode: ${m})`).matches);
@@ -3000,14 +3012,7 @@ function bindCloud() {
 }
 
 /* ---- settings ---- */
-function renderAntCard() {
-  const host = $('#antHost'); if (!host || typeof ANT === 'undefined') return;
-  if (!('usb' in navigator)) { host.innerHTML = ''; return; } // iPhone / Safari / Firefox: no USB access for web pages
-  if (!host.firstChild) { host.innerHTML = ANT.settingsCard(); ANT.hooks.needKey = () => { go('settings'); setTimeout(() => { const c = $('#antCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); }; }
-  ANT.bindSettings(host);
-}
 function renderSettings() {
-  renderAntCard();
   $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang;
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
@@ -3071,7 +3076,7 @@ function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLib
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
   const pt = $('#pillTrainer'); pt.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[trainer.status] || '');
-  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · ' + t('power data only')} ${t('(tap to disconnect)')}` : antUsable() ? t('Connect your smart trainer (Bluetooth or ANT+)') : t('Connect your smart trainer (Bluetooth)');
+  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol}${trainer.cp ? ' · ERG' : ' · ' + t('power data only')} ${t('(tap to disconnect)')}` : t('Connect your smart trainer (Bluetooth)');
   const small = matchMedia('(max-width:860px)').matches;
   $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? t('Trainer') : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? t('Connecting…') : trainer.status === 'reconnecting' ? t('Reconnecting…') : small ? t('Trainer') : t('Connect trainer');
   const ph = $('#pillHr'); ph.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[hrm.status] || '');
@@ -3132,8 +3137,8 @@ function showBtHelp(force, why) {
    WIRING
    ===================================================================== */
 function bind() {
-  $('#pillTrainer').onclick = () => chooseLink('trainer');
-  $('#pillHr').onclick = () => chooseLink('hr');
+  $('#pillTrainer').onclick = () => connectLink('trainer');
+  $('#pillHr').onclick = () => connectLink('hr');
   $('#pillSim').onclick = () => { initAudio(); sim.on ? sim.stop() : sim.start(); };
   ['#q', '#sort', '#durf'].forEach(s => $(s).addEventListener('input', renderLib));
   $('#frErg').onclick = () => startFreeRide('erg');
@@ -3162,7 +3167,7 @@ function bind() {
   };
   $('#cErg').onclick = () => setMode(true); $('#cSlope').onclick = () => setMode(false);
   $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm(t('End the ride and save it?'))) finishRide(false); };
-  $('#rideConnect').onclick = () => chooseLink('trainer');
+  $('#rideConnect').onclick = () => connectLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cCustom').onclick = openRideCustom;
   $('#cFull').classList.toggle('hidden', !fsOK);

@@ -187,7 +187,7 @@ function makeEnv(dev) {
     applyControl: () => { env.applyCalls++; }, clamp: (v, lo, hi) => Math.min(hi, Math.max(lo, v)),
     S: { weight: 75 }, sim: { on: false, stop() { } }, hrm: { connected: false },
     t: (s, v) => v ? s.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m) : s, // English, as the page shows it without French
-    hasBt: () => true,
+    hasBt: () => true, TRAINER_NAMES: ['DIRETO', 'KICKR'],
     navigator: { bluetooth: { requestDevice: async opts => { env.requests.push(opts); return dev; } } },
   };
   const names = Object.keys(stubs);
@@ -197,14 +197,20 @@ function makeEnv(dev) {
 const until = async (cond, ms = 4000) => { const t0 = Date.now(); while (!cond()) { if (Date.now() - t0 > ms) throw new Error('timed out waiting'); await sleep(10); } };
 const ftmsReply = (ch, bytes) => setTimeout(() => ch.notify([0x80, bytes[0], 0x01]), 5);
 
-test('Trainer: requestDevice has no name filters and lists every protocol', async () => {
+test('Trainer: requestDevice lists every protocol, plus trainer names; "show all" accepts any device', async () => {
   const dev = fakeDevice('X', { 0x1818: [new FakeChar(0x2a63)] });
   const env = makeEnv(dev);
   await env.trainer.connect();
-  const r = env.requests[0];
-  assert.ok(r.filters.every(f => !f.namePrefix && !f.name), 'no name filters');
-  assert.deepEqual(r.filters.map(f => f.services[0]), [0x1826, 0x1818, P.UUID.FEC]);
-  for (const u of [0x1826, 0x1818, P.UUID.FEC, P.UUID.WAHOO_SVC, 0x180d, 'device_information', 'battery_service']) assert.ok(r.optionalServices.includes(u), 'optional ' + u);
+  const r = env.requests[0], svc = r.filters.filter(f => f.services), names = r.filters.filter(f => f.namePrefix);
+  assert.deepEqual(svc.map(f => f.services[0]), [0x1826, 0x1818, P.UUID.FEC], 'one service filter per protocol');
+  assert.ok(names.length && names.every(f => !f.services && typeof f.namePrefix === 'string'), 'name filters only widen the list');
+  assert.ok(r.filters.every(f => f.services || f.namePrefix), 'no empty filter');
+  const opt = [0x1826, 0x1818, P.UUID.FEC, P.UUID.WAHOO_SVC, 0x180d, 'device_information', 'battery_service'];
+  for (const u of opt) assert.ok(r.optionalServices.includes(u), 'optional ' + u);
+  await env.trainer.connect(true);
+  const all = env.requests[1];
+  assert.equal(all.acceptAllDevices, true); assert.equal(all.filters, undefined);
+  for (const u of opt) assert.ok(all.optionalServices.includes(u), 'all: optional ' + u);
 });
 
 test('Trainer: FTMS ERG + simulation, power range clamp, trainer HR', async () => {

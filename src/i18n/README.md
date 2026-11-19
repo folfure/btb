@@ -62,7 +62,7 @@ Informal **tu**, short and direct, like a coach. Typography: a non-breaking spac
 | calories | calories (kcal) |
 
 Keep as is: FTP, ERG, TSS, NP, IF, W′ (W prime), CP, eFTP, VO2max, CTL, ATL, TSB, MAP, Zone 1-7, Sweet Spot,
-Over-Under, Tempo, Strava, Bluetooth, ANT+, FE-C, FTMS, Bluefy, Zwift, Garmin.
+Over-Under, Tempo, Strava, Bluetooth, FE-C, FTMS, Bluefy, Zwift, Garmin.
 Categories: Recovery → Récupération, Endurance → Endurance, Tempo → Tempo, Sweet Spot → Sweet Spot,
 Threshold → Seuil, Over-Under → Over-Under, VO2max → VO2max, Anaerobic → Anaérobie, Sprint → Sprint,
 Hills → Côtes, Test → Test, Mixed → Mixte, Custom → Perso.

@@ -21,7 +21,7 @@ for (const [name, env] of variants) {
   check(`${name}: app script found (+ error reporter)`, !!m && all.length === 2);
   check(`${name}: app script runs in its own scope`, !!m && /^\s*\(\(\) => \{/.test(m[1]) && /\}\)\(\);\s*$/.test(m[1]));
   try { new Function(m[1]); check(`${name}: script parses`, true); } catch (e) { check(`${name}: script parses`, false, e.message); }
-  for (const g of ['const AN =', 'const BODY =', 'const ANUI =', 'const DEMO =', 'function makeGauge', 'function applyTheme', 'const TRAINER_PROTO =', 'const ANT =', 'const BTB_FONT =', 'function btbPath']) check(`${name}: has ${g}`, m[1].includes(g));
+  for (const g of ['const AN =', 'const BODY =', 'const ANUI =', 'const DEMO =', 'function makeGauge', 'function applyTheme', 'const TRAINER_PROTO =', 'const BTB_FONT =', 'function btbPath']) check(`${name}: has ${g}`, m[1].includes(g));
   check(`${name}: CSP hash matches every inline script`, all.every(x => html.includes(`'sha256-${createHash('sha256').update(x[1], 'utf8').digest('base64')}'`)));
   check(`${name}: LF line endings`, !html.includes('\r'));
 }

@@ -56,7 +56,6 @@
   "Fill in the fields above first.": "Remplis d'abord les champs ci-dessus.",
   "The relay URL must start with https://": "L'URL du relais doit commencer par https://",
   "Disconnect from Strava? Rides already uploaded stay on Strava.": "Te déconnecter de Strava ? Les sorties déjà envoyées restent sur Strava.",
-
   "Could not load the sign-in library (offline?)": "Impossible de charger le module de connexion (hors ligne ?)",
   "Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.": "Bienvenue sur BTB, Bouge Ton Body ! La prochaine fois, connecte-toi avec un code envoyé par e-mail.",
   "That link has expired or was already used. Enter your email to get a sign-in code instead.": "Ce lien a expiré ou a déjà été utilisé. Saisis ton e-mail pour recevoir un code de connexion à la place.",
@@ -81,7 +80,6 @@
   "Offline: rides are kept on this device and sync after you sign in.": "Hors ligne : les sorties restent sur cet appareil et se synchronisent une fois connecté.",
   "Sign out? Data on this device is removed; it stays in your cloud space.": "Te déconnecter ? Les données de cet appareil seront effacées ; elles restent dans ton espace cloud.",
   "Synced": "Synchronisé",
-
   "Sign in first": "Connecte-toi d'abord",
   "Session expired, sign in again": "Session expirée, reconnecte-toi",
   "This account is not an invited BTB rider": "Ce compte n'est pas un cycliste invité sur BTB",
@@ -111,17 +109,14 @@
   "Token has expired or is invalid": "Ce code est incorrect ou a expiré.",
   "Email rate limit exceeded": "Trop de demandes d'e-mail. Attends un peu avant de réessayer.",
   "Unable to validate email address: invalid format": "Adresse e-mail invalide",
-
   "Age {n}": "{n} ans",
   "Used for heart-rate zones. Age-based estimate: {bpm} bpm (Tanaka); a measured max is better.": "Sert à calculer les zones de fréquence cardiaque. Estimation selon l'âge : {bpm} bpm (Tanaka) ; une FC max mesurée est plus fiable.",
   "Used for heart-rate zones.": "Sert à calculer les zones de fréquence cardiaque.",
   "Reset rider settings to defaults? (Your weight log is kept.)": "Remettre les réglages du cycliste par défaut ? (Ton suivi du poids est conservé.)",
   "Backup restored": "Sauvegarde restaurée",
   "Restore failed: {msg}": "Échec de la restauration : {msg}",
-
   "power data only": "données de puissance uniquement",
   "(tap to disconnect)": "(touche pour déconnecter)",
-  "Connect your smart trainer (Bluetooth or ANT+)": "Connecte ton home trainer (Bluetooth ou ANT+)",
   "Connect your smart trainer (Bluetooth)": "Connecte ton home trainer (Bluetooth)",
   "Trainer": "Home trainer",
   "Reconnecting…": "Reconnexion…",
@@ -129,7 +124,6 @@
   "HR": "FC",
   "Connect HR": "Connecter la FC",
   "HR…": "FC…",
-
   "Sign in there once with the <b>code</b> from the email (don't tap the email link: it opens the browser, not the app).": "Connecte-toi une fois dans l'appli avec le <b>code</b> reçu par e-mail (ne touche pas le lien de l'e-mail : il ouvre le navigateur, pas l'appli).",
   "You're using BTB from your home screen.": "Tu utilises BTB depuis ton écran d'accueil.",
   "Workouts, plans, rides and Strava sync with your account.": "Séances, plans, sorties et Strava se synchronisent avec ton compte.",
@@ -143,7 +137,6 @@
   "Install BTB": "Installer BTB",
   "In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app.": "Dans <b>Chrome</b> ou <b>Edge</b>, clique sur l'icône d'installation dans la barre d'adresse, ou ouvre le menu › <b>Caster, enregistrer et partager</b> › <b>Installer la page en tant qu'application</b> (Edge : <b>Applications</b> › <b>Installer ce site en tant qu'application</b>). Sur Android : menu › <b>Ajouter à l'écran d'accueil</b>. Le Bluetooth continue de fonctionner dans l'appli installée.",
   "BTB installed": "BTB installé",
-
   "<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.": "<b>Le Bluetooth a été refusé.</b> Autorise le Bluetooth pour ce navigateur dans Réglages iOS › Confidentialité et sécurité › Bluetooth, puis recharge la page.",
   "<b>The browser blocked Bluetooth for this page.</b>": "<b>Le navigateur a bloqué le Bluetooth pour cette page.</b>",
   "Pages opened as a local file can be refused.": "Les pages ouvertes en tant que fichier local peuvent être refusées.",
@@ -155,7 +148,6 @@
   "Dismiss": "Fermer",
   "Copy link for Bluefy": "Copier le lien pour Bluefy",
   "Link copied. Paste it into Bluefy.": "Lien copié. Colle-le dans Bluefy.",
-
   "End the ride and save it?": "Terminer la sortie et l'enregistrer ?",
   "Saved to library": "Enregistrée dans la bibliothèque",
   "Recovery": "Récupération",
