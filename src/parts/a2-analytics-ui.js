@@ -32,17 +32,17 @@ const ANUI = (() => {
   const hm = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.round(s % 3600 / 60); return h ? `${h}h${String(m).padStart(2, '0')}` : `${m}m`; };
   const isoAgo = d => new Date(Date.now() - d * DAY).toISOString();
   const keyDate = k => { const a = String(k).split('-'); return new Date(+a[0], a[1] - 1, +a[2]); };
-  const fD = (d, o) => d.toLocaleDateString(undefined, o || { day: 'numeric', month: 'short' });
+  const fD = (d, o) => d.toLocaleDateString(LOCALE, o || { day: 'numeric', month: 'short' });
   const fDay = iso => fD(new Date(iso), { day: 'numeric', month: 'short', year: '2-digit' });
-  const fLong = iso => { const d = new Date(iso); return fD(d, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); };
+  const fLong = iso => { const d = new Date(iso); return fD(d, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' }); };
   const reduced = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 
   const FORM = [
-    { lo: 25, name: 'Transition', v: '--an-f1' },
-    { lo: 5, name: 'Fresh', v: '--an-f2' },
-    { lo: -10, name: 'Grey zone', v: '--an-f3' },
-    { lo: -30, name: 'Optimal', v: '--an-f4' },
-    { lo: -Infinity, name: 'High risk', v: '--an-f5' },
+    { lo: 25, name: t('Transition'), v: '--an-f1' },
+    { lo: 5, name: t('Fresh'), v: '--an-f2' },
+    { lo: -10, name: t('Grey zone'), v: '--an-f3' },
+    { lo: -30, name: t('Optimal'), v: '--an-f4' },
+    { lo: -Infinity, name: t('High risk'), v: '--an-f5' },
   ];
   const formIdx = t => { for (let i = 0; i < FORM.length; i++) if (t > FORM[i].lo) return i; return 4; };
   const pzIdx = f => { for (let i = 0; i < PZ.length; i++) if (f < PZ[i].hi - 1e-9) return i; return PZ.length - 1; };
@@ -209,7 +209,7 @@ const ANUI = (() => {
   }
   function zoneBars(secs, zones, kind, ref, one) {
     const tot = (secs || []).reduce((a, b) => a + (+b || 0), 0);
-    if (!tot) return `<div class="anx-none">No ${kind === 'hr' ? 'heart-rate' : 'power'} data${one ? '' : ' in this period'}.</div>`;
+    if (!tot) return `<div class="anx-none">${kind === 'hr' ? (one ? t('No heart-rate data.') : t('No heart-rate data in this period.')) : one ? t('No power data.') : t('No power data in this period.')}</div>`;
     const mx = Math.max(...secs);
     const rng = (z, i) => {
       if (!ref) return '';
@@ -223,14 +223,14 @@ const ANUI = (() => {
         <span class="zt num">${secs[i] ? fmtTime(secs[i]) : '–'}</span><span class="zp num">${pc >= 0.5 ? Math.round(pc) + '%' : secs[i] ? '<1%' : ''}</span></div>`; }).join('')}</div>`;
   }
   function polarization(tiz) {
-    const t = tiz.reduce((a, b) => a + b, 0); if (!t) return '';
-    const low = (tiz[0] + tiz[1]) / t * 100, mid = (tiz[2] + tiz[3]) / t * 100, high = (tiz[4] + tiz[5] + tiz[6]) / t * 100;
-    const kind = low >= 70 && high > mid ? ['Polarized', 'Mostly easy with hard efforts on top, little in the middle.']
-      : low >= mid && mid >= high ? ['Pyramidal', 'Lots of easy riding, less tempo/threshold, least above threshold.']
-        : mid > low ? ['Threshold-heavy', 'More time at tempo/threshold than easy: watch fatigue.'] : ['Mixed', 'An even spread across intensities.'];
+    const tt = tiz.reduce((a, b) => a + b, 0); if (!tt) return '';
+    const low = (tiz[0] + tiz[1]) / tt * 100, mid = (tiz[2] + tiz[3]) / tt * 100, high = (tiz[4] + tiz[5] + tiz[6]) / tt * 100;
+    const kind = low >= 70 && high > mid ? [t('Polarized'), t('Mostly easy with hard efforts on top, little in the middle.')]
+      : low >= mid && mid >= high ? [t('Pyramidal'), t('Lots of easy riding, less tempo/threshold, least above threshold.')]
+        : mid > low ? [t('Threshold-heavy'), t('More time at tempo/threshold than easy: watch fatigue.')] : [t('Mixed'), t('An even spread across intensities.')];
     const part = (lbl, v, col) => `<div class="pp"><span class="k">${lbl}</span><b class="num">${Math.round(v)}%</b><span class="pbar"><i style="width:${v.toFixed(1)}%;background:${col}"></i></span></div>`;
     return `<div class="anx-polar"><div class="ph"><span class="anx-pill">${kind[0]}</span><span class="muted">${kind[1]}</span></div>
-      <div class="pg">${part('Low · Z1–2', low, PZ[1].col)}${part('Mid · Z3–4', mid, PZ[3].col)}${part('High · Z5+', high, PZ[5].col)}</div></div>`;
+      <div class="pg">${part(t('Low · Z1–2'), low, PZ[1].col)}${part(t('Mid · Z3–4'), mid, PZ[3].col)}${part(t('High · Z5+'), high, PZ[5].col)}</div></div>`;
   }
 
   /* ======================================================================
@@ -245,7 +245,7 @@ const ANUI = (() => {
       root._anxBound = true;
       root.addEventListener('click', e => { const t = e.target.closest('[data-ride]'); if (t && t.dataset.ride && root.contains(t)) openRideAnalysis(t.dataset.ride); });
     }
-    if (typeof AN === 'undefined') { root.innerHTML = '<div class="card pad anx-empty"><h3>Analytics unavailable</h3><p class="muted">The analysis module did not load.</p></div>'; return; }
+    if (typeof AN === 'undefined') { root.innerHTML = '<div class="card pad anx-empty"><h3>' + t('Analytics unavailable') + '</h3><p class="muted">' + t('The analysis module did not load.') + '</p></div>'; return; }
     const rides = HIST().filter(r => r && r.date && !isNaN(new Date(r.date)));
     if (!rides.length) { PG = { root, rides: [], withAn: [], byId: {}, all: [] }; root.innerHTML = emptyHTML() + bodyShell(); renderBody(); return; }
     const withAn = rides.filter(r => r.an && Array.isArray(r.an.mmp) && r.an.mmp.length);
@@ -254,22 +254,22 @@ const ANUI = (() => {
     PG = { root, rides, withAn, byId, all };
     root.innerHTML = `
       <div class="anx-kpis" id="anxKpis"></div>
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Fitness &amp; form</h3><p>Fitness (CTL, 42-day load), fatigue (ATL, 7-day) and form (TSB = CTL − ATL).</p></div>
-        ${seg('fit', [[42, '6w'], [90, '3m'], [182, '6m'], [365, '1y'], [0, 'All']], prefs.fit)}</div>
-        <div class="anx-legend"><span><i style="background:var(--an-ctl)"></i>Fitness</span><span><i style="background:var(--an-atl)"></i>Fatigue</span><span><i class="dot" style="background:var(--muted)"></i>Daily TSS</span><span><i style="background:var(--an-f4)"></i>Form</span></div>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Fitness &amp; form')}</h3><p>${t('Fitness (CTL, 42-day load), fatigue (ATL, 7-day) and form (TSB = CTL − ATL).')}</p></div>
+        ${seg('fit', [[42, t('6w')], [90, t('3m')], [182, t('6m')], [365, t('1y')], [0, t('All')]], prefs.fit)}</div>
+        <div class="anx-legend"><span><i style="background:var(--an-ctl)"></i>${t('Fitness')}</span><span><i style="background:var(--an-atl)"></i>${t('Fatigue')}</span><span><i class="dot" style="background:var(--muted)"></i>${t('Daily TSS')}</span><span><i style="background:var(--an-f4)"></i>${t('Form')}</span></div>
         <div class="anx-chart" id="anxFit"></div></section>
       ${bodyShell()}
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Weekly load</h3><p>TSS per week, split by time in power zones. Labels: hours ridden.</p></div>
-        ${seg('wk', [[12, '12w'], [26, '26w'], [52, '52w']], prefs.wk)}</div>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Weekly load')}</h3><p>${t('TSS per week, split by time in power zones. Labels: hours ridden.')}</p></div>
+        ${seg('wk', [[12, t('12w')], [26, t('26w')], [52, t('52w')]], prefs.wk)}</div>
         <div class="anx-chart" id="anxWk"></div></section>
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Power curve</h3><p id="anxPcSub">Best average power for every duration.</p></div>
-        <div class="anx-ctl">${seg('per', [[42, '42d'], [90, '90d'], [365, '1y'], [0, 'All']], prefs.per)}${seg('unit', [['w', 'W'], ['wkg', 'W/kg']], prefs.unit)}</div></div>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Power curve')}</h3><p id="anxPcSub">${t('Best average power for every duration.')}</p></div>
+        <div class="anx-ctl">${seg('per', [[42, t('42d')], [90, t('90d')], [365, t('1y')], [0, t('All')]], prefs.per)}${seg('unit', [['w', 'W'], ['wkg', 'W/kg']], prefs.unit)}</div></div>
         <div class="anx-legend" id="anxPcLeg"></div>
         <div class="anx-chart" id="anxPc"></div><div class="anx-foot" id="anxPcFoot"></div></section>
       <div class="anx-grid2">
-        <section class="card anx-card"><div class="anx-ch"><div><h3>Time in zones</h3><p id="anxZSub"></p></div>${seg('zper', [[7, '7d'], [42, '42d'], [90, '90d'], [365, '1y'], [0, 'All']], prefs.zper)}</div>
+        <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Time in zones')}</h3><p id="anxZSub"></p></div>${seg('zper', [[7, t('7d')], [42, t('42d')], [90, t('90d')], [365, t('1y')], [0, t('All')]], prefs.zper)}</div>
           <div id="anxZones"></div></section>
-        <section class="card anx-card"><div class="anx-ch"><div><h3>Records</h3><p>Best efforts: last 90 days and all time. Tap one to open the ride.</p></div></div>
+        <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Records')}</h3><p>${t('Best efforts: last 90 days and all time. Tap one to open the ride.')}</p></div></div>
           <div id="anxRec"></div></section>
       </div>`;
     renderKpis(); renderFit(); renderBody(); renderWeeks(); renderCurve(); renderZones(); renderRecords();
@@ -281,13 +281,13 @@ const ANUI = (() => {
   }
 
   function emptyHTML() {
-    const it = (t, d) => `<li><b>${t}</b><span>${d}</span></li>`;
+    const it = (k, d) => `<li><b>${k}</b><span>${d}</span></li>`;
     return `<div class="card anx-empty">
       <svg viewBox="0 0 120 64" class="anx-eart" aria-hidden="true"><path d="M4 54 L22 40 L34 46 L52 22 L66 32 L84 12 L98 20 L116 6" fill="none" stroke="var(--an-ctl)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 58 L22 52 L34 56 L52 40 L66 50 L84 30 L98 42 L116 26" fill="none" stroke="var(--an-atl)" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round" opacity=".7"/></svg>
-      <h3>Your progress shows up here</h3>
-      <p class="muted">Ride any workout or a free ride and save it. After your first rides you'll see:</p>
-      <ul>${it('Fitness, fatigue &amp; form', 'Training load over time, and whether you are fresh or overreaching.')}${it('Weekly load', 'TSS and hours per week, coloured by intensity.')}${it('Power curve &amp; eFTP', 'Your best power for 1 s to 2 h, a Critical Power fit and an FTP estimate.')}${it('Time in zones', 'How your training is distributed, power and heart rate.')}${it('Records', 'Best 5 s to 60 min efforts, with the ride they came from.')}</ul>
-      <button class="btn primary" data-goto="workouts">Find a workout</button></div>`;
+      <h3>${t('Your progress shows up here')}</h3>
+      <p class="muted">${t('Ride any workout or a free ride and save it. After your first rides you\'ll see:')}</p>
+      <ul>${it(t('Fitness, fatigue &amp; form'), t('Training load over time, and whether you are fresh or overreaching.'))}${it(t('Weekly load'), t('TSS and hours per week, coloured by intensity.'))}${it(t('Power curve &amp; eFTP'), t('Your best power for 1 s to 2 h, a Critical Power fit and an FTP estimate.'))}${it(t('Time in zones'), t('How your training is distributed, power and heart rate.'))}${it(t('Records'), t('Best 5 s to 60 min efforts, with the ride they came from.'))}</ul>
+      <button class="btn primary" data-goto="workouts">${t('Find a workout')}</button></div>`;
   }
 
   /* ---- KPI strip ---- */
@@ -311,27 +311,27 @@ const ANUI = (() => {
     const diff = fit ? fit.eftp - VS().ftp : 0;
     const pctWk = lw.tss ? Math.min(100, tw.tss / lw.tss * 100) : (tw.tss ? 100 : 0);
     el.innerHTML = `
-      <div class="card anx-kpi" style="--k:var(--an-ctl)"><div class="k">Fitness <span>CTL</span></div><div class="v num">${fx(last.ctl, 0)}</div>
-        <div class="s num">${sgn(ramp)} <span class="dim">ramp / 7 d</span>${ramp > 8 ? ' <b class="warn">steep</b>' : ''}</div>${spark('ctl')}</div>
-      <div class="card anx-kpi" style="--k:var(--an-atl)"><div class="k">Fatigue <span>ATL</span></div><div class="v num">${fx(last.atl, 0)}</div>
-        <div class="s num">${sgn(last.atl - wk.atl)} <span class="dim">vs 7 d ago</span></div>${spark('atl')}</div>
-      <div class="card anx-kpi" style="--k:var(${fz.v})"><div class="k">Form <span>TSB</span></div><div class="v num">${sgn(last.tsb, 0)}</div>
+      <div class="card anx-kpi" style="--k:var(--an-ctl)"><div class="k">${t('Fitness')} <span>CTL</span></div><div class="v num">${fx(last.ctl, 0)}</div>
+        <div class="s num">${sgn(ramp)} <span class="dim">${t('ramp / 7 d')}</span>${ramp > 8 ? ' <b class="warn">' + t('steep') + '</b>' : ''}</div>${spark('ctl')}</div>
+      <div class="card anx-kpi" style="--k:var(--an-atl)"><div class="k">${t('Fatigue')} <span>ATL</span></div><div class="v num">${fx(last.atl, 0)}</div>
+        <div class="s num">${sgn(last.atl - wk.atl)} <span class="dim">${t('vs 7 d ago')}</span></div>${spark('atl')}</div>
+      <div class="card anx-kpi" style="--k:var(${fz.v})"><div class="k">${t('Form')} <span>TSB</span></div><div class="v num">${sgn(last.tsb, 0)}</div>
         <div class="s"><span class="anx-pill" style="color:var(${fz.v})">${fz.name}</span></div>${spark('tsb')}</div>
-      <div class="card anx-kpi" style="--k:var(--an-curve)"><div class="k">eFTP <span>90 d</span></div>
-        ${fit ? `<div class="v num">${fit.eftp}<small>W</small></div><div class="s num">${(fit.eftp / VS().weight).toFixed(2)} W/kg · <span class="${diff > 0 ? 'up' : diff < 0 ? 'down' : 'dim'}">${sgn(diff, 0)} W</span> <span class="dim">vs FTP ${VS().ftp}</span></div>
-          ${Math.abs(diff) >= 2 ? `<button class="btn sm anx-useftp" data-v="${fit.eftp}">Use as FTP</button>` : '<div class="s dim">matches your FTP</div>'}`
-        : `<div class="v num dim">–</div><div class="s dim">Needs hard 2–20 min efforts in the last 90 days.</div>`}</div>
-      <div class="card anx-kpi" style="--k:var(--an-wbal)"><div class="k">W′ <span>anaerobic</span></div>
-        ${fit ? `<div class="v num">${(fit.wprime / 1000).toFixed(1)}<small>kJ</small></div><div class="s num">CP <b>${fit.cp} W</b> <span class="dim">· fit of ${fit.pts} bests</span></div>` : `<div class="v num dim">–</div><div class="s dim">Estimated with eFTP.</div>`}</div>
-      <div class="card anx-kpi" style="--k:var(--accent)"><div class="k">This week</div><div class="v num">${tw.tss}<small>TSS</small></div>
-        <div class="s num">${hm(tw.dur)} · ${tw.n} ride${tw.n === 1 ? '' : 's'} <span class="dim">· last wk ${lw.tss} / ${hm(lw.dur)}</span></div>
+      <div class="card anx-kpi" style="--k:var(--an-curve)"><div class="k">eFTP <span>${t('90 d')}</span></div>
+        ${fit ? `<div class="v num">${fit.eftp}<small>W</small></div><div class="s num">${(fit.eftp / VS().weight).toFixed(2)} W/kg · <span class="${diff > 0 ? 'up' : diff < 0 ? 'down' : 'dim'}">${sgn(diff, 0)} W</span> <span class="dim">${t('vs FTP {ftp}', { ftp: VS().ftp })}</span></div>
+          ${Math.abs(diff) >= 2 ? `<button class="btn sm anx-useftp" data-v="${fit.eftp}">${t('Use as FTP')}</button>` : '<div class="s dim">' + t('matches your FTP') + '</div>'}`
+        : `<div class="v num dim">–</div><div class="s dim">${t('Needs hard 2–20 min efforts in the last 90 days.')}</div>`}</div>
+      <div class="card anx-kpi" style="--k:var(--an-wbal)"><div class="k">W′ <span>${t('anaerobic')}</span></div>
+        ${fit ? `<div class="v num">${(fit.wprime / 1000).toFixed(1)}<small>kJ</small></div><div class="s num">CP <b>${fit.cp} W</b> <span class="dim">· ${t('fit of {n} bests', { n: fit.pts })}</span></div>` : `<div class="v num dim">–</div><div class="s dim">${t('Estimated with eFTP.')}</div>`}</div>
+      <div class="card anx-kpi" style="--k:var(--accent)"><div class="k">${t('This week')}</div><div class="v num">${tw.tss}<small>TSS</small></div>
+        <div class="s num">${hm(tw.dur)} · ${tw.n === 1 ? t('{n} ride', { n: tw.n }) : t('{n} rides', { n: tw.n })} <span class="dim">· ${t('last wk {tss} / {dur}', { tss: lw.tss, dur: hm(lw.dur) })}</span></div>
         <div class="wbar"><i style="width:${pctWk.toFixed(1)}%"></i></div></div>`;
     const b = el.querySelector('.anx-useftp');
     if (b) b.addEventListener('click', () => {
       const v = +b.dataset.v; if (!(v > 0)) return;
-      if (typeof DEMO !== 'undefined' && DEMO.active) { toast('Demo data: turn Sim off to change your own FTP'); return; }
+      if (typeof DEMO !== 'undefined' && DEMO.active) { toast(t('Demo data: turn Sim off to change your own FTP')); return; }
       S.ftp = v; saveSettings(); if (typeof afterSettings === 'function') afterSettings();
-      toast(`FTP set to ${v} W (eFTP from your 90-day power curve)`);
+      toast(t('FTP set to {v} W (eFTP from your 90-day power curve)', { v }));
       renderProgressImpl();
     });
   }
@@ -344,7 +344,7 @@ const ANUI = (() => {
     const byDay = {};
     rides.forEach(r => { const k = AN.dayKey(r.date); (byDay[k] || (byDay[k] = [])).push(r); });
     const host = root.querySelector('#anxFit');
-    if (ser.length < 2) { host.innerHTML = '<div class="anx-none">Not enough days yet: ride a few more times to see a trend.</div>'; return; }
+    if (ser.length < 2) { host.innerHTML = '<div class="anx-none">' + t('Not enough days yet: ride a few more times to see a trend.') + '</div>'; return; }
     mkChart(host, { height: w => w < 560 ? 250 : 320, draw: ch => drawFitness(ch, ser, byDay), hover: (ch, x, y) => hoverFitness(ch, x, y, ser, byDay) });
   }
   function drawFitness(ch, ser, byDay) {
@@ -412,7 +412,7 @@ const ANUI = (() => {
     }
     // labels
     ctx.font = ch.font(9.5, 700);
-    text(ctx, 'FORM', L + 4, bt + 7, rgba(P.muted, .7), 'left');
+    text(ctx, t('FORM'), L + 4, bt + 7, rgba(P.muted, .7), 'left');
   }
   function hoverFitness(ch, x, y, ser, byDay) {
     const g = ch.g; if (!g) return null;
@@ -421,8 +421,8 @@ const ANUI = (() => {
     dot(c, xx, g.Y(e.ctl), P.ctl, P.panel); dot(c, xx, g.Y(e.atl), P.atl, P.panel, 3); dot(c, xx, g.YB(e.tsb), P.f[formIdx(e.tsb)], P.panel, 3);
     const fz = FORM[formIdx(e.tsb)], rides = byDay[e.d] || [];
     return `<div class="t">${fD(keyDate(e.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
-      ${trow(P.ctl, 'Fitness', fx(e.ctl, 1))}${trow(P.atl, 'Fatigue', fx(e.atl, 1))}${trow(P.f[formIdx(e.tsb)], 'Form', sgn(e.tsb, 1), `<em style="color:var(${fz.v})">${fz.name}</em>`)}
-      ${e.tss ? trow(null, 'Load', Math.round(e.tss) + ' TSS') : ''}${rides.slice(0, 4).map(r => `<div class="n">${esc(r.name)} <span>${r.tss || 0} TSS</span></div>`).join('')}`;
+      ${trow(P.ctl, t('Fitness'), fx(e.ctl, 1))}${trow(P.atl, t('Fatigue'), fx(e.atl, 1))}${trow(P.f[formIdx(e.tsb)], t('Form'), sgn(e.tsb, 1), `<em style="color:var(${fz.v})">${fz.name}</em>`)}
+      ${e.tss ? trow(null, t('Load'), Math.round(e.tss) + ' TSS') : ''}${rides.slice(0, 4).map(r => `<div class="n">${esc(r.name)} <span>${r.tss || 0} TSS</span></div>`).join('')}`;
   }
 
   /* ---- weekly load ---- */
@@ -444,7 +444,7 @@ const ANUI = (() => {
     const k = Math.max(1, Math.ceil(54 / slot));
     W.forEach((x, i) => {
       const cx = L + i * slot + slot / 2, x0 = cx - bw / 2, cur = i === n - 1;
-      if ((n - 1 - i) % k === 0) { const s = cur ? 'This wk' : fD(keyDate(x.wk)), hw = ctx.measureText(s).width / 2; text(ctx, s, clampN(cx, hw + 2, w - hw - 2), h - B / 2 + 1, cur ? P.muted : P.dim, 'center'); }
+      if ((n - 1 - i) % k === 0) { const s = cur ? t('This wk') : fD(keyDate(x.wk)), hw = ctx.measureText(s).width / 2; text(ctx, s, clampN(cx, hw + 2, w - hw - 2), h - B / 2 + 1, cur ? P.muted : P.dim, 'center'); }
       if (!(x.tss > 0)) return;
       const top = Y(x.tss), tot = x.tiz.reduce((a, b) => a + b, 0);
       ctx.save(); ctx.globalAlpha = cur ? 0.62 : 1;
@@ -462,7 +462,7 @@ const ANUI = (() => {
     });
     if (avg > 0) {
       const y = Y(avg); hline(ctx, L, L + pw, y, rgba(P.text, .45), [4, 4]);
-      ctx.font = ch.font(9.5, 700); const s = `avg ${Math.round(avg)}`, tw = ctx.measureText(s).width;
+      ctx.font = ch.font(9.5, 700); const s = t('avg {v}', { v: Math.round(avg) }), tw = ctx.measureText(s).width;
       ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(L + 2, y - 15, tw + 8, 13); text(ctx, s, L + 6, y - 8.5, P.muted, 'left');
     }
   }
@@ -471,8 +471,8 @@ const ANUI = (() => {
     const i = clampN(Math.floor((x - g.L) / g.slot), 0, g.n - 1), wk = W[i], P = ch.P;
     ch.octx.fillStyle = rgba(P.text, .06); ch.octx.fillRect(g.L + i * g.slot, g.T - 14, g.slot, g.ph + 14);
     const tot = wk.tiz.reduce((a, b) => a + b, 0), end = new Date(keyDate(wk.wk).getTime() + 6 * DAY);
-    return `<div class="t">${fD(keyDate(wk.wk))} – ${fD(end)}${i === g.n - 1 ? ' <span>this week</span>' : ''}</div>
-      ${trow(null, 'Rides', wk.n)}${trow(null, 'Load', wk.tss + ' TSS')}${trow(null, 'Time', hm(wk.dur))}${trow(null, 'Work', wk.kj + ' kJ')}${wk.dist ? trow(null, 'Distance', (wk.dist / 1000).toFixed(1) + ' km') : ''}
+    return `<div class="t">${fD(keyDate(wk.wk))} – ${fD(end)}${i === g.n - 1 ? ' <span>' + t('this week') + '</span>' : ''}</div>
+      ${trow(null, t('Rides'), wk.n)}${trow(null, t('Load'), wk.tss + ' TSS')}${trow(null, t('Time'), hm(wk.dur))}${trow(null, t('Work'), wk.kj + ' kJ')}${wk.dist ? trow(null, t('Distance'), (wk.dist / 1000).toFixed(1) + ' km') : ''}
       ${tot ? `<div class="zb">${PZ.map((z, k) => wk.tiz[k] ? `<i style="width:${(wk.tiz[k] / tot * 100).toFixed(1)}%;background:${z.col}"></i>` : '').join('')}</div>` : ''}`;
   }
 
@@ -553,30 +553,30 @@ const ANUI = (() => {
     const fit = AN.cpFit(cur.w);
     const host = root.querySelector('#anxPc'), foot = root.querySelector('#anxPcFoot'), leg = root.querySelector('#anxPcLeg');
     if (!cur.w.some(v => v != null)) {
-      host.innerHTML = `<div class="anx-none">${withAn.length ? 'No rides with power data in this period.' : 'No analysed rides yet: the power curve appears once rides with per-second data are analysed.'}</div>`;
+      host.innerHTML = `<div class="anx-none">${withAn.length ? t('No rides with power data in this period.') : t('No analysed rides yet: the power curve appears once rides with per-second data are analysed.')}</div>`;
       foot.innerHTML = ''; leg.innerHTML = ''; return;
     }
-    const perName = per ? (per === 365 ? 'last year' : `last ${per} days`) : 'all time';
+    const perName = per ? (per === 365 ? t('last year') : t('last {n} days', { n: per })) : t('all time');
     const series = [{ v: conv(cur), col: 'curve', lw: 2.6, fill: true, name: perName }];
-    if (prev && prev.w.some(v => v != null)) series.push({ v: conv(prev), col: 'cmp', dash: [5, 4], lw: 1.6, name: 'previous ' + (per === 365 ? 'year' : per + ' days') });
-    leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>${esc(perName)}</span>${series[1] ? `<span><i class="dash" style="color:var(--an-cmp)"></i>${esc(series[1].name)}</span>` : ''}${fit ? '<span><i class="dot2"></i>CP model</span>' : ''}`;
+    if (prev && prev.w.some(v => v != null)) series.push({ v: conv(prev), col: 'cmp', dash: [5, 4], lw: 1.6, name: per === 365 ? t('previous year') : t('previous {n} days', { n: per }) });
+    leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>${esc(perName)}</span>${series[1] ? `<span><i class="dash" style="color:var(--an-cmp)"></i>${esc(series[1].name)}</span>` : ''}${fit ? '<span><i class="dot2"></i>' + t('CP model') + '</span>' : ''}`;
     const u = unit === 'wkg' ? 'W/kg' : 'W', fmtV = v => unit === 'wkg' ? fx(v, 2) : fx(v, 0);
     curveChart(host, {
       series, unit, fit, fitScale: unit === 'wkg' ? VS().weight : 1,
       tip(i, ch) {
-        const P = ch.P, t = AN.MMP_DUR[i], id = cur.id[i], r = id && byId[id], w = cur.w[i];
-        let s = `<div class="t">${durLbl(t)} best</div>`;
-        if (w != null) s += trow(P.curve, unit === 'wkg' ? 'W/kg' : 'Power', `${fmtV(series[0].v[i])} ${u}`, `<em>${unit === 'wkg' ? Math.round(w) + ' W' : (w / kg(id)).toFixed(2) + ' W/kg'}</em>`);
-        if (series[1] && series[1].v[i] != null) { const d = w != null ? series[0].v[i] - series[1].v[i] : null; s += trow(P.cmp, 'Previous', `${fmtV(series[1].v[i])} ${u}`, d != null ? `<em class="${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : '−'}${fmtV(Math.abs(d))}</em>` : ''); }
-        if (fit && t >= 60) s += trow(null, 'CP model', `${fmtV((fit.cp + fit.wprime / t) / (unit === 'wkg' ? VS().weight : 1))} ${u}`);
-        if (r) s += `<div class="n">${esc(r.name)} <span>${fDay(r.date)}</span></div><div class="h">${ch.ptype === 'mouse' ? 'Click' : 'Tap again'} to open the ride</div>`;
+        const P = ch.P, tt = AN.MMP_DUR[i], id = cur.id[i], r = id && byId[id], w = cur.w[i];
+        let s = `<div class="t">${t('{d} best', { d: durLbl(tt) })}</div>`;
+        if (w != null) s += trow(P.curve, unit === 'wkg' ? 'W/kg' : t('Power'), `${fmtV(series[0].v[i])} ${u}`, `<em>${unit === 'wkg' ? Math.round(w) + ' W' : (w / kg(id)).toFixed(2) + ' W/kg'}</em>`);
+        if (series[1] && series[1].v[i] != null) { const d = w != null ? series[0].v[i] - series[1].v[i] : null; s += trow(P.cmp, t('Previous'), `${fmtV(series[1].v[i])} ${u}`, d != null ? `<em class="${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : '−'}${fmtV(Math.abs(d))}</em>` : ''); }
+        if (fit && tt >= 60) s += trow(null, t('CP model'), `${fmtV((fit.cp + fit.wprime / tt) / (unit === 'wkg' ? VS().weight : 1))} ${u}`);
+        if (r) s += `<div class="n">${esc(r.name)} <span>${fDay(r.date)}</span></div><div class="h">${ch.ptype === 'mouse' ? t('Click to open the ride') : t('Tap again to open the ride')}</div>`;
         return s;
       },
       pick(i) { const id = cur.id[i]; if (id) openRideAnalysis(id); },
     });
     foot.innerHTML = fit
-      ? `<span>CP <b class="num">${fit.cp} W</b></span><span>W′ <b class="num">${(fit.wprime / 1000).toFixed(1)} kJ</b></span><span>eFTP <b class="num">${fit.eftp} W</b> <span class="dim">(${(fit.eftp / VS().weight).toFixed(2)} W/kg)</span></span><span class="dim">2-parameter fit of the ${fit.pts} best efforts between 2 and 20 min</span>`
-      : '<span class="dim">Critical Power fit needs best efforts between 2 and 20 minutes in this period.</span>';
+      ? `<span>CP <b class="num">${fit.cp} W</b></span><span>W′ <b class="num">${(fit.wprime / 1000).toFixed(1)} kJ</b></span><span>eFTP <b class="num">${fit.eftp} W</b> <span class="dim">(${(fit.eftp / VS().weight).toFixed(2)} W/kg)</span></span><span class="dim">${t('2-parameter fit of the {n} best efforts between 2 and 20 min', { n: fit.pts })}</span>`
+      : '<span class="dim">' + t('Critical Power fit needs best efforts between 2 and 20 minutes in this period.') + '</span>';
   }
 
   /* ---- time in zones ---- */
@@ -584,22 +584,22 @@ const ANUI = (() => {
     const { withAn, root } = PG, per = prefs.zper;
     const zt = AN.zoneTotals(withAn, per ? isoAgo(per) : null);
     const tp = zt.tiz.reduce((a, b) => a + b, 0), th = zt.thz.reduce((a, b) => a + b, 0);
-    root.querySelector('#anxZSub').textContent = zt.n ? `${zt.n} ride${zt.n === 1 ? '' : 's'} · ${hm(tp)} pedalling${th ? ` · ${hm(th)} with heart rate` : ''}` : 'No analysed rides in this period.';
-    root.querySelector('#anxZones').innerHTML = `<div class="anx-zh">Power zones <span class="dim">· FTP ${VS().ftp} W</span></div>${zoneBars(zt.tiz, PZ, 'p', VS().ftp)}${polarization(zt.tiz)}
-      <div class="anx-zh" style="margin-top:16px">Heart-rate zones <span class="dim">· max ${VS().maxHr} bpm</span></div>${zoneBars(zt.thz, HZ, 'hr', VS().maxHr)}`;
+    root.querySelector('#anxZSub').textContent = zt.n ? `${zt.n === 1 ? t('{n} ride', { n: zt.n }) : t('{n} rides', { n: zt.n })} · ${t('{dur} pedalling', { dur: hm(tp) })}${th ? ' · ' + t('{dur} with heart rate', { dur: hm(th) }) : ''}` : t('No analysed rides in this period.');
+    root.querySelector('#anxZones').innerHTML = `<div class="anx-zh">${t('Power zones')} <span class="dim">· FTP ${VS().ftp} W</span></div>${zoneBars(zt.tiz, PZ, 'p', VS().ftp)}${polarization(zt.tiz)}
+      <div class="anx-zh" style="margin-top:16px">${t('Heart-rate zones')} <span class="dim">· max ${VS().maxHr} bpm</span></div>${zoneBars(zt.thz, HZ, 'hr', VS().maxHr)}`;
   }
 
   /* ---- records ---- */
   function renderRecords() {
     const { withAn, byId, root } = PG, el = root.querySelector('#anxRec');
-    if (!withAn.length) { el.innerHTML = '<div class="anx-none">Records appear once rides with per-second data are analysed.</div>'; return; }
+    if (!withAn.length) { el.innerHTML = '<div class="anx-none">' + t('Records appear once rides with per-second data are analysed.') + '</div>'; return; }
     const b90 = AN.bestCurve(withAn, isoAgo(90), null), ball = AN.bestCurve(withAn, null, null);
     const cell = (b, i, star) => {
       const v = b.w[i]; if (v == null) return '<td class="nil">–</td>';
       const r = byId[b.id[i]], kg = (r && +r.wt) || VS().weight;
-      return `<td data-ride="${esc(b.id[i] || '')}" tabindex="0"><b class="num">${Math.round(v)}</b><span class="u">W</span>${star ? '<span class="pb" title="All-time best">PB</span>' : ''}<div class="sub num">${(v / kg).toFixed(2)} W/kg · ${b.date[i] ? fDay(b.date[i]) : ''}</div></td>`;
+      return `<td data-ride="${esc(b.id[i] || '')}" tabindex="0"><b class="num">${Math.round(v)}</b><span class="u">W</span>${star ? '<span class="pb" title="' + t('All-time best') + '">' + t('PB') + '</span>' : ''}<div class="sub num">${(v / kg).toFixed(2)} W/kg · ${b.date[i] ? fDay(b.date[i]) : ''}</div></td>`;
     };
-    el.innerHTML = `<table class="anx-tbl anx-rec"><thead><tr><th>Duration</th><th>Last 90 days</th><th>All time</th></tr></thead><tbody>${KEY_DUR.map(d => {
+    el.innerHTML = `<table class="anx-tbl anx-rec"><thead><tr><th>${t('Duration')}</th><th>${t('Last 90 days')}</th><th>${t('All time')}</th></tr></thead><tbody>${KEY_DUR.map(d => {
       const i = AN.MMP_DUR.indexOf(d); if (i < 0) return '';
       return `<tr><td class="d">${durLbl(d)}</td>${cell(b90, i, b90.w[i] != null && b90.id[i] === ball.id[i])}${cell(ball, i, false)}</tr>`;
     }).join('')}</tbody></table>`;
@@ -611,7 +611,7 @@ const ANUI = (() => {
      ====================================================================== */
   const bc = (fn, ...a) => { try { return typeof BODY !== 'undefined' && BODY && typeof BODY[fn] === 'function' ? BODY[fn](...a) : null; } catch (e) { console.warn('BODY.' + fn, e); return null; } };
   const hasBody = () => typeof BODY !== 'undefined' && !!BODY;
-  const kcF = v => v == null || !isFinite(v) ? '–' : Math.round(v).toLocaleString();
+  const kcF = v => v == null || !isFinite(v) ? '–' : Math.round(v).toLocaleString(LOCALE);
   const kgF = v => fx(v, 1);
   const todayKey = () => AN.dayKey(new Date());
   const dayT = k => keyDate(k).getTime();
@@ -621,8 +621,8 @@ const ANUI = (() => {
     .filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.d) && +e.kg > 0).slice().sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
   let BD = null, justSaved = null; // body-section state; the last saved day (flashed in the list)
 
-  const bodyShell = () => hasBody() ? `<section class="anx-body" id="anxBody" aria-labelledby="anxBodyH"><div class="anx-sh"><h3 id="anxBodyH">Body &amp; energy</h3>
-      <p>Weight trend, energy use and long-term fitness markers. All numbers are estimates.</p></div><div id="anxBodyIn"></div></section>` : '';
+  const bodyShell = () => hasBody() ? `<section class="anx-body" id="anxBody" aria-labelledby="anxBodyH"><div class="anx-sh"><h3 id="anxBodyH">${t('Body &amp; energy')}</h3>
+      <p>${t('Weight trend, energy use and long-term fitness markers. All numbers are estimates.')}</p></div><div id="anxBodyIn"></div></section>` : '';
 
   // "nice" axis over [lo, hi] (does not start at 0)
   function niceRange(lo, hi, n) {
@@ -735,10 +735,10 @@ const ANUI = (() => {
     const plan = tgt && tr ? bc('targetPlan', { trend: tr, targetWeight: tgt, targetDate: tdKey || '' }) : null;
     const dir = plan ? -Math.sign(plan.remaining) : 0; // +1 = needs to gain, -1 = needs to lose
     BD = { wlog, tr, cur, tgt, tdKey, plan, dir, today };
-    const miss = [!(VS().sex === 'f' || VS().sex === 'm') && 'sex', !(+VS().birthYear > 1900) && 'birth year', !(+VS().height > 0) && 'height'].filter(Boolean);
+    const miss = [!(VS().sex === 'f' || VS().sex === 'm') && t('sex'), !(+VS().birthYear > 1900) && t('birth year'), !(+VS().height > 0) && t('height')].filter(Boolean);
     const hint = miss.length ? `<div class="anx-bhint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v6M12 7.2v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-        <span>Add your ${miss.length > 1 ? miss.slice(0, -1).join(', ') + ' and ' + miss[miss.length - 1] : miss[0]} in Settings for BMR, daily energy and heart-rate calorie estimates.</span>
-        <button class="btn sm" type="button" data-goto="settings">Open Settings</button></div>` : '';
+        <span>${t('Add your {items} in Settings for BMR, daily energy and heart-rate calorie estimates.', { items: miss.length > 1 ? miss.slice(0, -1).join(', ') + ' ' + t('and') + ' ' + miss[miss.length - 1] : miss[0] })}</span>
+        <button class="btn sm" type="button" data-goto="settings">${t('Open Settings')}</button></div>` : '';
     const trend = trendsData();
     host.innerHTML = `${hint}${weightCardHTML()}
       <div class="anx-grid2${trend ? '' : ' one'}">${energyCardHTML()}${trend ? trendsCardHTML(trend) : ''}</div>`;
@@ -756,39 +756,39 @@ const ANUI = (() => {
     const st = (k, v, u, s, cls) => `<div class="anx-ws${cls ? ' ' + cls : ''}"><span class="k">${k}</span><b class="v num">${v}${u ? `<small>${u}</small>` : ''}</b>${s ? `<span class="s">${s}</span>` : ''}</div>`;
     const rem = plan ? +plan.remaining : tgt ? (cur != null ? cur : +VS().weight || 0) - tgt : 0, reached = !!tgt && Math.abs(rem) < 0.1;
     const stats = [
-      tr ? st('Current', kgF(cur), 'kg', `7-day avg · last ${kgF(tr.last.kg)} ${tr.last.d === today ? 'today' : fD(keyDate(tr.last.d))}`) : st('Current', kgF(VS().weight), 'kg', 'from Settings'),
-      st('Per week', rate != null ? sgn(rate, 2) : '–', rate != null ? 'kg' : '', plan && plan.requiredPerWeek != null && !reached ? `need ${sgn(plan.requiredPerWeek, 2)} kg/wk` : rate != null ? 'trend, last 4 weeks' : 'needs weigh-ins over 5+ days', rateCls),
-      tgt ? st('To target', reached ? '0' : kgF(Math.abs(rem)), 'kg', reached ? `target ${kgF(tgt)} kg reached` : `${rem < 0 ? 'to gain' : 'to lose'} · target ${kgF(tgt)} kg`, reached ? 'good' : '')
-        : st('To target', '–', '', 'no target weight set'),
-      tgt ? st('ETA', plan && plan.etaDate ? (reached ? 'Now' : fD(keyDate(plan.etaDate), { day: 'numeric', month: 'short', year: '2-digit' })) : '–', '',
-        plan && plan.onTrack != null ? `<span class="anx-pill ${plan.onTrack ? 'good' : 'bad'}">${plan.onTrack ? 'on track' : 'behind'}</span>${tdKey ? ` <span class="dim">goal ${fD(keyDate(tdKey))}</span>` : ''}`
-          : tdKey ? `goal ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })}` : rate != null ? 'not trending toward target' : 'needs more weigh-ins')
-        : st('ETA', '–', '', 'set a target in Settings'),
+      tr ? st(t('Current'), kgF(cur), 'kg', t('7-day avg · last {kg} {when}', { kg: kgF(tr.last.kg), when: tr.last.d === today ? t('today') : fD(keyDate(tr.last.d)) })) : st(t('Current'), kgF(VS().weight), 'kg', t('from Settings')),
+      st(t('Per week'), rate != null ? sgn(rate, 2) : '–', rate != null ? 'kg' : '', plan && plan.requiredPerWeek != null && !reached ? t('need {v} kg/wk', { v: sgn(plan.requiredPerWeek, 2) }) : rate != null ? t('trend, last 4 weeks') : t('needs weigh-ins over 5+ days'), rateCls),
+      tgt ? st(t('To target'), reached ? '0' : kgF(Math.abs(rem)), 'kg', reached ? t('target {kg} kg reached', { kg: kgF(tgt) }) : rem < 0 ? t('to gain · target {kg} kg', { kg: kgF(tgt) }) : t('to lose · target {kg} kg', { kg: kgF(tgt) }), reached ? 'good' : '')
+        : st(t('To target'), '–', '', t('no target weight set')),
+      tgt ? st(t('ETA'), plan && plan.etaDate ? (reached ? t('Now') : fD(keyDate(plan.etaDate), { day: 'numeric', month: 'short', year: '2-digit' })) : '–', '',
+        plan && plan.onTrack != null ? `<span class="anx-pill ${plan.onTrack ? 'good' : 'bad'}">${plan.onTrack ? t('on track') : t('behind')}</span>${tdKey ? ` <span class="dim">${t('goal {date}', { date: fD(keyDate(tdKey)) })}</span>` : ''}`
+          : tdKey ? t('goal {date}', { date: fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' }) }) : rate != null ? t('not trending toward target') : t('needs more weigh-ins'))
+        : st(t('ETA'), '–', '', t('set a target in Settings')),
     ].join('');
     const f0 = tr && (tr.first || wlog[0]);
-    const prog = plan && plan.pct != null && f0 ? `<div class="anx-wprog"><div class="l"><span>Progress to target</span><b class="num">${Math.round(plan.pct)}%</b></div>
-        <div class="anx-wbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(plan.pct)}" aria-label="Progress to target weight"><i style="width:${clampN(plan.pct, 0, 100).toFixed(1)}%"></i></div>
-        <div class="s num">${kgF(f0.kg)} kg on ${fD(keyDate(f0.d), { day: 'numeric', month: 'short', year: '2-digit' })} → ${kgF(tgt)} kg${tdKey ? ` by ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })}` : ''}</div></div>` : '';
+    const prog = plan && plan.pct != null && f0 ? `<div class="anx-wprog"><div class="l"><span>${t('Progress to target')}</span><b class="num">${Math.round(plan.pct)}%</b></div>
+        <div class="anx-wbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(plan.pct)}" aria-label="${t('Progress to target weight')}"><i style="width:${clampN(plan.pct, 0, 100).toFixed(1)}%"></i></div>
+        <div class="s num">${t('{kg} kg on {date}', { kg: kgF(f0.kg), date: fD(keyDate(f0.d), { day: 'numeric', month: 'short', year: '2-digit' }) })} → ${kgF(tgt)} kg${tdKey ? ' ' + t('by {date}', { date: fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' }) }) : ''}</div></div>` : '';
     const ex = wlog.find(e => e.d === today);
     const recent = wlog.slice(-7).reverse();
     const prevOf = d => { const i = wlog.findIndex(e => e.d === d); return i > 0 ? wlog[i - 1] : null; };
     const flash = justSaved && Date.now() - justSaved.at < 4000 ? justSaved.d : null;
-    const list = recent.length ? `<div class="anx-wlh"><span>Recent weigh-ins</span><span class="dim">${wlog.length} total</span></div><ul class="anx-wlist">${recent.map(e => {
+    const list = recent.length ? `<div class="anx-wlh"><span>${t('Recent weigh-ins')}</span><span class="dim">${t('{n} total', { n: wlog.length })}</span></div><ul class="anx-wlist">${recent.map(e => {
       const p = prevOf(e.d), dd = p ? e.kg - p.kg : null, cls = dd == null || Math.abs(dd) < 0.05 ? 'dim' : dir ? (Math.sign(dd) === dir ? 'good' : 'bad') : 'dim';
-      return `<li class="${e.d === flash ? 'new' : ''}"><span class="d">${e.d === today ? 'Today' : fWd(e.d)}</span><b class="num">${kgF(e.kg)}<small>kg</small></b>
+      return `<li class="${e.d === flash ? 'new' : ''}"><span class="d">${e.d === today ? t('Today') : fWd(e.d)}</span><b class="num">${kgF(e.kg)}<small>kg</small></b>
         <span class="dd num ${cls}">${dd == null ? '' : sgn(dd, 1)}</span><span class="hr num">${+e.rhr > 0 ? `${Math.round(e.rhr)}<small>bpm</small>` : ''}</span>
-        <button type="button" class="anx-wdel" data-d="${esc(e.d)}" aria-label="Remove weigh-in of ${esc(fWd(e.d))}">×</button></li>`;
-    }).join('')}</ul>` : '<div class="anx-wlh"><span>Recent weigh-ins</span></div><p class="anx-wnone">Nothing logged yet. Weigh yourself in the morning, before eating, for the steadiest trend.</p>';
+        <button type="button" class="anx-wdel" data-d="${esc(e.d)}" aria-label="${t('Remove weigh-in of {date}', { date: esc(fWd(e.d)) })}">×</button></li>`;
+    }).join('')}</ul>` : '<div class="anx-wlh"><span>' + t('Recent weigh-ins') + '</span></div><p class="anx-wnone">' + t('Nothing logged yet. Weigh yourself in the morning, before eating, for the steadiest trend.') + '</p>';
     const canLog = typeof addWeightLog === 'function';
-    const form = canLog ? `<form class="anx-wform" novalidate><div class="anx-wft">Log weight</div>
+    const form = canLog ? `<form class="anx-wform" novalidate><div class="anx-wft">${t('Log weight')}</div>
         <div class="anx-wfg">
-          <label class="fl"><span>Weight</span><span class="inp"><input type="text" inputmode="decimal" name="kg" autocomplete="off" value="${esc(kgF(ex ? ex.kg : VS().weight))}" aria-describedby="anxWfErr"><em>kg</em></span></label>
-          <label class="fl"><span>Resting HR <i>optional</i></span><span class="inp"><input type="text" inputmode="numeric" name="rhr" autocomplete="off" placeholder="morning" value="${ex && +ex.rhr > 0 ? Math.round(ex.rhr) : ''}"><em>bpm</em></span></label>
-          <label class="fl"><span>Date</span><input type="date" name="d" value="${today}" max="${today}"></label>
-          <button class="btn primary" type="submit">${ex ? 'Update' : 'Save'}</button>
+          <label class="fl"><span>${t('Weight')}</span><span class="inp"><input type="text" inputmode="decimal" name="kg" autocomplete="off" value="${esc(kgF(ex ? ex.kg : VS().weight))}" aria-describedby="anxWfErr"><em>kg</em></span></label>
+          <label class="fl"><span>${t('Resting HR')} <i>${t('optional')}</i></span><span class="inp"><input type="text" inputmode="numeric" name="rhr" autocomplete="off" placeholder="${t('morning')}" value="${ex && +ex.rhr > 0 ? Math.round(ex.rhr) : ''}"><em>bpm</em></span></label>
+          <label class="fl"><span>${t('Date')}</span><input type="date" name="d" value="${today}" max="${today}"></label>
+          <button class="btn primary" type="submit">${ex ? t('Update') : t('Save')}</button>
         </div><div class="anx-wferr" id="anxWfErr" role="alert"></div></form>` : '';
-    return `<section class="card anx-card anx-wcard"><div class="anx-ch"><div><h3>Weight</h3><p>Weigh-ins, the 7-day average${tgt ? ' and your target' : ''}.</p></div>
-        ${seg('wr', [[30, '30d'], [90, '90d'], [365, '1y'], [0, 'All']], prefs.wr)}</div>
+    return `<section class="card anx-card anx-wcard"><div class="anx-ch"><div><h3>${t('Weight')}</h3><p>${tgt ? t('Weigh-ins, the 7-day average and your target.') : t('Weigh-ins, the 7-day average.')}</p></div>
+        ${seg('wr', [[30, t('30d')], [90, t('90d')], [365, t('1y')], [0, t('All')]], prefs.wr)}</div>
       <div class="anx-wgrid"><div class="anx-wmain"><div class="anx-wstats">${stats}</div>${prog}
           <div class="anx-legend" id="anxWtLeg"></div><div class="anx-chart" id="anxWt"></div></div>
         <div class="anx-wside">${form}<div class="anx-wlog">${list}</div></div></div></section>`;
@@ -797,12 +797,12 @@ const ANUI = (() => {
   function renderWeightChart() {
     const root = PG && PG.root, host = root && root.querySelector('#anxWt'), leg = root && root.querySelector('#anxWtLeg'); if (!host || !BD) return;
     const { wlog, tgt, tdKey, cur, today } = BD;
-    if (!wlog.length) { host.innerHTML = '<div class="anx-none">No weigh-ins yet: log your first one to start the trend.</div>'; leg.innerHTML = ''; return; }
+    if (!wlog.length) { host.innerHTML = '<div class="anx-none">' + t('No weigh-ins yet: log your first one to start the trend.') + '</div>'; leg.innerHTML = ''; return; }
     const todayT = dayT(today), firstT = dayT(wlog[0].d);
     const days = prefs.wr || Math.min(3660, Math.max(14, Math.round((todayT - firstT) / DAY) + 1));
     const tr = bc('weightTrend', wlog, { days });
     const pts = tr && Array.isArray(tr.pts) ? tr.pts.filter(p => p && /^\d{4}-\d{2}-\d{2}$/.test(p.d) && isFinite(+p.kg)) : [];
-    if (!pts.length) { host.innerHTML = `<div class="anx-none">No weigh-ins in the last ${days} days.</div>`; leg.innerHTML = ''; return; }
+    if (!pts.length) { host.innerHTML = `<div class="anx-none">${t('No weigh-ins in the last {n} days.', { n: days })}</div>`; leg.innerHTML = ''; return; }
     let t0 = todayT - (days - 1) * DAY, t1 = todayT;
     if (!prefs.wr) t0 = Math.min(t0, firstT);
     const tdT = tdKey ? dayT(tdKey) : null, marks = [], notes = [], lines = [];
@@ -811,27 +811,27 @@ const ANUI = (() => {
       if (tdT - todayT <= Math.max(21 * DAY, 0.75 * (t1 - t0))) {
         t1 = tdT; marks.push({ t: tdT, col: 'goal', label: fD(keyDate(tdKey)) });
         if (tgt && cur != null && Math.abs(cur - tgt) >= 0.1) path = [[todayT, cur], [tdT, tgt]];
-      } else notes.push({ s: `target date ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })} →`, col: 'goal', bottom: false });
+      } else notes.push({ s: t('target date {date} →', { date: fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' }) }), col: 'goal', bottom: false });
     } else if (tdT != null && tdT >= t0) marks.push({ t: tdT, col: 'goal', label: fD(keyDate(tdKey)) });
     let lo = Infinity, hi = -Infinity; pts.forEach(p => { for (const v of [+p.kg, +p.avg7]) if (isFinite(v) && v > 0) { lo = Math.min(lo, v); hi = Math.max(hi, v); } });
     const reach = Math.max(3, (hi - lo) * 1.5), incT = tgt != null && tgt >= lo - reach && tgt <= hi + reach;
-    if (tgt != null && !incT) notes.push({ s: `target ${kgF(tgt)} kg ${tgt < lo ? '↓' : '↑'}`, col: 'goal', bottom: tgt < lo });
+    if (tgt != null && !incT) notes.push({ s: t('target {kg} kg {arrow}', { kg: kgF(tgt), arrow: tgt < lo ? '↓' : '↑' }), col: 'goal', bottom: tgt < lo });
     const tp = p => dayT(p.d);
     lines.push({ pts: pts.map(p => [tp(p), +p.kg]), col: 'wt', noLine: true, dots: pts.length > 120 ? 1.8 : 2.6, alpha: .55 });
     lines.push({ pts: pts.map(p => p.avg7 != null && +p.avg7 > 0 ? [tp(p), +p.avg7] : null), col: 'wt', lw: 2.4, area: true, dots: 3 });
     if (path && incT) lines.push({ pts: path, col: 'goal', lw: 1.6, dash: [2, 5], alpha: .9 });
     const rmap = {}; wlog.forEach(e => { if (+e.rhr > 0) rmap[e.d] = Math.round(e.rhr); });
-    leg.innerHTML = `<span><i class="dot" style="background:var(--an-wt);opacity:.6"></i>Weigh-in</span><span><i style="background:var(--an-wt)"></i>7-day average</span>${tgt != null ? '<span><i class="dash" style="color:var(--an-goal)"></i>Target</span>' : ''}${path && incT ? '<span><i class="dot2" style="border-color:var(--an-goal);opacity:1"></i>Needed pace</span>' : ''}`;
+    leg.innerHTML = `<span><i class="dot" style="background:var(--an-wt);opacity:.6"></i>${t('Weigh-in')}</span><span><i style="background:var(--an-wt)"></i>${t('7-day average')}</span>${tgt != null ? '<span><i class="dash" style="color:var(--an-goal)"></i>' + t('Target') + '</span>' : ''}${path && incT ? '<span><i class="dot2" style="border-color:var(--an-goal);opacity:1"></i>' + t('Needed pace') + '</span>' : ''}`;
     tsChart(host, {
       t0: t0 - 0.6 * DAY, t1: t1 + 0.6 * DAY, pad: 0.3, lines, marks, notes,
-      refs: tgt != null && incT ? [{ v: tgt, col: 'goal', label: `Target ${kgF(tgt)} kg`, dash: [6, 4] }] : [],
+      refs: tgt != null && incT ? [{ v: tgt, col: 'goal', label: t('Target {kg} kg', { kg: kgF(tgt) }), dash: [6, 4] }] : [],
       include: tgt != null && incT ? [tgt] : [],
       hits: pts.map(p => ({ t: tp(p), p, ys: [[+p.kg, 'wt', 3], [p.avg7 != null ? +p.avg7 : null, 'wt', 4]] })),
       tip(hh, ch) {
         const P = ch.P, p = hh.p, a = p.avg7 != null ? +p.avg7 : null;
         return `<div class="t">${fD(keyDate(p.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
-          ${trow(rgba(P.wt, .55), 'Weigh-in', `${kgF(p.kg)} kg`)}${a != null ? trow(P.wt, '7-day avg', `${kgF(a)} kg`) : ''}
-          ${rmap[p.d] ? trow(P.hr, 'Resting HR', `${rmap[p.d]} bpm`) : ''}${tgt != null && a != null ? trow(null, 'To target', Math.abs(a - tgt) < 0.1 ? 'reached' : `${kgF(Math.abs(a - tgt))} kg`) : ''}`;
+          ${trow(rgba(P.wt, .55), t('Weigh-in'), `${kgF(p.kg)} kg`)}${a != null ? trow(P.wt, t('7-day avg'), `${kgF(a)} kg`) : ''}
+          ${rmap[p.d] ? trow(P.hr, t('Resting HR'), `${rmap[p.d]} bpm`) : ''}${tgt != null && a != null ? trow(null, t('To target'), Math.abs(a - tgt) < 0.1 ? t('reached') : `${kgF(Math.abs(a - tgt))} kg`) : ''}`;
       },
     }, w => w < 560 ? 210 : 250);
   }
@@ -849,18 +849,18 @@ const ANUI = (() => {
       d.addEventListener('change', () => {
         const e = BD && BD.wlog.find(x => x.d === d.value);
         if (e) { kg.value = kgF(e.kg); rhr.value = +e.rhr > 0 ? Math.round(e.rhr) : ''; }
-        btn.textContent = e ? 'Update' : 'Save'; bad(null);
+        btn.textContent = e ? t('Update') : t('Save'); bad(null);
       });
       f.addEventListener('submit', e => {
         e.preventDefault();
         const v = numIn(kg.value), hrS = String(rhr.value || '').trim(), h = hrS ? numIn(hrS) : null, day = d.value, today = todayKey();
-        if (v == null || v < 25 || v > 250) return bad(kg, 'Enter a weight between 25 and 250 kg.');
-        if (hrS && (h == null || h < 25 || h > 120)) return bad(rhr, 'Resting HR should be between 25 and 120 bpm, or leave it empty.');
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || AN.dayKey(day) !== day || day > today) return bad(d, 'Pick a date that is not in the future.');
+        if (v == null || v < 25 || v > 250) return bad(kg, t('Enter a weight between 25 and 250 kg.'));
+        if (hrS && (h == null || h < 25 || h > 120)) return bad(rhr, t('Resting HR should be between 25 and 120 bpm, or leave it empty.'));
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || AN.dayKey(day) !== day || day > today) return bad(d, t('Pick a date that is not in the future.'));
         bad(null);
         justSaved = { d: day, at: Date.now() };
         try { if (h != null) addWeightLog(day, Math.round(v * 10) / 10, Math.round(h)); else addWeightLog(day, Math.round(v * 10) / 10); }
-        catch (er) { console.error(er); return bad(null, 'Could not save: ' + (er && er.message ? er.message : 'unknown error')); }
+        catch (er) { console.error(er); return bad(null, t('Could not save: {msg}', { msg: er && er.message ? er.message : t('unknown error') })); }
         refresh();
       });
     }
@@ -869,7 +869,7 @@ const ANUI = (() => {
       const b = e.target.closest('.anx-wdel'); if (!b) return;
       if (!b.classList.contains('arm')) { // two-step remove: first tap arms the button for 3 s
         ul.querySelectorAll('.anx-wdel.arm').forEach(x => { x.classList.remove('arm'); x.textContent = '×'; });
-        b.classList.add('arm'); b.textContent = 'Remove'; clearTimeout(b._t);
+        b.classList.add('arm'); b.textContent = t('Remove'); clearTimeout(b._t);
         b._t = setTimeout(() => { b.classList.remove('arm'); b.textContent = '×'; }, 3000); return;
       }
       clearTimeout(b._t);
@@ -886,22 +886,22 @@ const ANUI = (() => {
     BD.kcalWeeks = W; BD.mon = mon;
     const tw = W.find(x => x.wk === mon) || { ride: 0, n: 0 }, fat = bc('fatKg', tw.ride);
     const et = (k, v, u, s, col) => `<div class="anx-et" style="--k:${col}"><span class="k">${k}</span><b class="num">${v}${u ? `<small>${u}</small>` : ''}</b>${s ? `<span class="s">${s}</span>` : ''}</div>`;
-    const needProfile = 'needs height &amp; birth year';
-    return `<section class="card anx-card anx-ecard"><div class="anx-ch"><div><h3>Energy</h3><p>Estimated daily energy use and calories burned on the bike.</p></div></div>
+    const needProfile = t('needs height &amp; birth year');
+    return `<section class="card anx-card anx-ecard"><div class="anx-ch"><div><h3>${t('Energy')}</h3><p>${t('Estimated daily energy use and calories burned on the bike.')}</p></div></div>
       <div class="anx-etiles">
-        ${et('BMR', kcF(bmr), bmr ? 'kcal/day' : '', bmr ? 'at complete rest' : needProfile, 'var(--muted)')}
-        ${et('Rest day', kcF(rest), rest ? 'kcal' : '', rest ? 'BMR × 1.2, light activity' : needProfile, 'var(--an-wt)')}
-        ${et('Average day', kcF(E.avgNeed), E.avgNeed != null ? 'kcal' : '', E.avgNeed != null ? `incl. ${kcF(E.avgRidePerDay)} kcal/day riding (28 d)` : needProfile, 'var(--an-goal)')}
-        ${et('Rides this week', kcF(tw.ride), 'kcal', tw.ride > 0 && fat != null ? `≈ ${fat.toFixed(2)} kg of fat-equivalent` : `${tw.n} ride${tw.n === 1 ? '' : 's'} so far`, 'var(--an-kcal)')}
+        ${et(t('BMR'), kcF(bmr), bmr ? t('kcal/day') : '', bmr ? t('at complete rest') : needProfile, 'var(--muted)')}
+        ${et(t('Rest day'), kcF(rest), rest ? 'kcal' : '', rest ? t('BMR × 1.2, light activity') : needProfile, 'var(--an-wt)')}
+        ${et(t('Average day'), kcF(E.avgNeed), E.avgNeed != null ? 'kcal' : '', E.avgNeed != null ? t('incl. {kcal} kcal/day riding (28 d)', { kcal: kcF(E.avgRidePerDay) }) : needProfile, 'var(--an-goal)')}
+        ${et(t('Rides this week'), kcF(tw.ride), 'kcal', tw.ride > 0 && fat != null ? t('≈ {kg} kg of fat-equivalent', { kg: fat.toFixed(2) }) : tw.n === 1 ? t('{n} ride so far', { n: tw.n }) : t('{n} rides so far', { n: tw.n }), 'var(--an-kcal)')}
       </div>
-      <div class="anx-zh" style="margin-top:12px">Ride calories per week <span class="dim">· this week and the 4 before</span></div>
+      <div class="anx-zh" style="margin-top:12px">${t('Ride calories per week')} <span class="dim">· ${t('this week and the 4 before')}</span></div>
       <div class="anx-chart" id="anxKcal"></div>
-      <p class="anx-note">Estimates, not medical advice. Ride calories come from the work on the pedals and assume ~24&nbsp;% gross efficiency (heart-rate based, Keytel et&nbsp;al. 2005, when a ride has no power). BMR: Mifflin-St&nbsp;Jeor. Average day = BMR × 1.2 + riding. 1&nbsp;kg of body fat ≈ 7,700&nbsp;kcal.</p></section>`;
+      <p class="anx-note">${t('Estimates, not medical advice. Ride calories come from the work on the pedals and assume ~24&nbsp;% gross efficiency (heart-rate based, Keytel et&nbsp;al. 2005, when a ride has no power). BMR: Mifflin-St&nbsp;Jeor. Average day = BMR × 1.2 + riding. 1&nbsp;kg of body fat ≈ 7,700&nbsp;kcal.')}</p></section>`;
   }
   function renderKcalChart() {
     const host = PG && PG.root && PG.root.querySelector('#anxKcal'); if (!host || !BD) return;
     const W = BD.kcalWeeks || [];
-    if (!W.some(x => x.ride > 0)) { host.innerHTML = '<div class="anx-none">No rides in the last 5 weeks.</div>'; return; }
+    if (!W.some(x => x.ride > 0)) { host.innerHTML = '<div class="anx-none">' + t('No rides in the last 5 weeks.') + '</div>'; return; }
     mkChart(host, {
       height: w => w < 560 ? 160 : 180,
       draw(ch) {
@@ -917,7 +917,7 @@ const ANUI = (() => {
         const done = W.slice(0, -1).filter(x => x.n), avg = done.length ? done.reduce((a, x) => a + x.ride, 0) / done.length : 0;
         W.forEach((x, i) => {
           const cx = L + i * slot + slot / 2, x0 = cx - bw / 2, cur = x.wk === BD.mon;
-          text(ctx, cur ? 'This wk' : fD(keyDate(x.wk)), cx, h - B / 2 + 1, cur ? P.muted : P.dim, 'center');
+          text(ctx, cur ? t('This wk') : fD(keyDate(x.wk)), cx, h - B / 2 + 1, cur ? P.muted : P.dim, 'center');
           if (!(x.ride > 0)) return;
           const top = Y(x.ride), g = ctx.createLinearGradient(0, top, 0, T + ph); g.addColorStop(0, rgba(P.kcal, cur ? .62 : .95)); g.addColorStop(1, rgba(P.kcal, cur ? .25 : .45));
           topRounded(ctx, x0, top, bw, Y(0) - top, Math.min(5, bw / 3)); ctx.fillStyle = g; ctx.fill();
@@ -926,7 +926,7 @@ const ANUI = (() => {
         });
         if (avg > 0) {
           const y = Y(avg); hline(ctx, L, L + pw, y, rgba(P.text, .4), [4, 4]);
-          ctx.font = ch.font(9.5, 700); const s = `avg ${kcF(avg)}`, tw = ctx.measureText(s).width;
+          ctx.font = ch.font(9.5, 700); const s = t('avg {v}', { v: kcF(avg) }), tw = ctx.measureText(s).width;
           ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(L + 2, y - 15, tw + 8, 13); text(ctx, s, L + 6, y - 8.5, P.muted, 'left'); ctx.font = ch.font(10);
         }
       },
@@ -935,8 +935,8 @@ const ANUI = (() => {
         const i = clampN(Math.floor((x - g.L) / g.slot), 0, g.n - 1), wk = W[i], P = ch.P;
         ch.octx.fillStyle = rgba(P.text, .06); ch.octx.fillRect(g.L + i * g.slot, g.T - 14, g.slot, g.ph + 14);
         const fat = bc('fatKg', wk.ride), end = new Date(keyDate(wk.wk).getTime() + 6 * DAY);
-        return `<div class="t">${fD(keyDate(wk.wk))} – ${fD(end)}${wk.wk === BD.mon ? ' <span>this week</span>' : ''}</div>
-          ${trow(P.kcal, 'Ride calories', `${kcF(wk.ride)} kcal`)}${trow(null, 'Rides', wk.n)}${wk.ride > 0 && fat != null ? trow(null, 'Fat-equivalent', `≈ ${fat.toFixed(2)} kg`) : ''}<div class="h">Estimate</div>`;
+        return `<div class="t">${fD(keyDate(wk.wk))} – ${fD(end)}${wk.wk === BD.mon ? ' <span>' + t('this week') + '</span>' : ''}</div>
+          ${trow(P.kcal, t('Ride calories'), `${kcF(wk.ride)} kcal`)}${trow(null, t('Rides'), wk.n)}${wk.ride > 0 && fat != null ? trow(null, t('Fat-equivalent'), `≈ ${fat.toFixed(2)} kg`) : ''}<div class="h">${t('Estimate')}</div>`;
       },
     });
   }
@@ -964,16 +964,16 @@ const ANUI = (() => {
     const out = [];
     if (D.tabs.includes('eftp')) {
       const l = lastOf(D.ef, 'eftp'), f = firstOf(D.ef, 'eftp'), d = l && f && l !== f ? l.eftp - f.eftp : null;
-      out.push(tile('eftp', 'eFTP', l ? l.eftp : '–', l ? 'W' : '', l ? `${d != null ? `<span class="${d > 0 ? 'good' : d < 0 ? 'bad' : ''}">${sgn(d, 0)} W</span> since ${fD(keyDate(f.wk))}` : '90-day CP fit'}` : 'needs 2–20 min efforts', 'var(--an-curve)'));
-      out.push(tile('vo2', 'VO₂max', D.vNow != null ? fx(D.vNow, 1) : '–', D.vNow != null ? 'ml/kg/min' : '', D.vNow != null ? 'ACSM estimate from best 5-min power' : 'needs a 5-min effort (90 d)', 'var(--an-vo2)'));
+      out.push(tile('eftp', 'eFTP', l ? l.eftp : '–', l ? 'W' : '', l ? `${d != null ? t('{delta} since {date}', { delta: `<span class="${d > 0 ? 'good' : d < 0 ? 'bad' : ''}">${sgn(d, 0)} W</span>`, date: fD(keyDate(f.wk)) }) : t('90-day CP fit')}` : t('needs 2–20 min efforts'), 'var(--an-curve)'));
+      out.push(tile('vo2', 'VO₂max', D.vNow != null ? fx(D.vNow, 1) : '–', D.vNow != null ? 'ml/kg/min' : '', D.vNow != null ? t('ACSM estimate from best 5-min power') : t('needs a 5-min effort (90 d)'), 'var(--an-vo2)'));
     }
     if (D.tabs.includes('rhr')) {
       const l = D.rh[D.rh.length - 1], old = D.rh.filter(e => dayT(e.d) <= dayT(l.d) - 21 * DAY).slice(-7);
       const ref = old.length ? old.reduce((a, e) => a + e.rhr, 0) / old.length : null, d = ref != null ? l.rhr - ref : null;
-      out.push(tile('rhr', 'Resting HR', Math.round(l.rhr), 'bpm', d != null ? `<span class="${d < -0.5 ? 'good' : d > 2 ? 'bad' : ''}">${sgn(d, 0)}</span> vs 3–4 wk ago` : `logged ${l.d === BD.today ? 'today' : fD(keyDate(l.d))}`, 'var(--an-hr)'));
+      out.push(tile('rhr', t('Resting HR'), Math.round(l.rhr), 'bpm', d != null ? t('{delta} vs 3–4 wk ago', { delta: `<span class="${d < -0.5 ? 'good' : d > 2 ? 'bad' : ''}">${sgn(d, 0)}</span>` }) : t('logged {when}', { when: l.d === BD.today ? t('today') : fD(keyDate(l.d)) }), 'var(--an-hr)'));
     }
-    return `<section class="card anx-card anx-tcard"><div class="anx-ch"><div><h3>Trends</h3><p>Long-term markers, one point per week (rolling 90-day bests)${D.rh.length ? ', resting HR from your log' : ''}.</p></div></div>
-      <div class="anx-bts n${out.length}" role="group" aria-label="Trend to chart">${out.join('')}</div>
+    return `<section class="card anx-card anx-tcard"><div class="anx-ch"><div><h3>${t('Trends')}</h3><p>${D.rh.length ? t('Long-term markers, one point per week (rolling 90-day bests), resting HR from your log.') : t('Long-term markers, one point per week (rolling 90-day bests).')}</p></div></div>
+      <div class="anx-bts n${out.length}" role="group" aria-label="${t('Trend to chart')}">${out.join('')}</div>
       <div class="anx-legend" id="anxTrLeg"></div><div class="anx-chart" id="anxTr"></div><div class="anx-foot" id="anxTrFoot"></div></section>`;
   }
   function bindTrends(host, D) {
@@ -990,38 +990,38 @@ const ANUI = (() => {
     const range = (a, key) => { const t = a.filter(p => p[key] != null).map(wkT); return [Math.min(...t) - 3 * DAY, Math.max(...t) + 3 * DAY]; }; // from the first week with a value
     const ftp = +VS().ftp > 0 ? +VS().ftp : null;
     if (k === 'eftp') {
-      leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>eFTP</span>${ftp ? '<span><i class="dash" style="color:var(--muted)"></i>FTP setting</span>' : ''}`;
-      foot.innerHTML = '<span class="dim">eFTP = 96 % of Critical Power, fitted to your best 2–20 min efforts of the 90 days up to each week.</span>';
-      if (!D.hasEf || !D.ef.length) { el.innerHTML = '<div class="anx-none">No eFTP yet: it needs hard 2–20 minute efforts.</div>'; return; }
+      leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>eFTP</span>${ftp ? '<span><i class="dash" style="color:var(--muted)"></i>' + t('FTP setting') + '</span>' : ''}`;
+      foot.innerHTML = '<span class="dim">' + t('eFTP = 96 % of Critical Power, fitted to your best 2–20 min efforts of the 90 days up to each week.') + '</span>';
+      if (!D.hasEf || !D.ef.length) { el.innerHTML = '<div class="anx-none">' + t('No eFTP yet: it needs hard 2–20 minute efforts.') + '</div>'; return; }
       const [t0, t1] = range(D.ef, 'eftp');
       tsChart(el, {
         t0, t1, pad: 5,
         lines: [{ pts: D.ef.map(p => p.eftp != null ? [wkT(p), p.eftp] : null), col: 'curve', lw: 2.4, area: true, dots: 3 }],
         refs: ftp ? [{ v: ftp, col: 'muted', label: `FTP ${ftp} W`, dash: [5, 4] }] : [], include: ftp ? [ftp] : [],
         hits: D.ef.filter(p => p.eftp != null).map(p => ({ t: wkT(p), p, ys: [[p.eftp, 'curve', 4]] })),
-        tip: (hh, ch) => { const p = hh.p; return `<div class="t">Week of ${fD(keyDate(p.wk), { day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.curve, 'eFTP', `${p.eftp} W`, VS().weight > 0 ? `<em>${(p.eftp / VS().weight).toFixed(2)} W/kg</em>` : '')}${p.cp ? trow(null, 'CP', `${p.cp} W`) : ''}${p.wprime ? trow(null, 'W′', `${(p.wprime / 1000).toFixed(1)} kJ`) : ''}${ftp ? trow(null, 'vs FTP', `${sgn(p.eftp - ftp, 0)} W`) : ''}`; },
+        tip: (hh, ch) => { const p = hh.p; return `<div class="t">${t('Week of {date}', { date: fD(keyDate(p.wk), { day: 'numeric', month: 'short', year: 'numeric' }) })}</div>${trow(ch.P.curve, 'eFTP', `${p.eftp} W`, VS().weight > 0 ? `<em>${(p.eftp / VS().weight).toFixed(2)} W/kg</em>` : '')}${p.cp ? trow(null, 'CP', `${p.cp} W`) : ''}${p.wprime ? trow(null, 'W′', `${(p.wprime / 1000).toFixed(1)} kJ`) : ''}${ftp ? trow(null, t('vs FTP'), `${sgn(p.eftp - ftp, 0)} W`) : ''}`; },
       });
     } else if (k === 'vo2') {
-      leg.innerHTML = '<span><i style="background:var(--an-vo2)"></i>VO₂max estimate</span>';
-      foot.innerHTML = `<span class="dim">ACSM cycling equation on the best 5-min power: 10.8 × W ÷ kg + 7 (ml/kg/min). A rough estimate that tracks your 5-min form, not a lab value.</span>${D.p5 ? `<span>Best 5 min (90 d) <b class="num">${Math.round(D.p5)} W</b></span>` : ''}`;
-      if (!D.hasVo) { el.innerHTML = '<div class="anx-none">No estimate yet: it needs a hard 5-minute effort and your weight on the ride.</div>'; return; }
+      leg.innerHTML = '<span><i style="background:var(--an-vo2)"></i>' + t('VO₂max estimate') + '</span>';
+      foot.innerHTML = `<span class="dim">${t('ACSM cycling equation on the best 5-min power: 10.8 × W ÷ kg + 7 (ml/kg/min). A rough estimate that tracks your 5-min form, not a lab value.')}</span>${D.p5 ? `<span>${t('Best 5 min (90 d)')} <b class="num">${Math.round(D.p5)} W</b></span>` : ''}`;
+      if (!D.hasVo) { el.innerHTML = '<div class="anx-none">' + t('No estimate yet: it needs a hard 5-minute effort and your weight on the ride.') + '</div>'; return; }
       const [t0, t1] = range(D.vo, 'vo2');
       tsChart(el, {
         t0, t1, pad: 1,
         lines: [{ pts: D.vo.map(p => p.vo2 != null ? [wkT(p), p.vo2] : null), col: 'vo2', lw: 2.4, area: true, dots: 3 }],
         hits: D.vo.filter(p => p.vo2 != null).map(p => ({ t: wkT(p), p, ys: [[p.vo2, 'vo2', 4]] })),
-        tip: (hh, ch) => `<div class="t">Week of ${fD(keyDate(hh.p.wk), { day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.vo2, 'VO₂max', `${fx(hh.p.vo2, 1)}`, '<em>ml/kg/min</em>')}<div class="h">Estimate from 90-day best 5-min power</div>`,
+        tip: (hh, ch) => `<div class="t">${t('Week of {date}', { date: fD(keyDate(hh.p.wk), { day: 'numeric', month: 'short', year: 'numeric' }) })}</div>${trow(ch.P.vo2, 'VO₂max', `${fx(hh.p.vo2, 1)}`, '<em>ml/kg/min</em>')}<div class="h">${t('Estimate from 90-day best 5-min power')}</div>`,
       });
     } else {
-      leg.innerHTML = '<span><i class="dot" style="background:var(--an-hr)"></i>Morning resting HR</span>';
-      foot.innerHTML = '<span class="dim">A resting HR well above your normal can mean fatigue, illness or poor sleep: consider an easy day.</span>';
+      leg.innerHTML = '<span><i class="dot" style="background:var(--an-hr)"></i>' + t('Morning resting HR') + '</span>';
+      foot.innerHTML = '<span class="dim">' + t('A resting HR well above your normal can mean fatigue, illness or poor sleep: consider an easy day.') + '</span>';
       const pts = D.rh.map(e => [dayT(e.d), +e.rhr]), t1 = dayT(BD.today), t0 = Math.min(pts[0][0], t1 - 27 * DAY);
       tsChart(el, {
         t0: t0 - 0.6 * DAY, t1: t1 + 0.6 * DAY, pad: 2,
         lines: [{ pts, col: 'hr', lw: 1.8, dots: 2.6, allDots: true }],
-        refs: +VS().restHr > 0 ? [{ v: +VS().restHr, col: 'muted', label: `Settings ${Math.round(VS().restHr)} bpm`, dash: [5, 4] }] : [], include: +VS().restHr > 0 ? [+VS().restHr] : [],
+        refs: +VS().restHr > 0 ? [{ v: +VS().restHr, col: 'muted', label: t('Settings {n} bpm', { n: Math.round(VS().restHr) }), dash: [5, 4] }] : [], include: +VS().restHr > 0 ? [+VS().restHr] : [],
         hits: D.rh.map(e => ({ t: dayT(e.d), p: e, ys: [[+e.rhr, 'hr', 4]] })),
-        tip: (hh, ch) => `<div class="t">${fD(keyDate(hh.p.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.hr, 'Resting HR', `${Math.round(hh.p.rhr)} bpm`)}`,
+        tip: (hh, ch) => `<div class="t">${fD(keyDate(hh.p.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.hr, t('Resting HR'), `${Math.round(hh.p.rhr)} bpm`)}`,
       });
     }
   }
@@ -1043,16 +1043,16 @@ const ANUI = (() => {
   async function openRide(id, fallback) {
     const hist = HIST();
     const r = hist.find(x => x.id === id) || (fallback && fallback.id === id ? fallback : null); // a just-finished ride may still be saving
-    if (!r) { toast('Ride not found'); return; }
+    if (!r) { toast(t('Ride not found')); return; }
     if (ov) closeRide();
     closeRide.focus = document.activeElement;
     const node = document.createElement('div');
-    node.id = 'rideAn'; node.className = 'anx anx-ov'; node.setAttribute('role', 'dialog'); node.setAttribute('aria-modal', 'true'); node.setAttribute('aria-label', 'Ride analysis: ' + (r.name || 'ride'));
+    node.id = 'rideAn'; node.className = 'anx anx-ov'; node.setAttribute('role', 'dialog'); node.setAttribute('aria-modal', 'true'); node.setAttribute('aria-label', t('Ride analysis: {name}', { name: r.name || t('ride') }));
     const cc = typeof CAT_COL !== 'undefined' && r.cat ? CAT_COL[r.cat] : null;
-    node.innerHTML = `<div class="anx-ovbar"><button class="anx-x" type="button" aria-label="Close analysis"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back</span></button>
-      <div class="anx-ovt"><b>${esc(r.name || 'Ride')}</b><span>${fLong(r.date)}</span></div>
-      <div class="anx-ovb">${r.completed ? '<span class="badge" style="color:var(--ok)">Completed</span>' : '<span class="badge" style="color:var(--muted)">Ended early</span>'}${cc ? `<span class="badge anx-catb" style="color:${cc}">${esc(r.cat)}</span>` : ''}</div></div>
-      <div class="anx-ovbody"><div class="anx-loading"><i class="anx-spin"></i><span>Loading ride data…</span></div></div>`;
+    node.innerHTML = `<div class="anx-ovbar"><button class="anx-x" type="button" aria-label="${t('Close analysis')}"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${t('Back')}</span></button>
+      <div class="anx-ovt"><b>${esc(r.name || (s => s[0].toUpperCase() + s.slice(1))(t('ride')))}</b><span>${fLong(r.date)}</span></div>
+      <div class="anx-ovb">${r.completed ? '<span class="badge" style="color:var(--ok)">' + t('Completed') + '</span>' : '<span class="badge" style="color:var(--muted)">' + t('Ended early') + '</span>'}${cc ? `<span class="badge anx-catb" style="color:${cc}">${esc(t(r.cat))}</span>` : ''}</div></div>
+      <div class="anx-ovbody"><div class="anx-loading"><i class="anx-spin"></i><span>${t('Loading ride data…')}</span></div></div>`;
     document.body.appendChild(node); document.body.classList.add('anx-lock');
     ov = node;
     node.querySelector('.anx-x').addEventListener('click', closeRide);
@@ -1062,7 +1062,7 @@ const ANUI = (() => {
     try { raw = await rideStreams(r); } catch (e) { err = e; }
     if (ov !== node) return; // closed or replaced while loading
     try { renderRidePage(node.querySelector('.anx-ovbody'), r, raw, err, hist); }
-    catch (e) { console.error(e); node.querySelector('.anx-ovbody').innerHTML = `<div class="card pad anx-none">Could not analyse this ride: ${esc(e.message)}</div>`; }
+    catch (e) { console.error(e); node.querySelector('.anx-ovbody').innerHTML = `<div class="card pad anx-none">${t('Could not analyse this ride: {msg}', { msg: esc(e.message) })}</div>`; }
   }
 
   function prepStreams(s) {
@@ -1085,39 +1085,40 @@ const ANUI = (() => {
     const np = (an && an.np) || r.np, IF = r.IF || (np && ftp ? +(np / ftp).toFixed(2) : null);
     const pk = [[5, '5s'], [60, '1m'], [300, '5m'], [1200, '20m']].map(([d, l]) => peak(d) != null ? `<span><em>${l}</em>${peak(d)}</span>` : '').join('');
     const stats = [
-      tile('Duration', fmtTime(r.dur), '', an && an.coast ? `${fmtTime(an.coast)} coasting` : ''),
-      tile('Distance', fx((r.dist || 0) / 1000, 1), 'km'),
-      tile('Avg power', fx(r.avgP), 'W', `${fx(r.avgP / kg, 2)} W/kg`),
-      tile('Norm. power', fx(np), 'W', `${fx(np / kg, 2)} W/kg`),
-      tile('Max power', fx(r.maxP), 'W'),
-      tile('Intensity', fx(IF, 2), 'IF', `FTP ${ftp} W`),
-      tile('Load', fx(r.tss), 'TSS', `${fx(r.kj)} kJ work`),
+      tile(t('Duration'), fmtTime(r.dur), '', an && an.coast ? t('{time} coasting', { time: fmtTime(an.coast) }) : ''),
+      tile(t('Distance'), fx((r.dist || 0) / 1000, 1), 'km'),
+      tile(t('Avg power'), fx(r.avgP), 'W', `${fx(r.avgP / kg, 2)} W/kg`),
+      tile(t('Norm. power'), fx(np), 'W', `${fx(np / kg, 2)} W/kg`),
+      tile(t('Max power'), fx(r.maxP), 'W'),
+      tile(t('Intensity'), fx(IF, 2), 'IF', `FTP ${ftp} W`),
+      tile(t('Load'), fx(r.tss), 'TSS', t('{kj} kJ work', { kj: fx(r.kj) })),
       kcalTile(r),
-      tile('Variability', an && an.vi != null ? fx(an.vi, 2) : '–', 'VI', an && an.vi ? (an.vi <= 1.05 ? 'steady' : an.vi <= 1.15 ? 'variable' : 'very variable') : ''),
-      tile('Efficiency', an && an.ef != null ? fx(an.ef, 2) : '–', 'EF', 'NP ÷ avg HR'),
-      tile('Pw:HR drift', dec != null ? fx(dec, 1) : '–', dec != null ? '%' : '', dec == null ? 'needs 20 min with HR' : dec < 5 ? 'well coupled' : dec < 10 ? 'some drift' : 'strong drift', dec == null ? '' : dec < 5 ? 'good' : dec < 10 ? 'meh' : 'bad'),
-      tile('Heart rate', r.avgHr ? fx(r.avgHr) : '–', r.avgHr ? 'bpm' : '', r.maxHr ? `max ${r.maxHr} bpm` : ''),
-      tile('Cadence', r.avgC ? fx(r.avgC) : '–', r.avgC ? 'rpm' : ''),
-      tile('W′bal low', wbMin != null ? fx(Math.max(0, wbMin) / 1000, 1) : '–', wbMin != null ? 'kJ' : '', wbMin != null ? `${Math.round(Math.max(0, wbMin) / wp * 100)}% of W′ left` : '', wbMin != null && wbMin / wp < 0.1 ? 'bad' : ''),
-      pk ? `<div class="card anx-tile wide"><div class="k">Peak power</div><div class="anx-peaks num">${pk}</div></div>` : '',
+      tile(t('Variability'), an && an.vi != null ? fx(an.vi, 2) : '–', 'VI', an && an.vi ? (an.vi <= 1.05 ? t('steady') : an.vi <= 1.15 ? t('variable') : t('very variable')) : ''),
+      tile(t('Efficiency'), an && an.ef != null ? fx(an.ef, 2) : '–', 'EF', t('NP ÷ avg HR')),
+      tile(t('Pw:HR drift'), dec != null ? fx(dec, 1) : '–', dec != null ? '%' : '', dec == null ? t('needs 20 min with HR') : dec < 5 ? t('well coupled') : dec < 10 ? t('some drift') : t('strong drift'), dec == null ? '' : dec < 5 ? 'good' : dec < 10 ? 'meh' : 'bad'),
+      tile(t('Heart rate'), r.avgHr ? fx(r.avgHr) : '–', r.avgHr ? 'bpm' : '', r.maxHr ? `max ${r.maxHr} bpm` : ''),
+      tile(t('Cadence'), r.avgC ? fx(r.avgC) : '–', r.avgC ? 'rpm' : ''),
+      tile(t('W′bal low'), wbMin != null ? fx(Math.max(0, wbMin) / 1000, 1) : '–', wbMin != null ? 'kJ' : '', wbMin != null ? t('{pct}% of W′ left', { pct: Math.round(Math.max(0, wbMin) / wp * 100) }) : '', wbMin != null && wbMin / wp < 0.1 ? 'bad' : ''),
+      pk ? `<div class="card anx-tile wide"><div class="k">${t('Peak power')}</div><div class="anx-peaks num">${pk}</div></div>` : '',
     ].join('');
     let html = `<div class="anx-ride">
-      <div class="anx-meta">${r.cat ? `<span>${esc(r.cat)}</span>` : ''}<span>FTP ${ftp} W</span><span>${fx(kg, 1)} kg</span>${an && an.ints ? `<span>${an.ints.filter(x => x.k === 'work').length} work intervals</span>` : ''}</div>
+      <div class="anx-meta">${r.cat ? `<span>${esc(t(r.cat))}</span>` : ''}<span>FTP ${ftp} W</span><span>${fx(kg, 1)} kg</span>${an && an.ints ? `<span>${t('{n} work intervals', { n: an.ints.filter(x => x.k === 'work').length })}</span>` : ''}</div>
       <div class="anx-tiles">${stats}</div>`;
     if (!st) {
-      html += `<div class="card anx-card anx-nodata"><h3>Summary only</h3><p class="muted">${esc(err && err.message ? err.message : 'No per-second data is stored for this ride')}. The detailed chart, intervals and selection stats need the second-by-second recording${an ? '; the stored analysis below is still available' : ''}.</p>${r.pv && r.pv.length ? `<div class="anx-pv">${pvSVG(r.pv, ftp)}</div>` : ''}</div>`;
+      const why = esc(err && err.message ? err.message : t('No per-second data is stored for this ride'));
+      html += `<div class="card anx-card anx-nodata"><h3>${t('Summary only')}</h3><p class="muted">${an ? t('{reason}. The detailed chart, intervals and selection stats need the second-by-second recording; the stored analysis below is still available.', { reason: why }) : t('{reason}. The detailed chart, intervals and selection stats need the second-by-second recording.', { reason: why })}</p>${r.pv && r.pv.length ? `<div class="anx-pv">${pvSVG(r.pv, ftp)}</div>` : ''}</div>`;
     } else {
-      html += `<section class="card anx-card anx-streamc"><div class="anx-ch"><div><h3>Power &amp; heart rate</h3><p class="anx-hint">${matchMedia('(pointer:coarse)').matches ? 'Touch to inspect · long-press and drag to select a range' : 'Hover to inspect · drag to select a range · double-click to reset zoom'}</p></div>
-          <div class="anx-ctl">${seg('sm', [[1, 'Raw'], [3, '3s'], [10, '10s'], [30, '30s']], prefs.sm)}</div></div>
+      html += `<section class="card anx-card anx-streamc"><div class="anx-ch"><div><h3>${t('Power &amp; heart rate')}</h3><p class="anx-hint">${matchMedia('(pointer:coarse)').matches ? t('Touch to inspect · long-press and drag to select a range') : t('Hover to inspect · drag to select a range · double-click to reset zoom')}</p></div>
+          <div class="anx-ctl">${seg('sm', [[1, t('Raw')], [3, '3s'], [10, '10s'], [30, '30s']], prefs.sm)}</div></div>
         <div class="anx-togs" id="anxTogs"></div>
         <div class="anx-chart" id="anxStream"></div>
         <div class="anx-selp" id="anxSel"></div></section>`;
     }
-    if (an && an.ints && an.ints.length) html += `<section class="card anx-card"><div class="anx-ch"><div><h3>Intervals</h3><p>${st ? 'Tap a row to select it on the chart.' : 'Detected from the recording.'}</p></div></div><div class="anx-tblw" id="anxInts"></div></section>`;
-    if (an) html += `<div class="anx-grid2"><section class="card anx-card"><div class="anx-ch"><div><h3>Power zones</h3><p>Time pedalling in each zone · FTP ${ftp} W</p></div></div>${zoneBars(an.tiz || [], PZ, 'p', ftp, true)}</section>
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Heart-rate zones</h3><p>Max HR ${VS().maxHr} bpm</p></div></div>${zoneBars(an.thz || [], HZ, 'hr', VS().maxHr, true)}</section></div>
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Power curve</h3><p>This ride vs your best of the 90 days before it.</p></div></div>
-        <div class="anx-legend"><span><i style="background:var(--an-curve)"></i>This ride</span><span><i class="dash" style="color:var(--an-cmp)"></i>90-day best before</span><span><i class="ring" style="color:var(--warn)"></i>All-time PB</span><span><i class="ring" style="color:var(--an-ctl)"></i>90-day PB</span></div>
+    if (an && an.ints && an.ints.length) html += `<section class="card anx-card"><div class="anx-ch"><div><h3>${t('Intervals')}</h3><p>${st ? t('Tap a row to select it on the chart.') : t('Detected from the recording.')}</p></div></div><div class="anx-tblw" id="anxInts"></div></section>`;
+    if (an) html += `<div class="anx-grid2"><section class="card anx-card"><div class="anx-ch"><div><h3>${t('Power zones')}</h3><p>${t('Time pedalling in each zone · FTP {ftp} W', { ftp })}</p></div></div>${zoneBars(an.tiz || [], PZ, 'p', ftp, true)}</section>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Heart-rate zones')}</h3><p>${t('Max HR {n} bpm', { n: VS().maxHr })}</p></div></div>${zoneBars(an.thz || [], HZ, 'hr', VS().maxHr, true)}</section></div>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>${t('Power curve')}</h3><p>${t('This ride vs your best of the 90 days before it.')}</p></div></div>
+        <div class="anx-legend"><span><i style="background:var(--an-curve)"></i>${t('This ride')}</span><span><i class="dash" style="color:var(--an-cmp)"></i>${t('90-day best before')}</span><span><i class="ring" style="color:var(--warn)"></i>${t('All-time PB')}</span><span><i class="ring" style="color:var(--an-ctl)"></i>${t('90-day PB')}</span></div>
         <div class="anx-chart" id="anxRc"></div><div class="anx-pbs" id="anxPbs"></div></section>`;
     html += '</div>';
     body.innerHTML = html;
@@ -1143,21 +1144,21 @@ const ANUI = (() => {
           tip(i, ch) {
             const P = ch.P, v = mmp[i], b = b90.w[i];
             let s = `<div class="t">${durLbl(AN.MMP_DUR[i])}</div>`;
-            if (v != null) s += trow(P.curve, 'This ride', `${v} W`, `<em>${(v / kg).toFixed(2)} W/kg</em>`);
-            if (b != null) { const o = byId[b90.id[i]]; s += trow(P.cmp, '90-day best', `${b} W`, v != null ? `<em class="${v >= b ? 'up' : 'down'}">${v >= b ? '+' : '−'}${Math.abs(v - b)}</em>` : '') + (o ? `<div class="n">${esc(o.name)} <span>${fDay(o.date)}</span></div>` : ''); }
-            const pb = pbs.find(p => p.i === i); if (pb) s += `<div class="pbt ${pb.all ? 'all' : ''}">${pb.all ? 'All-time PB' : '90-day PB'}</div>`;
+            if (v != null) s += trow(P.curve, t('This ride'), `${v} W`, `<em>${(v / kg).toFixed(2)} W/kg</em>`);
+            if (b != null) { const o = byId[b90.id[i]]; s += trow(P.cmp, t('90-day best'), `${b} W`, v != null ? `<em class="${v >= b ? 'up' : 'down'}">${v >= b ? '+' : '−'}${Math.abs(v - b)}</em>` : '') + (o ? `<div class="n">${esc(o.name)} <span>${fDay(o.date)}</span></div>` : ''); }
+            const pb = pbs.find(p => p.i === i); if (pb) s += `<div class="pbt ${pb.all ? 'all' : ''}">${pb.all ? t('All-time PB') : t('90-day PB')}</div>`;
             return s;
           },
         }, w => w < 560 ? 220 : 270);
-      } else body.querySelector('#anxRc').innerHTML = '<div class="anx-none">No power recorded.</div>';
+      } else body.querySelector('#anxRc').innerHTML = '<div class="anx-none">' + t('No power recorded.') + '</div>';
       const pbEl = body.querySelector('#anxPbs');
-      if (!prior) pbEl.innerHTML = '<span class="dim">Your first analysed ride: every duration is a baseline for future PBs.</span>';
-      else if (!pbs.length) pbEl.innerHTML = '<span class="dim">No new bests on this ride.</span>';
+      if (!prior) pbEl.innerHTML = '<span class="dim">' + t('Your first analysed ride: every duration is a baseline for future PBs.') + '</span>';
+      else if (!pbs.length) pbEl.innerHTML = '<span class="dim">' + t('No new bests on this ride.') + '</span>';
       else {
         const keyFirst = pbs.filter(p => KEY_DUR.includes(AN.MMP_DUR[p.i])), rest = pbs.filter(p => !KEY_DUR.includes(AN.MMP_DUR[p.i]));
         const chip = p => `<span class="anx-pb ${p.all ? 'all' : ''}"><b>${durLbl(AN.MMP_DUR[p.i])}</b> ${p.v} W${p.was ? ` <em>+${p.v - p.was}</em>` : ''}</span>`;
         const shown = (keyFirst.length ? keyFirst : rest).slice(0, 10), more = pbs.length - shown.length;
-        pbEl.innerHTML = `<span class="lbl">${pbs.some(p => p.all) ? 'New PBs' : 'New 90-day bests'}</span>${shown.map(chip).join('')}${more > 0 ? `<span class="dim">+${more} more durations</span>` : ''}`;
+        pbEl.innerHTML = `<span class="lbl">${pbs.some(p => p.all) ? t('New PBs') : t('New 90-day bests')}</span>${shown.map(chip).join('')}${more > 0 ? `<span class="dim">${t('+{n} more durations', { n: more })}</span>` : ''}`;
       }
     }
 
@@ -1181,9 +1182,9 @@ const ANUI = (() => {
     };
     D.wbal = () => D.wb || (D.wb = AN.wbalSeries(st.p, ftp, wp));
     const togs = body.querySelector('#anxTogs');
-    const TG = [['p', 'Power', '--an-power', true], ['t', 'Target', '--an-tgt', D.hasT], ['hr', 'Heart rate', '--an-hr', D.hasHr], ['c', 'Cadence', '--an-cad', D.hasC], ['wb', 'W′bal', '--an-wbal', true]];
+    const TG = [['p', t('Power'), '--an-power', true], ['t', t('Target'), '--an-tgt', D.hasT], ['hr', t('Heart rate'), '--an-hr', D.hasHr], ['c', t('Cadence'), '--an-cad', D.hasC], ['wb', 'W′bal', '--an-wbal', true]];
     togs.innerHTML = TG.filter(t => t[3]).map(([k, l, v]) => `<button type="button" class="anx-tog${prefs.ser[k] ? ' on' : ''}" data-s="${k}" style="--c:var(${v})" aria-pressed="${!!prefs.ser[k]}"><i></i>${l}</button>`).join('')
-      + '<button type="button" class="btn sm ghost anx-reset hidden">Reset zoom</button>';
+      + '<button type="button" class="btn sm ghost anx-reset hidden">' + t('Reset zoom') + '</button>';
     const chart = streamChart(body.querySelector('#anxStream'), D);
     D.chart = chart;
     togs.querySelectorAll('.anx-tog').forEach(b => b.addEventListener('click', () => {
@@ -1204,9 +1205,9 @@ const ANUI = (() => {
     if (!hasBody()) return '';
     const k = bc('rideKcal', r, VS()) || {};
     const main = k.power != null ? k.power : k.hr, hrOnly = k.power == null && k.hr != null;
-    const sub = main == null ? 'needs power or heart rate' : hrOnly ? 'est. from heart rate' : k.hr != null ? `est. · HR ${kcF(k.hr)}` : 'est. from power';
-    const why = 'Estimate. Power: work on the pedals ÷ ~24 % gross efficiency. Heart rate: Keytel et al. 2005 (uses weight, age and sex from Settings).';
-    return `<div class="card anx-tile anx-kc" title="${esc(why)}"><div class="k">Calories <span>est.</span></div><div class="v num">${main != null ? kcF(main) : '–'}${main != null ? '<small>kcal</small>' : ''}</div><div class="s">${sub}</div></div>`;
+    const sub = main == null ? t('needs power or heart rate') : hrOnly ? t('est. from heart rate') : k.hr != null ? t('est. · HR {kcal}', { kcal: kcF(k.hr) }) : t('est. from power');
+    const why = t('Estimate. Power: work on the pedals ÷ ~24 % gross efficiency. Heart rate: Keytel et al. 2005 (uses weight, age and sex from Settings).');
+    return `<div class="card anx-tile anx-kc" title="${esc(why)}"><div class="k">${t('Calories')} <span>${t('est.')}</span></div><div class="v num">${main != null ? kcF(main) : '–'}${main != null ? '<small>kcal</small>' : ''}</div><div class="s">${sub}</div></div>`;
   }
 
   function pvSVG(pv, ftp) {
@@ -1336,21 +1337,21 @@ const ANUI = (() => {
       },
       hover(ch, x, y) {
         const g = ch.g; if (!g || x < g.L - 4 || x > g.L + g.pw + 4) return null;
-        const t = tAt(ch, x), xx = g.X(t + 0.5), c = ch.octx, P = ch.P, ser = prefs.ser;
+        const tt = tAt(ch, x), xx = g.X(tt + 0.5), c = ch.octx, P = ch.P, ser = prefs.ser;
         vline(c, xx, g.T, g.base, rgba(P.text, .45));
-        const pv = g.pa[t], tv = st.tg[t], hv = st.hr[t], cv = st.c[t];
-        if (ser.wb) dot(c, xx, g.yW(D.wbal()[t]), P.wbal, P.panel, 3);
+        const pv = g.pa[tt], tv = st.tg[tt], hv = st.hr[tt], cv = st.c[tt];
+        if (ser.wb) dot(c, xx, g.yW(D.wbal()[tt]), P.wbal, P.panel, 3);
         if (ser.c && cv > 0) dot(c, xx, g.yC(cv), P.cad, P.panel, 3);
         if (ser.hr && hv > 0) dot(c, xx, g.yH(hv), P.hr, P.panel, 3);
         if (ser.p) dot(c, xx, g.yP(pv), P.power, P.panel, 4);
-        const zi = pzIdx(pv / D.ftp), ii = intAt(t), iv = D.ints[ii];
-        let s = `<div class="t">${fmtTime(t)}${iv ? ` <span>#${ii + 1} ${iv.k === 'work' ? 'work' : 'recovery'}</span>` : ''}</div>`;
-        s += trow(P.power, 'Power', `${Math.round(pv)} W`, `<em style="color:${PZ[zi].col}">${PZ[zi].n}</em>`);
-        if (D.hasT && tv > 0) s += trow(P.tgt, 'Target', `${Math.round(tv)} W`, `<em>${Math.round(pv / tv * 100)}%</em>`);
-        if (D.hasHr) s += trow(P.hr, 'Heart rate', hv > 0 ? `${Math.round(hv)} bpm` : '–');
-        if (D.hasC) s += trow(P.cad, 'Cadence', cv > 0 ? `${Math.round(cv)} rpm` : '–');
-        if (ser.wb) { const wb = D.wbal()[t]; s += trow(P.wbal, 'W′bal', `${(wb / 1000).toFixed(1)} kJ`, `<em>${Math.round(wb / D.wp * 100)}%</em>`); }
-        if (D.sel && drag && drag.sel) s += `<div class="h">Selection ${fmtTime(D.sel[1] - D.sel[0])}</div>`;
+        const zi = pzIdx(pv / D.ftp), ii = intAt(tt), iv = D.ints[ii];
+        let s = `<div class="t">${fmtTime(tt)}${iv ? ` <span>#${ii + 1} ${iv.k === 'work' ? t('work') : t('recovery')}</span>` : ''}</div>`;
+        s += trow(P.power, t('Power'), `${Math.round(pv)} W`, `<em style="color:${PZ[zi].col}">${PZ[zi].n}</em>`);
+        if (D.hasT && tv > 0) s += trow(P.tgt, t('Target'), `${Math.round(tv)} W`, `<em>${Math.round(pv / tv * 100)}%</em>`);
+        if (D.hasHr) s += trow(P.hr, t('Heart rate'), hv > 0 ? `${Math.round(hv)} bpm` : '–');
+        if (D.hasC) s += trow(P.cad, t('Cadence'), cv > 0 ? `${Math.round(cv)} rpm` : '–');
+        if (ser.wb) { const wb = D.wbal()[tt]; s += trow(P.wbal, 'W′bal', `${(wb / 1000).toFixed(1)} kJ`, `<em>${Math.round(wb / D.wp * 100)}%</em>`); }
+        if (D.sel && drag && drag.sel) s += `<div class="h">${t('Selection {time}', { time: fmtTime(D.sel[1] - D.sel[0]) })}</div>`;
         return s;
       },
       down(ch, x, y, e) {
@@ -1389,19 +1390,19 @@ const ANUI = (() => {
 
   function renderSel(el, D) {
     if (!D.sel) {
-      el.innerHTML = `<div class="anx-selhint">${matchMedia('(pointer:coarse)').matches ? 'Long-press the chart and drag' : 'Drag across the chart'} to analyse a range${D.ints.length ? ', or pick an interval in the strip above the chart or in the table' : ''}.</div>`;
+      el.innerHTML = `<div class="anx-selhint">${matchMedia('(pointer:coarse)').matches ? (D.ints.length ? t('Long-press the chart and drag to analyse a range, or pick an interval in the strip above the chart or in the table.') : t('Long-press the chart and drag to analyse a range.')) : D.ints.length ? t('Drag across the chart to analyse a range, or pick an interval in the strip above the chart or in the table.') : t('Drag across the chart to analyse a range.')}</div>`;
       return;
     }
     const [a, b] = D.sel, rs = AN.rangeStats(D.st, a, b, D.ftp), iv = D.selInt >= 0 ? D.ints[D.selInt] : null;
     const pct = rs.tgt ? Math.round(rs.avgP / rs.tgt * 100) : null;
     const item = (k, v, u, s) => `<div class="si"><span class="k">${k}</span><b class="num">${v}<small>${u || ''}</small></b>${s ? `<span class="s">${s}</span>` : ''}</div>`;
     const zoomed = D.view[0] <= a && D.view[1] >= b && D.view[1] - D.view[0] <= (b - a) * 1.25 + 40;
-    el.innerHTML = `<div class="anx-selh"><div><b>${iv ? `Interval ${D.selInt + 1} · ${iv.k === 'work' ? 'work' : 'recovery'}` : 'Selection'}</b><span class="num">${fmtTime(a)} → ${fmtTime(b)} · ${fmtTime(rs.d)}</span></div>
-      <div class="row">${zoomed ? '' : '<button type="button" class="btn sm" data-a="zoom">Zoom in</button>'}<button type="button" class="btn sm ghost" data-a="clear" aria-label="Clear selection">Clear</button></div></div>
-      <div class="anx-selg">${item('Avg power', rs.avgP, ' W', `${(rs.avgP / D.kg).toFixed(2)} W/kg · ${Math.round(rs.avgP / D.ftp * 100)}% FTP`)}${item('Norm. power', rs.np, ' W')}${item('Max power', rs.maxP, ' W')}
-      ${rs.tgt ? item('Target', rs.tgt, ' W', `<span class="${pct >= 95 && pct <= 105 ? 'good' : pct >= 90 && pct <= 110 ? 'meh' : 'bad'}">${pct}% compliance</span>`) : ''}
-      ${rs.avgHr ? item('Heart rate', rs.avgHr, ' bpm', `max ${rs.maxHr}`) : ''}${rs.avgC ? item('Cadence', rs.avgC, ' rpm') : ''}${item('Work', rs.kj, ' kJ')}${rs.dist ? item('Distance', (rs.dist / 1000).toFixed(2), ' km') : ''}
-      ${rs.avgHr ? item('Pw:HR', (rs.avgP / rs.avgHr).toFixed(2), '', 'W per beat') : ''}</div>`;
+    el.innerHTML = `<div class="anx-selh"><div><b>${iv ? t('Interval {n} · {kind}', { n: D.selInt + 1, kind: iv.k === 'work' ? t('work') : t('recovery') }) : t('Selection')}</b><span class="num">${fmtTime(a)} → ${fmtTime(b)} · ${fmtTime(rs.d)}</span></div>
+      <div class="row">${zoomed ? '' : '<button type="button" class="btn sm" data-a="zoom">' + t('Zoom in') + '</button>'}<button type="button" class="btn sm ghost" data-a="clear" aria-label="${t('Clear selection')}">${t('Clear')}</button></div></div>
+      <div class="anx-selg">${item(t('Avg power'), rs.avgP, ' W', `${(rs.avgP / D.kg).toFixed(2)} W/kg · ${Math.round(rs.avgP / D.ftp * 100)}% FTP`)}${item(t('Norm. power'), rs.np, ' W')}${item(t('Max power'), rs.maxP, ' W')}
+      ${rs.tgt ? item(t('Target'), rs.tgt, ' W', `<span class="${pct >= 95 && pct <= 105 ? 'good' : pct >= 90 && pct <= 110 ? 'meh' : 'bad'}">${t('{pct}% compliance', { pct })}</span>`) : ''}
+      ${rs.avgHr ? item(t('Heart rate'), rs.avgHr, ' bpm', `max ${rs.maxHr}`) : ''}${rs.avgC ? item(t('Cadence'), rs.avgC, ' rpm') : ''}${item(t('Work'), rs.kj, ' kJ')}${rs.dist ? item(t('Distance'), (rs.dist / 1000).toFixed(2), ' km') : ''}
+      ${rs.avgHr ? item('Pw:HR', (rs.avgP / rs.avgHr).toFixed(2), '', t('W per beat')) : ''}</div>`;
     el.querySelector('[data-a="clear"]').addEventListener('click', () => { D.sel = null; D.selInt = -1; renderSel(el, D); D.chart.redrawOv(); const tb = document.getElementById('anxInts'); if (tb) tb.querySelectorAll('tr.on').forEach(tr => tr.classList.remove('on')); });
     const z = el.querySelector('[data-a="zoom"]'); if (z) z.addEventListener('click', () => { const pad = Math.max(0, Math.round((b - a) * 0.04)); D.setView(Math.max(0, a - pad), Math.min(D.n, Math.max(b + pad, a + 20))); });
   }
@@ -1410,7 +1411,7 @@ const ANUI = (() => {
     const el = body.querySelector('#anxInts'); if (!el) return;
     const hasT = an.ints.some(iv => iv.tgt > 0);
     const comp = (p, t) => { if (!hasT) return ''; if (!t) return '<td class="dim">–</td>'; const pc = Math.round(p / t * 100); return `<td class="num ${pc >= 95 && pc <= 105 ? 'good' : pc >= 90 && pc <= 110 ? 'meh' : 'bad'}">${pc}%</td>`; };
-    el.innerHTML = `<table class="anx-tbl anx-ints"><thead><tr><th>#</th><th>Start</th><th>Time</th><th>Avg</th>${hasT ? '<th>Target</th><th>%</th>' : ''}<th>NP</th><th>HR</th><th>Max HR</th><th>Cad</th></tr></thead><tbody>${an.ints.map((iv, i) => {
+    el.innerHTML = `<table class="anx-tbl anx-ints"><thead><tr><th>#</th><th>${t('Start')}</th><th>${t('Time')}</th><th>${t('Avg')}</th>${hasT ? '<th>' + t('Target') + '</th><th>%</th>' : ''}<th>NP</th><th>${t('HR')}</th><th>${t('Max HR')}</th><th>${t('Cad')}</th></tr></thead><tbody>${an.ints.map((iv, i) => {
       const z = PZ[pzIdx((iv.tgt || iv.p) / ftp)];
       return `<tr data-i="${i}" class="${iv.k === 'work' ? 'work' : 'rec'}" ${D ? 'tabindex="0"' : ''}><td><span class="ib" style="background:${iv.k === 'work' ? z.col : 'var(--line2)'}"></span>${i + 1}</td><td class="num">${fmtTime(iv.s)}</td><td class="num">${fmtTime(iv.d)}</td>
         <td class="num"><b>${fx(iv.p)}</b> <span class="dim">W</span></td>${hasT ? `<td class="num">${iv.tgt ? iv.tgt + ' W' : '<span class="dim">–</span>'}</td>` : ''}${comp(iv.p, iv.tgt)}<td class="num">${fx(iv.np)}</td>

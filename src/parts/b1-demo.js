@@ -16,7 +16,7 @@ const DEMO = (() => {
     const { segs, total } = expand(w), n = Math.min(total, 7200);
     const p = new Array(n), hr = new Array(n), c = new Array(n), dd = new Array(n), tg = new Array(n);
     let h = restHr + 15, d = 0, si = 0, fade = 1;
-    const ramp = /ramp/i.test(w.name), mapW = trueFtp * 1.33 * (0.97 + rand() * 0.06); // the rider's real 1-min ramp limit
+    const ramp = /ramp/i.test(w.id + ' ' + w.name), mapW = trueFtp * 1.33 * (0.97 + rand() * 0.06); // the rider's real 1-min ramp limit
     let end = n;
     for (let i = 0; i < n; i++) {
       while (si < segs.length - 1 && i >= segs[si].start + segs[si].d) si++;
@@ -69,7 +69,7 @@ const DEMO = (() => {
       if (at > now) continue;
       const trueFtp = 214 + 32 * prog; // the rider gets fitter over the 18 weeks
       const { r, st } = ride(rand, w, at, ftp, kg, maxHr, restHr, easyWeek, trueFtp);
-      if (/ramp/i.test(w.name) && r.an) { const m1 = AN.mmpCurve(st.p)[AN.MMP_DUR.indexOf(60)]; if (m1) ftp = Math.round(m1 * 0.75); r.name = w.name + ' (FTP → ' + ftp + ' W)'; }
+      if (/ramp/i.test(w.id + ' ' + w.name) && r.an) { const m1 = AN.mmpCurve(st.p)[AN.MMP_DUR.indexOf(60)]; if (m1) ftp = Math.round(m1 * 0.75); r.name = w.name + ' ' + t('(FTP → {ftp} W)', { ftp }); }
       rides.unshift(r); streams.set(r.id, st);
     }
     const last = wlog[wlog.length - 1], target = new Date(now); target.setDate(target.getDate() + 70);

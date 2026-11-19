@@ -7,6 +7,8 @@
 // Encoders return plain number arrays (bytes); decoders take a DataView, a typed array or a number array.
 // See src/protocol_notes.md for the byte layouts and sources. src/test/protocols.test.mjs covers every helper.
 const TRAINER_PROTO = (() => {
+  // t() is the page's translation helper (i18n.js); the Node tests run this part without it: English
+  const t = typeof i18nT === 'function' ? i18nT : s => s; // the page's t(); plain English in node tests
   const dvOf = x => x instanceof DataView ? x : ArrayBuffer.isView(x) ? new DataView(x.buffer, x.byteOffset, x.byteLength) : new DataView(Uint8Array.from(x).buffer);
   const bytesOf = x => x instanceof Uint8Array ? x : x instanceof DataView ? new Uint8Array(x.buffer, x.byteOffset, x.byteLength) : Uint8Array.from(x);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -36,7 +38,7 @@ const TRAINER_PROTO = (() => {
 
   /* ---------------- FTMS ---------------- */
   const ftms = {
-    RESULT: { 1: 'success', 2: 'not supported', 3: 'invalid parameter', 4: 'operation failed', 5: 'control not permitted' },
+    RESULT: { 1: t('success'), 2: t('not supported'), 3: t('invalid parameter'), 4: t('operation failed'), 5: t('control not permitted') },
     requestControl: () => [0x00],
     reset: () => [0x01],
     start: () => [0x07],

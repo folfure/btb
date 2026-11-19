@@ -305,7 +305,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 
 <main>
   <div id="btBanner" class="banner hidden"></div>
-  <div id="demoBar" class="banner hidden"><b>Demo data.</b> The simulator is on, so History and Progress add a made-up rider (18 weeks of rides marked DEMO, a weight log and a body profile) to explore every feature, next to your own rides. The demo data is never saved or synced. Turn <b>Sim</b> off to hide it.</div>
+  <div id="demoBar" class="banner hidden" data-i18n><b>Demo data.</b> The simulator is on, so History and Progress add a made-up rider (18 weeks of rides marked DEMO, a weight log and a body profile) to explore every feature, next to your own rides. The demo data is never saved or synced. Turn <b>Sim</b> off to hide it.</div>
 
   <!-- WORKOUTS -->
   <section class="view" id="v-workouts">
@@ -339,7 +339,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 2x( 20m 95% @90rpm "FTP interval", 5m 50% "Recover" )
 30s max "Sprint!"
 8m 60-40% "Cool-down"</textarea>
-        <div class="hint">Durations: <kbd>90s</kbd> <kbd>5m</kbd> <kbd>1h10m</kbd> <kbd>4:30</kbd> · Power: <kbd>95%</kbd> FTP, ramp <kbd>50-75%</kbd>, absolute <kbd>250w</kbd>, all-out <kbd>max</kbd> · Cadence <kbd>@90rpm</kbd> · Repeats <kbd>4x( 4m 115%, 3m 50% )</kbd> · Label <kbd>"text"</kbd> · One step per line or comma separated.</div>
+        <div class="hint" data-i18n>Durations: <kbd>90s</kbd> <kbd>5m</kbd> <kbd>1h10m</kbd> <kbd>4:30</kbd> · Power: <kbd>95%</kbd> FTP, ramp <kbd>50-75%</kbd>, absolute <kbd>250w</kbd>, all-out <kbd>max</kbd> · Cadence <kbd>@90rpm</kbd> · Repeats <kbd>4x( 4m 115%, 3m 50% )</kbd> · Label <kbd>"text"</kbd> · One step per line or comma separated.</div>
       </div>
       <div class="bigprof" id="bProf"></div>
       <div class="row"><span class="kv" id="bStats"></span><span class="spacer"></span><span id="bErr" style="color:var(--bad);font-size:13px"></span></div>
@@ -410,7 +410,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
         <button class="btn danger" id="cEnd">End &amp; save</button>
         <button class="btn primary" id="rideConnect">Connect trainer</button>
       </div>
-      <p class="dim kbdhint" style="font-size:12px;margin:8px 2px">Shortcuts: <kbd>Space</kbd> start/pause · <kbd>N</kbd> next interval · <kbd>↑</kbd>/<kbd>↓</kbd> intensity ±1% (Shift ±5%) · <kbd>E</kbd> ERG/slope toggle</p>
+      <p class="dim kbdhint" style="font-size:12px;margin:8px 2px" data-i18n>Shortcuts: <kbd>Space</kbd> start/pause · <kbd>N</kbd> next interval · <kbd>↑</kbd>/<kbd>↓</kbd> intensity ±1% (Shift ±5%) · <kbd>E</kbd> ERG/slope toggle</p>
     </div>
   </section>
 
@@ -454,6 +454,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     <div class="card pad" style="margin-top:12px">
       <h3 style="margin-bottom:12px">Ride behaviour</h3>
       <div class="form">
+        <div class="field"><label>Language</label><select id="sLang"><option value="">Automatic (browser language)</option><option value="en">English</option><option value="fr">Français</option></select></div>
         <div class="field"><label>Theme</label><select id="sTheme"><option value="neon">Neon Miami</option><option value="classic">Classic</option></select></div>
         <div class="field"><label>Power display smoothing</label><select id="sSmooth"><option value="1">Instant</option><option value="3">3 s average</option><option value="5">5 s average</option><option value="10">10 s average</option></select></div>
         <div class="field"><label>Auto-pause</label><select id="sAutoPause"><option value="1">On (pause when you stop pedalling)</option><option value="0">Off</option></select></div>
@@ -469,7 +470,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     </div>
     <div id="antHost" style="margin-top:12px"></div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
-      <div class="row"><h3><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
+      <div class="row"><h3 data-i18n><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
       <div id="stvOn" class="hidden">
         <div class="row" style="margin-bottom:12px"><span>Connected as <b id="stvWho"></b></span><span class="spacer"></span><button class="btn sm danger" id="stvOff">Disconnect</button></div>
@@ -481,16 +482,16 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <div id="stvSetup">
         <div id="stvLocal">
         <ol class="muted" style="font-size:14px;margin:0 0 12px;padding-left:20px;line-height:1.6">
-          <li>Open <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> and create an API application (any name/website; category "Training").</li>
-          <li>Set <b>Authorization Callback Domain</b> to <code id="stvDomain" style="background:var(--bg2);padding:2px 6px;border-radius:6px;color:var(--text)"></code></li>
-          <li>Copy its <b>Client ID</b> and <b>Client Secret</b> here, then press Connect.</li>
+          <li data-i18n>Open <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> and create an API application (any name/website; category "Training").</li>
+          <li><span data-i18n>Set <b>Authorization Callback Domain</b> to</span> <code id="stvDomain" style="background:var(--bg2);padding:2px 6px;border-radius:6px;color:var(--text)"></code></li>
+          <li data-i18n>Copy its <b>Client ID</b> and <b>Client Secret</b> here, then press Connect.</li>
         </ol>
         <div class="form">
           <div class="field"><label>Client ID</label><input type="text" id="stvId" inputmode="numeric" autocomplete="off" placeholder="e.g. 123456"></div>
-          <div class="field"><label>Client Secret</label><input type="password" id="stvSecret" autocomplete="off" placeholder="40-character secret"><span class="hint">Stored in this browser (not in backups) and only sent to Strava. Other pages on the same web address can read browser storage: on a shared <i>username</i>.github.io, prefer a token relay or a custom domain.</span></div>
+          <div class="field"><label>Client Secret</label><input type="password" id="stvSecret" autocomplete="off" placeholder="40-character secret"><span class="hint" data-i18n>Stored in this browser (not in backups) and only sent to Strava. Other pages on the same web address can read browser storage: on a shared <i>username</i>.github.io, prefer a token relay or a custom domain.</span></div>
         </div>
         <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:13px">Sharing the app with others? Use a token relay instead of a secret</summary>
-          <div class="field" style="margin-top:8px"><label>Token relay URL</label><input type="text" id="stvRelay" autocomplete="off" placeholder="https://btb-strava.yourname.workers.dev"><span class="hint">A tiny server (see <code>strava-relay.worker.js</code>) keeps the Client Secret off the page, so riders only need the Client ID. New Strava apps accept 1 athlete; raise it to 10 under "My API Application", more needs Strava's review.</span></div>
+          <div class="field" style="margin-top:8px"><label>Token relay URL</label><input type="text" id="stvRelay" autocomplete="off" placeholder="https://btb-strava.yourname.workers.dev"><span class="hint" data-i18n>A tiny server (see <code>strava-relay.worker.js</code>) keeps the Client Secret off the page, so riders only need the Client ID. New Strava apps accept 1 athlete; raise it to 10 under "My API Application", more needs Strava's review.</span></div>
         </details>
         </div>
         <div class="row" style="margin-top:12px"><button class="btn" id="stvConnect" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Connect with Strava</button><span class="dim" id="stvHint" style="font-size:12.5px"></span></div>
@@ -503,12 +504,12 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     <div class="card pad" style="margin-top:12px">
       <h3>Connection notes</h3>
       <ul class="muted" style="font-size:14px;margin:8px 0 0;padding-left:18px">
-        <li><b>Connect trainer</b> works with any smart trainer that has ERG over Bluetooth. The app picks the protocol after connecting: the standard <b>FTMS</b> (Fitness Machine Service, used by almost every current trainer), <b>Tacx FE-C over Bluetooth</b> (older Tacx firmware) or the <b>Wahoo</b> trainer protocol (older Wahoo firmware). A power meter or a trainer without control connects read-only: you see your power, but ERG is not available. Updating the trainer firmware usually adds FTMS.</li>
-        <li>Heart rate comes from a separate Bluetooth strap (<b>Connect HR</b>) or, if your trainer relays one, from the trainer itself.</li>
+        <li data-i18n><b>Connect trainer</b> works with any smart trainer that has ERG over Bluetooth. The app picks the protocol after connecting: the standard <b>FTMS</b> (Fitness Machine Service, used by almost every current trainer), <b>Tacx FE-C over Bluetooth</b> (older Tacx firmware) or the <b>Wahoo</b> trainer protocol (older Wahoo firmware). A power meter or a trainer without control connects read-only: you see your power, but ERG is not available. Updating the trainer firmware usually adds FTMS.</li>
+        <li data-i18n>Heart rate comes from a separate Bluetooth strap (<b>Connect HR</b>) or, if your trainer relays one, from the trainer itself.</li>
         <li>Close Zwift, MyWhoosh, the trainer maker's app and similar apps first. The trainer accepts only one Bluetooth controller at a time.</li>
-        <li><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
-        <li><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
-        <li>Bluetooth only works on a secure page: <b>https://</b> or <b>http://localhost</b>. To share the app, host this single file on GitHub Pages, Netlify Drop, Cloudflare Pages or any https web space and send the link.</li>
+        <li data-i18n><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
+        <li data-i18n><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
+        <li data-i18n>Bluetooth only works on a secure page: <b>https://</b> or <b>http://localhost</b>. To share the app, host this single file on GitHub Pages, Netlify Drop, Cloudflare Pages or any https web space and send the link.</li>
         <li>ERG tips: start pedalling before the first target, and use the small chainring with a middle cog so low targets stay reachable. ERG takes a few seconds to settle after big steps.</li>
       </ul>
       <div class="row" style="margin-top:12px"><button class="btn sm" id="sExport">Back up data</button><label class="btn sm"><input type="file" id="sImport" accept=".json" style="display:none">Restore backup</label><button class="btn sm danger" id="sReset">Reset settings</button></div>
@@ -531,7 +532,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <button type="button" class="btn ghost sm" style="width:100%;margin-top:8px" id="gateBack">Use another email</button>
     </form>
     <div id="gateOffline" class="hidden" style="margin-top:12px"><button class="btn" style="width:100%" id="gateOfflineBtn">Ride offline (sync later)</button></div>
-    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0">Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
+    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0" data-i18n>Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
   </div>
 </div>
 <div id="modalRoot"></div>
@@ -540,11 +541,13 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 <script>
 (() => { // own scope: injected scripts (e.g. Bluefy's Web Bluetooth) may already use global names
 'use strict';
+/*__I18N__*/
 /* =====================================================================
    DATA (injected at build time)
    ===================================================================== */
 const LIBRARY = /*__WORKOUTS__*/[];
 const PLANS = /*__PLANS__*/[];
+i18nData(LIBRARY, PLANS); // French names, descriptions and labels when the interface is in French
 
 /* =====================================================================
    UTILITIES
@@ -588,7 +591,7 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 /* =====================================================================
    SETTINGS & ZONES
    ===================================================================== */
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
 // weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
 const WLOG_MAX = 1000;
@@ -604,37 +607,40 @@ function cleanWlog(a) {
 S.wlog = cleanWlog(S.wlog);
 const todayKey = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
 function addWeightLog(d, kg, rhr) {
-  if (DEMO.active) { toast('Demo data is shown while the simulator is on: turn Sim off to log your own weight', 5000); return false; }
+  if (DEMO.active) { toast(t('Demo data is shown while the simulator is on: turn Sim off to log your own weight'), 5000); return false; }
   d = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? String(d) : todayKey();
-  if (!(+kg >= 25 && +kg <= 250)) { toast('Weight must be between 25 and 250 kg'); return false; }
+  if (!(+kg >= 25 && +kg <= 250)) { toast(t('Weight must be between 25 and 250 kg')); return false; }
   S.wlog = cleanWlog(S.wlog.filter(e => e.d !== d).concat({ d, kg: +kg, rhr: rhr === '' || rhr == null ? undefined : +rhr }));
   const last = S.wlog[S.wlog.length - 1]; if (last) S.weight = last.kg; // the newest entry is the current weight
   saveSettings(); afterSettings(); return true;
 }
 function removeWeightLog(d) {
-  if (DEMO.active) { toast('Demo data: turn Sim off to edit your own weight log', 4000); return; } S.wlog = S.wlog.filter(e => e.d !== d); saveSettings(); afterSettings(); }
+  if (DEMO.active) { toast(t('Demo data: turn Sim off to edit your own weight log'), 4000); return; } S.wlog = S.wlog.filter(e => e.d !== d); saveSettings(); afterSettings(); }
 const saveSettings = () => { const ok = store('erglab.settings', S); if (typeof cloud !== 'undefined') cloud.schedulePush(); return ok; };
 
 const PZ = [
-  { n: 'Z1', name: 'Active recovery', lo: 0, hi: 0.55, col: '#8b95a7' },
-  { n: 'Z2', name: 'Endurance', lo: 0.55, hi: 0.75, col: '#3d8bfd' },
-  { n: 'Z3', name: 'Tempo', lo: 0.75, hi: 0.90, col: '#2fbf71' },
-  { n: 'Z4', name: 'Threshold', lo: 0.90, hi: 1.05, col: '#f5c518' },
-  { n: 'Z5', name: 'VO2max', lo: 1.05, hi: 1.20, col: '#ff8a1f' },
-  { n: 'Z6', name: 'Anaerobic', lo: 1.20, hi: 1.50, col: '#ff3b3b' },
-  { n: 'Z7', name: 'Neuromuscular', lo: 1.50, hi: 9, col: '#b04dff' },
+  { n: 'Z1', name: t('Active recovery'), lo: 0, hi: 0.55, col: '#8b95a7' },
+  { n: 'Z2', name: t('Endurance'), lo: 0.55, hi: 0.75, col: '#3d8bfd' },
+  { n: 'Z3', name: t('Tempo'), lo: 0.75, hi: 0.90, col: '#2fbf71' },
+  { n: 'Z4', name: t('Threshold'), lo: 0.90, hi: 1.05, col: '#f5c518' },
+  { n: 'Z5', name: t('VO2max'), lo: 1.05, hi: 1.20, col: '#ff8a1f' },
+  { n: 'Z6', name: t('Anaerobic'), lo: 1.20, hi: 1.50, col: '#ff3b3b' },
+  { n: 'Z7', name: t('Neuromuscular'), lo: 1.50, hi: 9, col: '#b04dff' },
 ];
 const HZ = [
-  { n: 'Z1', name: 'Recovery', lo: 0, hi: 0.60, col: '#8b95a7' },
-  { n: 'Z2', name: 'Endurance', lo: 0.60, hi: 0.70, col: '#3d8bfd' },
-  { n: 'Z3', name: 'Aerobic', lo: 0.70, hi: 0.80, col: '#2fbf71' },
-  { n: 'Z4', name: 'Threshold', lo: 0.80, hi: 0.90, col: '#ff8a1f' },
-  { n: 'Z5', name: 'Maximum', lo: 0.90, hi: 9, col: '#ff3b3b' },
+  { n: 'Z1', name: t('Recovery'), lo: 0, hi: 0.60, col: '#8b95a7' },
+  { n: 'Z2', name: t('Endurance'), lo: 0.60, hi: 0.70, col: '#3d8bfd' },
+  { n: 'Z3', name: t('Aerobic'), lo: 0.70, hi: 0.80, col: '#2fbf71' },
+  { n: 'Z4', name: t('Threshold'), lo: 0.80, hi: 0.90, col: '#ff8a1f' },
+  { n: 'Z5', name: t('Maximum'), lo: 0.90, hi: 9, col: '#ff3b3b' },
 ];
 const pZone = f => PZ.find(z => f < z.hi - 1e-9) || PZ[6];
 const hZone = f => HZ.find(z => f < z.hi - 1e-9) || HZ[4];
 const CAT_COL = { Recovery: '#8b95a7', Endurance: '#3d8bfd', Tempo: '#2fbf71', 'Sweet Spot': '#b5d334', Threshold: '#f5c518', 'Over-Under': '#ffb020', VO2max: '#ff8a1f', Anaerobic: '#ff3b3b', Sprint: '#b04dff', Hills: '#1fc9b3', Test: '#4cc2ff', Mixed: '#e05bb5', Custom: '#c0c6d4' };
 const CATS = Object.keys(CAT_COL);
+// display names of the categories (w.cat itself stays English: it is compared in code and stored)
+const CAT_NAME = { Recovery: t('Recovery'), Endurance: t('Endurance'), Tempo: t('Tempo'), 'Sweet Spot': t('Sweet Spot'), Threshold: t('Threshold'), 'Over-Under': t('Over-Under'), VO2max: t('VO2max'), Anaerobic: t('Anaerobic'), Sprint: t('Sprint'), Hills: t('Hills'), Test: t('Test'), Mixed: t('Mixed'), Custom: t('Custom') };
+const catName = c => CAT_NAME[c] || c;
 const FREE_FRAC = 1.6; // nominal intensity used to draw/estimate "max" segments
 
 /* =====================================================================
@@ -665,8 +671,8 @@ function expand(w) {
 const segFracAt = (seg, t) => seg.kind === 'free' ? null : seg.kind === 'ramp' ? seg.p0 + (seg.p1 - seg.p0) * clamp((t - seg.start) / seg.d, 0, 1) : seg.p0;
 function segLabel(seg) {
   if (seg.lbl) return seg.lbl;
-  if (seg.kind === 'free') return 'Max effort';
-  if (seg.kind === 'ramp') return seg.p1 > seg.p0 ? 'Ramp up' : 'Ramp down';
+  if (seg.kind === 'free') return t('Max effort');
+  if (seg.kind === 'ramp') return seg.p1 > seg.p0 ? t('Ramp up') : t('Ramp down');
   return pZone(seg.p0).name;
 }
 function workoutStats(w) {
@@ -759,9 +765,9 @@ function parseText(text, ftp = S.ftp) {
   for (let line of splitTop(noComments)) {
     const rep = line.match(/^(\d+)\s*x\s*\(([\s\S]*)\)\s*$/i);
     if (rep) {
-      if (+rep[1] < 1 || +rep[1] > 100) throw new Error(`Repeat count must be 1-100 in "${line.slice(0, 30)}"`);
+      if (+rep[1] < 1 || +rep[1] > 100) throw new Error(t('Repeat count must be 1-100 in "{line}"', { line: line.slice(0, 30) }));
       const inner = parseText(rep[2], ftp);
-      if (!inner.length) throw new Error('Empty repeat block');
+      if (!inner.length) throw new Error(t('Empty repeat block'));
       steps.push({ t: 'x', n: +rep[1], s: inner }); continue;
     }
     let lbl = ''; line = line.replace(/"([^"]*)"/, (_, l) => { lbl = l; return ' '; });
@@ -769,13 +775,13 @@ function parseText(text, ftp = S.ftp) {
     const toks = line.trim().split(/\s+/).filter(Boolean);
     if (!toks.length) continue;
     const d = parseDuration(toks[0]);
-    if (d == null) throw new Error(`Can't read duration in "${line.trim()}"`);
+    if (d == null) throw new Error(t('Can\'t read duration in "{line}"', { line: line.trim() }));
     const pw = (toks[1] || '').toLowerCase();
     let seg;
     if (/^(max|free|all-?out|sprint)$/.test(pw)) seg = { t: 'f', d };
     else {
       const m = pw.match(/^(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?(%|w)$/);
-      if (!m) throw new Error(`Can't read power in "${line.trim()}" (use 95%, 50-75% or 250w)`);
+      if (!m) throw new Error(t('Can\'t read power in "{line}" (use 95%, 50-75% or 250w)', { line: line.trim() }));
       const k = m[3] === 'w' ? 1 / ftp : 1 / 100;
       const a = +m[1] * k, b = m[2] != null ? +m[2] * k : null;
       seg = b != null ? { t: 'r', d, p0: +a.toFixed(3), p1: +b.toFixed(3) } : { t: 's', d, p: +a.toFixed(3) };
@@ -788,14 +794,14 @@ function parseText(text, ftp = S.ftp) {
 }
 function validateSeg(s, ctx = '', depth = 0) {
   const bad = p => !(p > 0.05 && p <= 3);
-  if (!s || typeof s !== 'object') throw new Error(`Bad step in "${ctx}"`);
+  if (!s || typeof s !== 'object') throw new Error(t('Bad step in "{ctx}"', { ctx }));
   if (s.t === 'x') {
-    if (!(Number.isInteger(+s.n) && +s.n >= 1 && +s.n <= 100) || depth > 2 || !Array.isArray(s.s) || !s.s.length || s.s.length > 200) throw new Error(`Bad repeat block in "${ctx}"`);
+    if (!(Number.isInteger(+s.n) && +s.n >= 1 && +s.n <= 100) || depth > 2 || !Array.isArray(s.s) || !s.s.length || s.s.length > 200) throw new Error(t('Bad repeat block in "{ctx}"', { ctx }));
     s.s.forEach(c => validateSeg(c, ctx, depth + 1)); return;
   }
-  if (!['s', 'r', 'f'].includes(s.t)) throw new Error(`Unknown step type in "${ctx}"`);
-  if (!(s.d >= 1 && s.d <= 6 * 3600)) throw new Error(`Duration out of range in "${ctx}"`);
-  if ((s.t === 's' && bad(s.p)) || (s.t === 'r' && (bad(s.p0) || bad(s.p1)))) throw new Error(`Power out of range (5-300% FTP) in "${ctx}"`);
+  if (!['s', 'r', 'f'].includes(s.t)) throw new Error(t('Unknown step type in "{ctx}"', { ctx }));
+  if (!(s.d >= 1 && s.d <= 6 * 3600)) throw new Error(t('Duration out of range in "{ctx}"', { ctx }));
+  if ((s.t === 's' && bad(s.p)) || (s.t === 'r' && (bad(s.p0) || bad(s.p1)))) throw new Error(t('Power out of range (5-300% FTP) in "{ctx}"', { ctx }));
 }
 function segsToText(segs) {
   const pc = f => Math.round(f * 100);
@@ -809,12 +815,12 @@ function segsToText(segs) {
 }
 function parseZWO(xml) {
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
-  if (doc.querySelector('parsererror')) throw new Error('Invalid ZWO/XML');
+  if (doc.querySelector('parsererror')) throw new Error(t('Invalid ZWO/XML'));
   const root = doc.querySelector('workout_file') || doc.documentElement;
-  const name = root.querySelector('name')?.textContent?.trim() || 'Imported ZWO';
+  const name = root.querySelector('name')?.textContent?.trim() || t('Imported ZWO');
   const desc = root.querySelector('description')?.textContent?.trim() || '';
   const wk = root.querySelector('workout');
-  if (!wk) throw new Error('No <workout> element');
+  if (!wk) throw new Error(t('No <workout> element'));
   const A = (el, n, d) => { const v = el.getAttribute(n) ?? el.getAttribute(n.toLowerCase()); return v == null ? d : +v; };
   const seg = [];
   for (const el of wk.children) {
@@ -822,20 +828,20 @@ function parseZWO(xml) {
     const add = o => { if (cad) o.c = cad; seg.push(o); };
     if (tag === 'warmup' || tag === 'cooldown' || tag === 'ramp') {
       const lo = A(el, 'PowerLow', 0.5), hi = A(el, 'PowerHigh', lo);
-      add({ t: 'r', d, p0: lo, p1: hi, lbl: tag === 'warmup' ? 'Warm-up' : tag === 'cooldown' ? 'Cool-down' : '' });
+      add({ t: 'r', d, p0: lo, p1: hi, lbl: tag === 'warmup' ? t('Warm-up') : tag === 'cooldown' ? t('Cool-down') : '' });
     } else if (tag === 'steadystate') add({ t: 's', d, p: A(el, 'Power', A(el, 'PowerLow', 0.6)) });
     else if (tag === 'intervalst') {
       const n = clamp(Math.round(A(el, 'Repeat', 1)) || 1, 1, 100), on = { t: 's', d: A(el, 'OnDuration', 60), p: A(el, 'OnPower', A(el, 'PowerOnHigh', 1)), lbl: 'On' }, off = { t: 's', d: A(el, 'OffDuration', 60), p: A(el, 'OffPower', A(el, 'PowerOffHigh', 0.5)), lbl: 'Off' };
       if (cad) on.c = cad; const cr = A(el, 'CadenceResting', null); if (cr) off.c = cr;
       seg.push({ t: 'x', n, s: [on, off] });
-    } else if (tag === 'freeride' || tag === 'maxeffort') add({ t: tag === 'maxeffort' ? 'f' : 's', d, p: 0.6, lbl: tag === 'freeride' ? 'Free ride' : 'Max effort' });
+    } else if (tag === 'freeride' || tag === 'maxeffort') add({ t: tag === 'maxeffort' ? 'f' : 's', d, p: 0.6, lbl: tag === 'freeride' ? t('Free ride') : t('Max effort') });
   }
-  if (!seg.length) throw new Error('Workout has no supported steps');
+  if (!seg.length) throw new Error(t('Workout has no supported steps'));
   return { name, desc, seg };
 }
 function parseERG(txt) {
   const lines = txt.split(/\r?\n/);
-  let ftp = null, name = 'Imported workout', desc = '', inData = false, mode = 'pct';
+  let ftp = null, name = t('Imported workout'), desc = '', inData = false, mode = 'pct';
   const pts = [];
   for (const raw of lines) {
     const l = raw.trim(); if (!l) continue;
@@ -847,7 +853,7 @@ function parseERG(txt) {
     if (/^\[END COURSE DATA\]/i.test(l)) { inData = false; continue; }
     if (inData && (m = l.match(/^([\d.]+)\s+([\d.]+)/))) pts.push([+m[1] * 60, +m[2]]);
   }
-  if (pts.length < 2) throw new Error('No course data found');
+  if (pts.length < 2) throw new Error(t('No course data found'));
   const f = v => mode === 'w' ? v / (ftp || S.ftp) : v / 100;
   const seg = [];
   for (let i = 0; i < pts.length - 1; i++) {
@@ -925,9 +931,9 @@ class FtmsTrainer {
   }
   async start() {
     const P = TRAINER_PROTO.ftms;
-    if (this.features && !this.features.power) toast('This trainer does not report ERG (power target) support. Trying anyway.', 5000);
+    if (this.features && !this.features.power) toast(t('This trainer does not report ERG (power target) support. Trying anyway.'), 5000);
     const r = await this.requestControl();
-    if (r !== 1 && r !== -1) toast('Trainer did not grant control (' + (P.RESULT[r] || 'error') + '). Close other apps using it.', 5000);
+    if (r !== 1 && r !== -1) toast(t('Trainer did not grant control ({why}). Close other apps using it.', { why: P.RESULT[r] || t('error') }), 5000);
     await this.t.cmd(P.start()); // start / resume (tolerate "not supported")
   }
   requestControl() { return this.t.cmd(TRAINER_PROTO.ftms.requestControl()); }
@@ -950,10 +956,10 @@ class FtmsTrainer {
   onStatus(v) {
     const m = TRAINER_PROTO.ftms.parseStatus(v); if (!m || !(m.reset || m.lost)) return;
     // reset / control permission lost → request control again and resend (some trainers reset themselves after a stop)
-    const t = this.t; t.applied = null; this.lostCount++;
-    if (m.lost && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).', 7000); return; }
-    if (m.lost) toast('Another app took control of the trainer');
-    setTimeout(() => { if (t.ad === this && t.cp) this.requestControl().then(() => { t.applied = null; applyControl(); }); }, 1500);
+    const tr = this.t; tr.applied = null; this.lostCount++;
+    if (m.lost && this.lostCount > 3) { toast(t('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).'), 7000); return; }
+    if (m.lost) toast(t('Another app took control of the trainer'));
+    setTimeout(() => { if (tr.ad === this && tr.cp) this.requestControl().then(() => { tr.applied = null; applyControl(); }); }, 1500);
   }
   onIBD(v) {
     const d = TRAINER_PROTO.ftms.parseIndoorBikeData(v);
@@ -1014,7 +1020,7 @@ class WahooTrainer { // older KICKR / Snap / Core firmware: Wahoo control charac
   async start() {
     this.mode = null;
     const r = await this.t.cmd(TRAINER_PROTO.wahoo.unlock());
-    if (r !== 1 && r !== -1) toast('The trainer did not accept the control unlock. Close other apps using it, then reconnect.', 5000);
+    if (r !== 1 && r !== -1) toast(t('The trainer did not accept the control unlock. Close other apps using it, then reconnect.'), 5000);
   }
   async send(d) {
     const W = TRAINER_PROTO.wahoo, t = this.t, ok = r => r === 1 || r === -1;
@@ -1029,7 +1035,7 @@ class WahooTrainer { // older KICKR / Snap / Core firmware: Wahoo control charac
 }
 
 class ReadOnlyTrainer { // power meter, or a trainer that offers no control we can use
-  constructor(t) { this.t = t; this.name = 'Power meter'; this.range = null; }
+  constructor(tr) { this.t = tr; this.name = t('Power meter'); this.range = null; }
   get canSim() { return false; }
   async setup(s) { await this.t.listen(await s.cps.getCharacteristic(TRAINER_PROTO.UUID.CPM), v => this.t.onCPM(v)); }
 }
@@ -1061,18 +1067,18 @@ class Trainer {
       });
       if (this.dev && this.dev !== dev) this.disconnect();
       clearTimeout(this.reconnTimer); this.reconnTimer = null;
-      this.dev = dev; this.name = dev.name || 'Trainer'; this.userDisconnect = false; this.reconnTries = 0;
+      this.dev = dev; this.name = dev.name || t('Trainer'); this.userDisconnect = false; this.reconnTries = 0;
       dev.removeEventListener('gattserverdisconnected', this._disc);
       dev.addEventListener('gattserverdisconnected', this._disc);
       await this.setup(++this.gen);
     } catch (e) {
       if (e && e.name === 'NotFoundError') {
-        if (/adapter|not available|unavailable/i.test(e.message || '')) toast('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.', 7000);
+        if (/adapter|not available|unavailable/i.test(e.message || '')) toast(t('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.'), 7000);
         this.setStatus(this.dev && this.dev.gatt.connected && this.ad ? 'connected' : 'idle'); return;
       }
       console.error(e); this.setStatus('error', e.message);
       if (e && (e.name === 'SecurityError' || e.name === 'NotAllowedError')) showBtHelp(true, 'security');
-      toast('Trainer: ' + (e.message || e), 5000);
+      toast(t('Trainer: {msg}', { msg: e.message || e }), 5000);
     }
   }
   async setup(gen) {
@@ -1091,22 +1097,22 @@ class Trainer {
     found.wahooCp = found.ftmsCp || found.fec ? null : (await chr(found.cps, U.WAHOO_CP)) || (await chr(await svc(U.WAHOO_SVC), U.WAHOO_CP));
     if (stale()) return;
     const kind = P.pick({ ftms: !!found.ftms, ftmsCp: !!found.ftmsCp, fec: !!found.fec, wahoo: !!found.wahooCp, cps: !!found.cps });
-    if (!kind) throw new Error('No supported service found (FTMS, Tacx FE-C, Wahoo or Cycling Power). Is it a smart trainer or power meter?');
+    if (!kind) throw new Error(t('No supported service found (FTMS, Tacx FE-C, Wahoo or Cycling Power). Is it a smart trainer or power meter?'));
     const ad = new ({ ftms: FtmsTrainer, fec: FecTrainer, wahoo: WahooTrainer, cps: ReadOnlyTrainer })[kind](this);
     this.ad = ad; this.protocol = ad.name;
     await ad.setup(found, stale);
     if (stale()) return;
     this.reconnTries = 0;
     this.setStatus('connected');
-    if (sim.on) { sim.stop(); toast('Simulator turned off: trainer connected'); }
+    if (sim.on) { sim.stop(); toast(t('Simulator turned off: trainer connected')); }
     if (!this.cp) {
-      const why = kind === 'cps' ? 'power data only, ERG is not available on this device' : 'data only: the trainer offers no control';
-      toast(`${this.name} connected (${this.protocol}): ${why}`, 5000); return;
+      const why = kind === 'cps' ? t('power data only, ERG is not available on this device') : t('data only: the trainer offers no control');
+      toast(t('{name} connected ({protocol}): {why}', { name: this.name, protocol: this.protocol, why }), 5000); return;
     }
     await ad.start?.();
     if (stale() || !this.cp) return;
     this.applied = null; this.kick(); applyControl();
-    toast(`${this.name} connected · ${this.protocol} · ERG ready`);
+    toast(t('{name} connected · {protocol} · ERG ready', { name: this.name, protocol: this.protocol }));
   }
   // subscribe to notifications / indications; every listener is removed again on reconnect / disconnect
   listen(ch, fn) {
@@ -1136,7 +1142,7 @@ class Trainer {
         if (gen !== this.gen || this.userDisconnect) return;
         console.warn('reconnect failed', e);
         if (this.reconnTries < 15) { this.setStatus('reconnecting'); this.reconnTimer = setTimeout(tryIt, Math.min(8000, 1000 * this.reconnTries)); }
-        else { this.setStatus('error', 'Lost connection'); toast('Trainer connection lost. Tap Trainer to reconnect.', 6000); }
+        else { this.setStatus('error', t('Lost connection')); toast(t('Trainer connection lost. Tap Trainer to reconnect.'), 6000); }
       }
     };
     this.reconnTimer = setTimeout(tryIt, 800);
@@ -1227,12 +1233,12 @@ class HrStrap {
       const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [UUID.HRS] }], optionalServices: ['battery_service'] });
       clearTimeout(this.timer); this.timer = null;
       if (this.dev && this.dev !== dev) { this.dev.removeEventListener('gattserverdisconnected', this._d); try { this.dev.gatt.disconnect(); } catch { } }
-      this.dev = dev; this.name = dev.name || 'HR'; this.user = false;
+      this.dev = dev; this.name = dev.name || t('HR'); this.user = false;
       dev.removeEventListener('gattserverdisconnected', this._d); dev.addEventListener('gattserverdisconnected', this._d);
       await this.setup(++this.gen);
     } catch (e) {
-      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast('No Bluetooth adapter found.', 6000); return; }
-      this.status = 'error'; updateConnUI(); toast('HR: ' + e.message);
+      if (e.name === 'NotFoundError') { if (/adapter|not available/i.test(e.message || '')) toast(t('No Bluetooth adapter found.'), 6000); return; }
+      this.status = 'error'; updateConnUI(); toast(t('HR: {msg}', { msg: e.message }));
     }
   }
   async setup(gen) {
@@ -1241,7 +1247,7 @@ class HrStrap {
     const c = await (await s.getPrimaryService(UUID.HRS)).getCharacteristic(UUID.HRM);
     c.removeEventListener('characteristicvaluechanged', this._v); c.addEventListener('characteristicvaluechanged', this._v);
     await c.startNotifications(); if (gen !== this.gen) return;
-    this.status = 'connected'; updateConnUI(); toast(`${this.name} connected`);
+    this.status = 'connected'; updateConnUI(); toast(t('{name} connected', { name: this.name }));
   }
   onHR(v) { if (v.byteLength < 2) return; const f = v.getUint8(0); const hr = f & 1 ? v.getUint16(1, true) : v.getUint8(1); if (hr > 0) { live.hr = hr; live.tHr = performance.now(); } }
   onDisc() {
@@ -1267,13 +1273,13 @@ const antUsable = () => typeof ANT !== 'undefined' && ANT.supported();
 // connect: Bluetooth directly, or a small chooser when this browser can also use an ANT+ USB stick (WebUSB)
 function chooseLink(kind) {
   const isHr = kind === 'hr', cur = isHr ? hrm : trainer;
-  if (cur.connected) { if (confirm(`Disconnect ${cur.name}?`)) cur.disconnect(); return; }
+  if (cur.connected) { if (confirm(t('Disconnect {name}?', { name: cur.name }))) cur.disconnect(); return; }
   const ble = () => { if (isHr) { hrm = bleHr; bleHr.connect(); } else { trainer = bleTrainer; bleTrainer.connect(); } };
   if (!antUsable()) { ble(); return; }
-  const m = openModal(`<h2>${isHr ? 'Connect heart rate' : 'Connect your trainer'}</h2>
-    <p class="muted" style="margin:6px 0 14px">${isHr ? 'Pick how your heart-rate strap talks to this computer.' : 'Pick how your smart trainer talks to this computer. Both control ERG.'}</p>
-    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">ANT+ USB stick</button><span class="spacer"></span><button class="btn ghost" id="lkX">Cancel</button></div>
-    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? 'ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).' : 'ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.'}</p>`, true);
+  const m = openModal(`<h2>${isHr ? t('Connect heart rate') : t('Connect your trainer')}</h2>
+    <p class="muted" style="margin:6px 0 14px">${isHr ? t('Pick how your heart-rate strap talks to this computer.') : t('Pick how your smart trainer talks to this computer. Both control ERG.')}</p>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">${t('ANT+ USB stick')}</button><span class="spacer"></span><button class="btn ghost" id="lkX">${t('Cancel')}</button></div>
+    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? t('ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).') : t('ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.')}</p>`, true);
   $('#lkX', m).onclick = closeModal;
   $('#lkBle', m).onclick = () => { closeModal(); ble(); };
   $('#lkAnt', m).onclick = () => {
@@ -1289,11 +1295,11 @@ function chooseLink(kind) {
 const sim = {
   on: false, p: 0, hr: 0, timer: null,
   start() {
-    if (trainer.connected) { toast('Disconnect the trainer to use the simulator'); return; }
+    if (trainer.connected) { toast(t('Disconnect the trainer to use the simulator')); return; }
     this.on = true; this.p = 0; this.hr = S.restHr + 10;
     clearInterval(this.timer);
     this.timer = setInterval(() => this.step(), 1000);
-    updateConnUI(); toast('Simulator on: the app rides itself. History and Progress show demo data.', 4500); demoChanged();
+    updateConnUI(); toast(t('Simulator on: the app rides itself. History and Progress show demo data.'), 4500); demoChanged();
   },
   stop() { this.on = false; clearInterval(this.timer); updateConnUI(); demoChanged(); },
   step() {
@@ -1356,15 +1362,15 @@ const aggNP = a => a.npN ? Math.pow(a.np4 / a.npN, 0.25) : (a.n ? a.sumP / a.n :
 
 function rideInProgress() { return R.state === 'running' || R.state === 'paused'; }
 function loadWorkout(w, source = null) {
-  if (rideInProgress() && !confirm('A ride is in progress. Discard it and load this workout?')) return false;
+  if (rideInProgress() && !confirm(t('A ride is in progress. Discard it and load this workout?'))) return false;
   const { segs, total } = expand(w);
   Object.assign(R, RIDE_RESET(), { w, segs, total, freeRide: false, source });
   clearCheckpoint(); showRide(); go('ride'); return true;
 }
 function startFreeRide(mode) {
-  if (rideInProgress() && !confirm('A ride is in progress. Discard it?')) return;
-  const w = { id: 'free-ride', name: mode === 'erg' ? 'Free ride · ERG' : 'Free ride · Slope', cat: 'Endurance', seg: [] };
-  Object.assign(R, RIDE_RESET(), { w, segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: 'Free ride', c: null }], total: 0, freeRide: true, freeMode: mode, freeWatts: Math.round(S.ftp * 0.6 / 5) * 5, freeGrade: R.freeGrade ?? 1, source: null });
+  if (rideInProgress() && !confirm(t('A ride is in progress. Discard it?'))) return;
+  const w = { id: 'free-ride', name: mode === 'erg' ? t('Free ride · ERG') : t('Free ride · Slope'), cat: 'Endurance', seg: [] };
+  Object.assign(R, RIDE_RESET(), { w, segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: t('Free ride'), c: null }], total: 0, freeRide: true, freeMode: mode, freeWatts: Math.round(S.ftp * 0.6 / 5) * 5, freeGrade: R.freeGrade ?? 1, source: null });
   clearCheckpoint(); showRide(); go('ride');
 }
 function idxAt(t) {
@@ -1430,12 +1436,12 @@ const isRampTest = () => !R.freeRide && R.w && R.w.cat === 'Test' && /ramp/i.tes
 function endRampTest() {
   if (R.testEnded) return;
   R.testEnded = true; R.failSince = null;
-  let cd = R.segs.findIndex((s, i) => i > R.idx && /cool/i.test(s.lbl));
+  let cd = R.segs.findIndex((s, i) => i > R.idx && /cool|calme/i.test(s.lbl));
   if (cd < 0) cd = R.segs.length - 1;
   const best = bestAvg(R.samples.map(x => x.p), 60);
   jumpTo(R.segs[cd].start, false);
   if (R.state === 'paused') { R.state = 'running'; R.autoPaused = false; }
-  toast(`Ramp test finished${best ? ` · best minute ${Math.round(best)} W → FTP ≈ ${Math.round(best * 0.75)} W` : ''}. Cool down!`, 7000);
+  toast(best ? t('Ramp test finished · best minute {best} W → FTP ≈ {ftp} W. Cool down!', { best: Math.round(best), ftp: Math.round(best * 0.75) }) : t('Ramp test finished. Cool down!'), 7000);
   if (S.sound) beep(1046, 0.5, 0.25);
 }
 let tickTimer = null, lastNudge = 0;
@@ -1447,11 +1453,11 @@ function tick() {
   const pwr = liveFresh('Power') ? live.power : 0, cad = liveFresh('Cad') ? live.cadence : 0;
   const hasData = trainer.connected || sim.on || liveFresh('Power');
   // The page was frozen (screen lock / app switch on iOS): don't credit the missing time, pause instead.
-  if (R.state === 'running' && gap > 5 && trainer.connected) { pauseRide(false, 'Ride paused: the app was asleep or in the background'); return; }
+  if (R.state === 'running' && gap > 5 && trainer.connected) { pauseRide(false, t('Ride paused: the app was asleep or in the background')); return; }
   let dt = Math.min(gap, 120);
   if (R.state === 'running') {
     const seg = R.segs[R.idx];
-    if (isRampTest() && !R.testEnded && seg && seg.kind !== 'free' && seg.p0 >= 0.9 && !/cool/i.test(seg.lbl) && hasData) {
+    if (isRampTest() && !R.testEnded && seg && seg.kind !== 'free' && seg.p0 >= 0.9 && !/cool|calme/i.test(seg.lbl) && hasData) {
       const tgt = targetWattsAt(R.t);
       const failing = cad < 50 || (tgt && pwr < tgt * 0.75);
       R.failSince = failing ? (R.failSince || now) : null;
@@ -1535,12 +1541,12 @@ function finishRide(completed) {
   releaseWake();
   trainer.release();
   renderRide(true);
-  if (!wasStarted) { clearCheckpoint(); toast('Ride too short to save'); return; }
+  if (!wasStarted) { clearCheckpoint(); toast(t('Ride too short to save')); return; }
   const ride = buildRideRecord(completed);
-  saveRide(ride).then(clearCheckpoint, e => { console.warn('save', e); toast('Could not save the ride: ' + e.message, 8000); });
+  saveRide(ride).then(clearCheckpoint, e => { console.warn('save', e); toast(t('Could not save the ride: {msg}', { msg: e.message }), 8000); });
   if (R.source && R.source.plan && ride.completed) {
     const d = load('erglab.plandone', {}); (d[R.source.plan] ||= {})[R.source.key] = ride.date;
-    if (!store('erglab.plandone', d)) toast('Storage full: plan progress not saved', 5000);
+    if (!store('erglab.plandone', d)) toast(t('Storage full: plan progress not saved'), 5000);
     cloud.schedulePush();
   }
   summaryModal(ride);
@@ -1578,9 +1584,9 @@ function storeHistory(h, keep) {
     if (old && old.p) { if (!old.hs && !old.cloud) stripped++; stripStreams(old); continue; } // inline streams (no IndexedDB)
     if (old) { delete old.an.ints; continue; } // interval lists are recomputed from the streams when needed
     if (h.length > 1) { h.pop(); evicted++; continue; }
-    toast('Storage full: could not save this ride. Download the TCX now!', 8000); return false;
+    toast(t('Storage full: could not save this ride. Download the TCX now!'), 8000); return false;
   }
-  if (stripped || evicted) toast(`Storage nearly full: detailed data of ${stripped} old ride(s) removed${evicted ? `, ${evicted} ride(s) deleted` : ''}`, 6000);
+  if (stripped || evicted) toast((stripped === 1 ? t('Storage nearly full: detailed data of {n} old ride removed', { n: stripped }) : t('Storage nearly full: detailed data of {n} old rides removed', { n: stripped })) + (evicted ? ', ' + (evicted === 1 ? t('{n} ride deleted', { n: evicted }) : t('{n} rides deleted', { n: evicted })) : ''), 6000);
   return true;
 }
 function markRide(id, patch) { const h = load('erglab.history', []); const x = h.find(y => y.id === id); if (x) { Object.assign(x, patch); storeHistory(h, x); } return x; }
@@ -1593,7 +1599,7 @@ function saveCheckpoint() {
 }
 function clearCheckpoint() { try { localStorage.removeItem('erglab.inprogress'); } catch { } }
 function restoreCheckpoint(snap) {
-  const { segs, total } = snap.freeRide ? { segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: 'Free ride', c: null }], total: 0 } : expand(snap.w);
+  const { segs, total } = snap.freeRide ? { segs: [{ start: 0, d: 1e9, kind: 'steady', p0: 0.6, p1: 0.6, lbl: t('Free ride'), c: null }], total: 0 } : expand(snap.w);
   Object.assign(R, RIDE_RESET(), { w: snap.w, segs, total, source: snap.source, freeRide: !!snap.freeRide, freeMode: snap.freeMode || 'erg', freeWatts: snap.freeWatts || 150, freeGrade: snap.freeGrade ?? 1,
     t: snap.t, elapsed: snap.p.length, skipped: snap.skipped || 0, startedAt: snap.startedAt, dist: snap.dist || 0, intensity: snap.intensity || 100, testEnded: !!snap.testEnded, state: 'paused', autoPaused: false });
   R.samples = snap.p.map((p, i) => ({ s: i, pos: snap.pos[i], p, c: snap.c[i], hr: snap.hr[i], tgt: snap.tg ? snap.tg[i] : null, d: snap.dd[i] }));
@@ -1604,12 +1610,12 @@ function restoreCheckpoint(snap) {
 function offerRecovery() {
   const snap = load('erglab.inprogress', null);
   if (!snap || !snap.p || snap.p.length < 30) return;
-  const m = openModal(`<h2>Unfinished ride found</h2>
-    <p class="muted">${esc(snap.w.name)} · ${fmtTime(snap.p.length)} recorded · last saved ${new Date(snap.savedAt).toLocaleTimeString()}.<br>The app was closed or reloaded during the ride.</p>
-    <div class="row" style="margin-top:14px"><button class="btn primary" id="rcResume">Resume ride</button><button class="btn" id="rcSave">Save it as finished</button><span class="spacer"></span><button class="btn danger" id="rcDrop">Discard</button></div>`, true);
-  $('#rcResume', m).onclick = () => { closeModal(); restoreCheckpoint(snap); toast('Ride restored and paused. Press Resume when ready.', 5000); };
+  const m = openModal(`<h2>${t('Unfinished ride found')}</h2>
+    <p class="muted">${t('{name} · {time} recorded · last saved {at}.<br>The app was closed or reloaded during the ride.', { name: esc(snap.w.name), time: fmtTime(snap.p.length), at: new Date(snap.savedAt).toLocaleTimeString(LOCALE) })}</p>
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="rcResume">${t('Resume ride')}</button><button class="btn" id="rcSave">${t('Save it as finished')}</button><span class="spacer"></span><button class="btn danger" id="rcDrop">${t('Discard')}</button></div>`, true);
+  $('#rcResume', m).onclick = () => { closeModal(); restoreCheckpoint(snap); toast(t('Ride restored and paused. Press Resume when ready.'), 5000); };
   $('#rcSave', m).onclick = () => { closeModal(); restoreCheckpoint(snap); finishRide(false); };
-  $('#rcDrop', m).onclick = () => { if (confirm('Discard this unfinished ride?')) { clearCheckpoint(); closeModal(); } };
+  $('#rcDrop', m).onclick = () => { if (confirm(t('Discard this unfinished ride?'))) { clearCheckpoint(); closeModal(); } };
 }
 
 /* =====================================================================
@@ -1649,7 +1655,7 @@ function noSleepVideo() { // fallback for browsers without the Wake Lock API: ke
     const p = nsv.play(); return p ? p.then(() => true, () => false) : Promise.resolve(true);
   } catch { return Promise.resolve(false); }
 }
-function warnSleep() { if (warnedSleep) return; warnedSleep = true; toast(isIOS ? 'Tip: set Settings › Display & Brightness › Auto-Lock to "Never" during rides so the screen stays on.' : 'Tip: keep this screen on during the ride.', 8000); }
+function warnSleep() { if (warnedSleep) return; warnedSleep = true; toast(isIOS ? t('Tip: set Settings › Display & Brightness › Auto-Lock to "Never" during rides so the screen stays on.') : t('Tip: keep this screen on during the ride.'), 8000); }
 function requestWake() { // call synchronously from a tap (Start / Resume)
   if ('wakeLock' in navigator) {
     if (wake) return;
@@ -1661,7 +1667,7 @@ function releaseWake() { try { wake?.release(); } catch { } wake = null; try { n
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') { if (rideInProgress()) requestWake(); return; }
   // iOS freezes hidden pages: drop the trainer to an easy load and pause, rather than holding an interval target forever
-  if (isIOS && R.state === 'running') pauseRide(false, 'Ride paused: the app went to the background');
+  if (isIOS && R.state === 'running') pauseRide(false, t('Ride paused: the app went to the background'));
   if (rideInProgress()) saveCheckpoint();
 });
 window.addEventListener('pagehide', () => { if (rideInProgress()) saveCheckpoint(); });
@@ -1673,12 +1679,12 @@ window.addEventListener('pagehide', () => { if (rideInProgress()) saveCheckpoint
 let G = {};
 function buildGauges() {
   const ftp = S.ftp, maxP = Math.ceil(ftp * 1.6 / 50) * 50;
-  G.power = makeGauge($('#gPower'), { label: 'Power', unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
+  G.power = makeGauge($('#gPower'), { label: t('Power'), unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
   const wk = ftp / S.weight, maxW = Math.ceil(wk * 1.6 * 2) / 2;
   G.wkg = makeGauge($('#gWkg'), { label: 'W/kg', unit: 'W/kg', min: 0, max: maxW, bands: PZ.map(z => ({ from: z.lo * wk, to: Math.min(z.hi, 9) * wk, col: z.col })), ticks: [0, +(wk * 0.75).toFixed(1), +wk.toFixed(1), maxW] });
-  G.cad = makeGauge($('#gCad'), { label: 'Cadence', unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
+  G.cad = makeGauge($('#gCad'), { label: t('Cadence'), unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
   const hrMin = 40, mx = S.maxHr;
-  G.hr = makeGauge($('#gHr'), { label: 'Heart rate', unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
+  G.hr = makeGauge($('#gHr'), { label: t('Heart rate@@gauge'), unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
 }
 function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
@@ -1711,19 +1717,19 @@ function renderRide(force) {
   // header + state
   $('#rWname').textContent = R.w.name;
   const st = $('#rState');
-  st.textContent = { ready: 'Ready', running: 'Riding', paused: R.autoPaused ? 'Auto-paused' : 'Paused', done: 'Finished' }[R.state] || '';
+  st.textContent = { ready: t('Ready'), running: t('Riding'), paused: R.autoPaused ? t('Auto-paused') : t('Paused'), done: t('Finished') }[R.state] || '';
   st.className = 'state-tag ' + (R.state === 'running' ? 'run' : R.state === 'paused' ? 'pause' : '');
   // interval card
   let tgtW = null, frac = null, col = '#8c96ab';
   if (R.freeRide) {
-    $('#rIname').textContent = R.freeMode === 'erg' ? 'Free ride · ERG' : 'Free ride · Slope';
+    $('#rIname').textContent = R.freeMode === 'erg' ? t('Free ride · ERG') : t('Free ride · Slope');
     if (R.freeMode === 'erg') { tgtW = R.freeWatts; frac = tgtW / S.ftp; col = pZone(frac).col; $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W'; $('#rTgtPct').textContent = Math.round(frac * 100) + '% FTP'; }
-    else { $('#rTgt').textContent = R.freeGrade.toFixed(1); $('#rTgtU').textContent = '% slope'; $('#rTgtPct').textContent = ''; col = '#1fc9b3'; }
+    else { $('#rTgt').textContent = R.freeGrade.toFixed(1); $('#rTgtU').textContent = t('% slope'); $('#rTgtPct').textContent = ''; col = '#1fc9b3'; }
     $('#rTgtCad').textContent = '';
-    $('#rLeft').innerHTML = `${fmtTime(R.elapsed)}<small>ride time</small>`;
+    $('#rLeft').innerHTML = `${fmtTime(R.elapsed)}<small>${t('ride time')}</small>`;
     $('#rProg').style.width = '0%';
     $('#rRem').textContent = '—'; $('#rIdx').textContent = '—'; $('#rNext').innerHTML = '';
-    $('#cFreeLab').textContent = R.freeMode === 'erg' ? 'Target' : 'Slope';
+    $('#cFreeLab').textContent = R.freeMode === 'erg' ? t('Target') : t('Slope');
     $('#cFree').textContent = R.freeMode === 'erg' ? `${R.freeWatts} W` : `${R.freeGrade.toFixed(1)} %`;
     $('#rSprint').classList.add('hidden');
   } else if (seg) {
@@ -1733,11 +1739,11 @@ function renderRide(force) {
       col = PZ[6].col;
       if (seg.d >= 180) { // long all-out test efforts: show a pacing guide instead of just MAX
         const g = Math.round(S.ftp * (seg.est || (seg.d >= 1200 ? 1.03 : seg.d >= 480 ? 1.08 : seg.d >= 300 ? 1.15 : 1.25)));
-        $('#rTgt').textContent = '≈' + g; $('#rTgtU').textContent = 'W pace'; $('#rTgtPct').textContent = `All-out, paced evenly · ERG off · ${S.sprintGrade}% slope, use your gears`;
-      } else { $('#rTgt').textContent = 'MAX'; $('#rTgtU').textContent = ''; $('#rTgtPct').textContent = `ERG off · ${S.sprintGrade}% slope, shift up and go`; }
+        $('#rTgt').textContent = '≈' + g; $('#rTgtU').textContent = t('W pace'); $('#rTgtPct').textContent = t('All-out, paced evenly · ERG off · {g}% slope, use your gears', { g: S.sprintGrade });
+      } else { $('#rTgt').textContent = 'MAX'; $('#rTgtU').textContent = ''; $('#rTgtPct').textContent = t('ERG off · {g}% slope, shift up and go', { g: S.sprintGrade }); }
     } else if (!R.ergOn) {
       frac = segFracAt(seg, R.t) * intensityK(); tgtW = Math.round(frac * S.ftp); col = pZone(frac).col;
-      $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W goal'; $('#rTgtPct').textContent = `Slope ${R.simGrade.toFixed(1)}% · ${Math.round(frac * 100)}% FTP`;
+      $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = t('W goal'); $('#rTgtPct').textContent = t('Slope {g}% · {pct}% FTP', { g: R.simGrade.toFixed(1), pct: Math.round(frac * 100) });
     } else {
       tgtW = ctl && ctl.kind === 'power' && R.state === 'running' ? ctl.w : targetWattsAt(R.t); frac = tgtW / S.ftp; col = pZone(frac).col;
       $('#rTgt').textContent = tgtW; $('#rTgtU').textContent = 'W';
@@ -1745,18 +1751,18 @@ function renderRide(force) {
     }
     $('#rTgtPct').style.color = col;
     $('#rTgtCad').textContent = seg.c ? `@ ${seg.c} rpm` : '';
-    $('#rLeft').innerHTML = `${fmtTime(left)}<small>left in interval</small>`;
+    $('#rLeft').innerHTML = `${fmtTime(left)}<small>${t('left in interval')}</small>`;
     $('#rProg').style.width = `${clamp((R.t - seg.start) / seg.d * 100, 0, 100)}%`;
     $('#rProg').style.background = col;
     $('#rEl').textContent = fmtTime(R.elapsed);
     $('#rRem').textContent = fmtTime(R.total - R.t);
     $('#rIdx').textContent = `${R.idx + 1} / ${R.segs.length}`;
     const nx = R.segs.slice(R.idx + 1, R.idx + 4);
-    $('#rNext').innerHTML = nx.length ? 'Next: ' + nx.map((s, i) => {
+    $('#rNext').innerHTML = nx.length ? t('Next:') + ' ' + nx.map((s, i) => {
       const w = s.kind === 'free' ? 'MAX' : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp * intensityK())}→${Math.round(s.p1 * S.ftp * intensityK())} W` : `${Math.round(s.p0 * S.ftp * intensityK())} W`;
       const c = s.kind === 'free' ? PZ[6].col : pZone(Math.max(s.p0, s.p1)).col;
       return `<span style="${i ? 'opacity:.7' : ''}"><b style="color:${c}">${w}</b> ${fmtSegDur(s.d)}${s.c ? ` @${s.c}` : ''}</span>`;
-    }).join(' &nbsp;·&nbsp; ') : '<b>Last interval: finish strong!</b>';
+    }).join(' &nbsp;·&nbsp; ') : '<b>' + t('Last interval: finish strong!') + '</b>';
     $('#rSprint').classList.toggle('hidden', !(seg.kind === 'free' && seg.d < 180 && R.state === 'running'));
   }
   if (R.freeRide) $('#rEl').textContent = fmtTime(R.elapsed);
@@ -1764,28 +1770,28 @@ function renderRide(force) {
   $('#rTgt').style.color = col;
   // start button
   const sb = $('#cStart');
-  if (R.state === 'running') { sb.textContent = '❚❚ Pause'; sb.className = 'btn lg'; }
-  else if (R.state === 'done') { sb.textContent = '✓ Finished'; sb.className = 'btn lg'; sb.disabled = true; }
-  else { sb.textContent = R.state === 'paused' ? '▶ Resume' : '▶ Start'; sb.className = 'btn go lg'; sb.disabled = false; }
+  if (R.state === 'running') { sb.textContent = t('❚❚ Pause'); sb.className = 'btn lg'; }
+  else if (R.state === 'done') { sb.textContent = t('✓ Finished'); sb.className = 'btn lg'; sb.disabled = true; }
+  else { sb.textContent = R.state === 'paused' ? t('▶ Resume') : t('▶ Start'); sb.className = 'btn go lg'; sb.disabled = false; }
   if (R.state !== 'done') sb.disabled = false;
-  $('#cEnd').textContent = R.state === 'done' ? 'Close' : R.state === 'ready' ? 'Cancel' : 'End & save';
+  $('#cEnd').textContent = R.state === 'done' ? t('Close') : R.state === 'ready' ? t('Cancel') : t('End & save');
   $('#cInt').textContent = ergMode() || R.freeRide ? R.intensity + '%' : R.simGrade.toFixed(1) + '%';
-  $('#cIntLab').textContent = ergMode() || R.freeRide ? 'Intensity' : 'Slope';
+  $('#cIntLab').textContent = ergMode() || R.freeRide ? t('Intensity') : t('Slope');
   $('#cErg').className = 'btn sm' + ((R.freeRide ? R.freeMode === 'erg' : R.ergOn) ? ' primary' : '');
   $('#cSlope').className = 'btn sm' + ((R.freeRide ? R.freeMode !== 'erg' : !R.ergOn) ? ' primary' : '');
   // gauges
   const p = smoothedPower();
   if (G.power) {
     const pz = p != null ? pZone(p / S.ftp) : null;
-    G.power.set(p, { target: tgtW, color: pz ? pz.col : '#555', zoneText: pz ? `${pz.n} · ${pz.name.toUpperCase()}` : '', subHtml: p != null ? `<b>${Math.round(p / S.ftp * 100)}%</b> FTP${tgtW ? ` · Δ <b>${Math.round(p - tgtW) > 0 ? '+' : ''}${Math.round(p - tgtW)}</b> W` : ''}` : 'no power data' });
+    G.power.set(p, { target: tgtW, color: pz ? pz.col : '#555', zoneText: pz ? `${pz.n} · ${pz.name.toUpperCase()}` : '', subHtml: p != null ? `<b>${Math.round(p / S.ftp * 100)}%</b> FTP${tgtW ? ` · Δ <b>${Math.round(p - tgtW) > 0 ? '+' : ''}${Math.round(p - tgtW)}</b> W` : ''}` : t('no power data') });
     const wkg = p != null ? p / S.weight : null;
     G.wkg.set(wkg, { target: tgtW ? tgtW / S.weight : null, color: pz ? pz.col : '#555', zoneText: pz ? pz.n : '', dec: 1, subHtml: `FTP <b>${(S.ftp / S.weight).toFixed(2)}</b> W/kg · ${S.weight} kg` });
     const c = liveFresh('Cad') ? live.cadence : null;
     const tc = !R.freeRide && seg && seg.c ? seg.c : null;
-    G.cad.set(c, { target: tc, color: c != null ? cadColor(c) : '#555', zoneText: c == null ? '' : c < 60 ? 'GRIND' : c < 75 ? 'LOW' : c < 100 ? 'SWEET' : c < 115 ? 'HIGH' : 'SPIN', subHtml: tc ? `target <b>${tc}</b> rpm` : (live.speed != null && liveFresh('Power') ? `<b>${live.speed.toFixed(1)}</b> km/h` : '') });
+    G.cad.set(c, { target: tc, color: c != null ? cadColor(c) : '#555', zoneText: c == null ? '' : c < 60 ? t('GRIND') : c < 75 ? t('LOW') : c < 100 ? t('SWEET') : c < 115 ? t('HIGH') : t('SPIN'), subHtml: tc ? t('target <b>{n}</b> rpm', { n: tc }) : (live.speed != null && liveFresh('Power') ? `<b>${live.speed.toFixed(1)}</b> km/h` : '') });
     const hr = liveFresh('Hr', 6000) ? live.hr : null;
     const hz = hr ? hZone(hr / S.maxHr) : null;
-    G.hr.set(hr, { color: hz ? hz.col : '#555', zoneText: hz ? `${hz.n} · ${hz.name.toUpperCase()}` : '', subHtml: hr ? `<b>${Math.round(hr / S.maxHr * 100)}%</b> of max ${S.maxHr}` : (hrm.connected ? 'waiting…' : 'connect HR strap') });
+    G.hr.set(hr, { color: hz ? hz.col : '#555', zoneText: hz ? `${hz.n} · ${hz.name.toUpperCase()}` : '', subHtml: hr ? t('<b>{pct}%</b> of max {max}', { pct: Math.round(hr / S.maxHr * 100), max: S.maxHr }) : (hrm.connected ? t('waiting…') : t('connect HR strap')) });
   }
   // stats
   const a = R.agg, ia = R.iagg;
@@ -1892,17 +1898,17 @@ function drawChart() {
    VIEWS: tabs, library, plans, builder, history, settings
    ===================================================================== */
 const TABS = [
-  { id: 'workouts', label: 'Workouts', icon: '<path d="M3 17l4-6 4 3 5-8 5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
-  { id: 'plans', label: 'Plans', icon: '<rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'ride', label: 'Ride', icon: '<circle cx="6" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 16l4-8h5l3 8M10 8l2 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
-  { id: 'build', label: 'Build', icon: '<path d="M4 20h16M6 16V9M10 16V5M14 16v-6M18 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'history', label: 'History', icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-  { id: 'progress', label: 'Progress', icon: '<path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
-  { id: 'settings', label: 'Settings', icon: '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'workouts', label: t('Workouts'), icon: '<path d="M3 17l4-6 4 3 5-8 5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { id: 'plans', label: t('Plans'), icon: '<rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'ride', label: t('Ride'), icon: '<circle cx="6" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 16l4-8h5l3 8M10 8l2 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
+  { id: 'build', label: t('Build'), icon: '<path d="M4 20h16M6 16V9M10 16V5M14 16v-6M18 16V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'history', label: t('History'), icon: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { id: 'progress', label: t('Progress'), icon: '<path d="M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { id: 'settings', label: t('Settings'), icon: '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
 ];
 function buildTabs() {
-  $('#tabs').innerHTML = TABS.map(t => `<button data-tab="${t.id}"><span>${t.label}</span></button>`).join('');
-  $('#btabs').innerHTML = TABS.map(t => `<button data-tab="${t.id}"><svg viewBox="0 0 24 24">${t.icon}</svg><span>${t.label}</span></button>`).join('');
+  $('#tabs').innerHTML = TABS.map(tb => `<button data-tab="${tb.id}"><span>${tb.label}</span></button>`).join('');
+  $('#btabs').innerHTML = TABS.map(tb => `<button data-tab="${tb.id}"><svg viewBox="0 0 24 24">${tb.icon}</svg><span>${tb.label}</span></button>`).join('');
   $$('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
 }
 function go(id) {
@@ -1924,15 +1930,15 @@ let catFilter = 'All';
 function renderCats() {
   const counts = {}; allWorkouts().forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
   const cats = ['All', ...CATS.filter(c => counts[c])];
-  $('#cats').innerHTML = cats.map(c => `<button class="chip ${c === catFilter ? 'on' : ''}" data-cat="${esc(c)}" style="${c !== 'All' ? `color:${CAT_COL[c]}` : ''}">${c !== 'All' ? `<i style="background:${CAT_COL[c]}"></i>` : ''}${esc(c)} <span class="dim">${c === 'All' ? allWorkouts().length : counts[c]}</span></button>`).join('');
+  $('#cats').innerHTML = cats.map(c => `<button class="chip ${c === catFilter ? 'on' : ''}" data-cat="${esc(c)}" style="${c !== 'All' ? `color:${CAT_COL[c]}` : ''}">${c !== 'All' ? `<i style="background:${CAT_COL[c]}"></i>` : ''}${esc(t(c))} <span class="dim">${c === 'All' ? allWorkouts().length : counts[c]}</span></button>`).join('');
   $$('#cats .chip').forEach(b => b.onclick = () => { catFilter = b.dataset.cat; renderCats(); renderLib(); });
 }
 function wCard(w) {
   const st = wStats(w); const col = CAT_COL[w.cat] || '#aaa';
   return `<div class="card wcard" data-wid="${esc(w.id)}">
-    <div class="top"><h3>${esc(w.name)}</h3><span class="badge" style="color:${col}">${esc(w.cat)}</span></div>
+    <div class="top"><h3>${esc(w.name)}</h3><span class="badge" style="color:${col}">${esc(t(w.cat))}</span></div>
     <div class="prof">${profileSVG(w, { W: 300, H: 54 })}</div>
-    <div class="kv num"><span><b>${fmtDur(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>avg <b>${Math.round(st.avgF * S.ftp)} W</b></span></div>
+    <div class="kv num"><span><b>${fmtDur(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span></div>
     <div class="desc">${esc(w.desc || '')}</div></div>`;
 }
 function renderLib() {
@@ -1942,8 +1948,8 @@ function renderLib() {
   if (durf) list = list.filter(w => { const m = wStats(w).total / 60; return durf === 999 ? m > 90 : m <= durf + 0.5; });
   const by = { cat: (a, b) => CATS.indexOf(a.cat) - CATS.indexOf(b.cat) || wStats(a).tss - wStats(b).tss, dur: (a, b) => wStats(a).total - wStats(b).total, tss: (a, b) => wStats(a).tss - wStats(b).tss, if: (a, b) => wStats(a).IF - wStats(b).IF, name: (a, b) => a.name.localeCompare(b.name) }[sort];
   list.sort(by);
-  $('#libCount').textContent = `${allWorkouts().length} workouts · scaled to FTP ${S.ftp} W (${(S.ftp / S.weight).toFixed(2)} W/kg)`;
-  $('#lib').innerHTML = list.length ? list.map(wCard).join('') : '<div class="empty">No workouts match.</div>';
+  $('#libCount').textContent = t('{n} workouts · scaled to FTP {ftp} W ({wkg} W/kg)', { n: allWorkouts().length, ftp: S.ftp, wkg: (S.ftp / S.weight).toFixed(2) });
+  $('#lib').innerHTML = list.length ? list.map(wCard).join('') : `<div class="empty">${t('No workouts match.')}</div>`;
 }
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-wid]'); if (c && !e.target.closest('button')) { const w = findWorkout(c.dataset.wid); if (w) workoutModal(w, c.dataset.src ? JSON.parse(c.dataset.src) : null); }
@@ -1953,7 +1959,7 @@ document.addEventListener('click', e => {
 /* ---- modals ---- */
 function openModal(html, narrow) {
   const root = $('#modalRoot');
-  root.innerHTML = `<div class="modal"><div class="box ${narrow ? 'narrow' : ''}"><button class="x" aria-label="Close">×</button>${html}</div></div>`;
+  root.innerHTML = `<div class="modal"><div class="box ${narrow ? 'narrow' : ''}"><button class="x" aria-label="${t('Close')}">×</button>${html}</div></div>`;
   const m = root.firstElementChild;
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('.x')) closeModal(); });
   return m;
@@ -1963,37 +1969,37 @@ function workoutModal(w, source) {
   const st = wStats(w); const { segs } = expand(w);
   const rows = segs.map(s => {
     const f = s.kind === 'free' ? null : s;
-    const pw = s.kind === 'free' ? '<b>MAX</b> (ERG off)' : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp)} → ${Math.round(s.p1 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}–${Math.round(s.p1 * 100)}%</span>` : `${Math.round(s.p0 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}%</span>`;
+    const pw = s.kind === 'free' ? t('<b>MAX</b> (ERG off)') : s.kind === 'ramp' ? `${Math.round(s.p0 * S.ftp)} → ${Math.round(s.p1 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}–${Math.round(s.p1 * 100)}%</span>` : `${Math.round(s.p0 * S.ftp)} W <span class="dim">${Math.round(s.p0 * 100)}%</span>`;
     const col = s.kind === 'free' ? PZ[6].col : pZone(Math.max(s.p0, s.p1)).col;
     return `<tr><td class="num dim">${fmtTime(s.start)}</td><td><span class="sw" style="background:${col}"></span>${esc(segLabel(s))}${s.rep ? ` <span class="dim">${s.rep.i}/${s.rep.n}</span>` : ''}</td><td class="num">${fmtSegDur(s.d)}</td><td class="num">${pw}</td><td class="num">${s.c ? s.c + ' rpm' : ''}</td></tr>`;
   }).join('');
   const m = openModal(`
-    <div class="row" style="gap:8px"><span class="badge" style="color:${CAT_COL[w.cat] || '#aaa'}">${esc(w.cat)}</span>${w.custom ? '<span class="badge" style="color:#c0c6d4">custom</span>' : ''}</div>
+    <div class="row" style="gap:8px"><span class="badge" style="color:${CAT_COL[w.cat] || '#aaa'}">${esc(t(w.cat))}</span>${w.custom ? `<span class="badge" style="color:#c0c6d4">${t('custom')}</span>` : ''}</div>
     <h2 style="margin:8px 0 4px">${esc(w.name)}</h2>
     <p class="muted" style="margin:0 0 6px">${esc(w.desc || '')}</p>
-    ${w.src ? `<p class="dim" style="margin:0;font-size:12.5px">Origin: ${esc(w.src)}</p>` : ''}
+    ${w.src ? `<p class="dim" style="margin:0;font-size:12.5px">${t('Origin: {src}', { src: esc(w.src) })}</p>` : ''}
     <div class="bigprof">${profileSVG(w, { W: 800, H: 170, axis: true })}</div>
-    <div class="kv num" style="margin-bottom:12px"><span>Duration <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>Avg <b>${Math.round(st.avgF * S.ftp)} W</b></span><span>Work <b>${Math.round(st.avgF * S.ftp * st.total / 1000)} kJ</b></span><span>Intervals <b>${st.n}</b></span><span>@ FTP <b>${S.ftp} W</b></span></div>
-    <div class="segwrap"><table class="segs"><thead><tr><th>Start</th><th>Interval</th><th>Duration</th><th>Target</th><th>Cadence</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="kv num" style="margin-bottom:12px"><span>${t('Duration')} <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('Avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span><span>${t('Work')} <b>${Math.round(st.avgF * S.ftp * st.total / 1000)} kJ</b></span><span>${t('Intervals')} <b>${st.n}</b></span><span>@ FTP <b>${S.ftp} W</b></span></div>
+    <div class="segwrap"><table class="segs"><thead><tr><th>${t('Start')}</th><th>${t('Interval')}</th><th>${t('Duration')}</th><th>${t('Target')}</th><th>${t('Cadence')}</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="row" style="margin-top:14px">
-      <button class="btn primary lg" id="mRide">▶ Ride this workout</button>
+      <button class="btn primary lg" id="mRide">${t('▶ Ride this workout')}</button>
       <span class="spacer"></span>
-      <button class="btn sm" id="mEdit">Copy to builder</button>
+      <button class="btn sm" id="mEdit">${t('Copy to builder')}</button>
       <button class="btn sm" id="mZwo">.zwo</button><button class="btn sm" id="mErg">.erg</button>
-      ${w.custom ? '<button class="btn sm danger" id="mDel">Delete</button>' : ''}
+      ${w.custom ? `<button class="btn sm danger" id="mDel">${t('Delete')}</button>` : ''}
     </div>`);
   $('#mRide', m).onclick = () => { closeModal(); loadWorkout(w, source); };
   $('#mZwo', m).onclick = () => download(slug(w.name) + '.zwo', toZWO(w), 'application/xml');
   $('#mErg', m).onclick = () => download(slug(w.name) + '.erg', toERG(w), 'text/plain');
-  $('#mEdit', m).onclick = () => { closeModal(); $('#bName').value = w.name + (w.custom ? '' : ' (copy)'); $('#bCat').value = CATS.includes(w.cat) ? w.cat : 'Custom'; $('#bText').value = segsToText(w.seg); builderPreview(); go('build'); };
-  const del = $('#mDel', m); if (del) del.onclick = () => { if (confirm('Delete this custom workout?')) { CUSTOM = CUSTOM.filter(x => x.id !== w.id); saveCustom(); closeModal(); refreshLibraries(); } };
+  $('#mEdit', m).onclick = () => { closeModal(); $('#bName').value = w.name + (w.custom ? '' : ' (' + t('copy') + ')'); $('#bCat').value = CATS.includes(w.cat) ? w.cat : 'Custom'; $('#bText').value = segsToText(w.seg); builderPreview(); go('build'); };
+  const del = $('#mDel', m); if (del) del.onclick = () => { if (confirm(t('Delete this custom workout?'))) { CUSTOM = CUSTOM.filter(x => x.id !== w.id); saveCustom(); closeModal(); refreshLibraries(); } };
 }
 
 /* ---- plans ---- */
 const openPlans = new Set();
 function renderPlans() {
   const done = load('erglab.plandone', {});
-  if (!PLANS.length) { $('#plans').innerHTML = '<div class="empty">No plans available.</div>'; return; }
+  if (!PLANS.length) { $('#plans').innerHTML = `<div class="empty">${t('No plans available.')}</div>`; return; }
   $('#plans').innerHTML = PLANS.map(pl => {
     const d = done[pl.id] || {};
     let total = 0, nDone = 0, nextKey = null;
@@ -2002,21 +2008,21 @@ function renderPlans() {
     const open = openPlans.has(pl.id);
     return `<div class="card plan" data-plan="${esc(pl.id)}">
       <div class="head" data-ptoggle="${esc(pl.id)}">
-        <div style="flex:1;min-width:240px"><div class="row" style="gap:8px"><h3>${esc(pl.name)}</h3><span class="badge" style="color:${pl.level === 'Beginner' ? '#2fbf71' : pl.level === 'Advanced' ? '#ff3b3b' : '#f5c518'}">${esc(pl.level || '')}</span></div>
+        <div style="flex:1;min-width:240px"><div class="row" style="gap:8px"><h3>${esc(pl.name)}</h3><span class="badge" style="color:${(pl.levelKey || pl.level) === 'Beginner' ? '#2fbf71' : (pl.levelKey || pl.level) === 'Advanced' ? '#ff3b3b' : '#f5c518'}">${esc(pl.level || '')}</span></div>
           <p class="muted" style="margin:4px 0 0;font-size:13.5px">${esc(pl.desc || '')}</p>
-          <div class="kv num" style="margin-top:6px"><span><b>${pl.weeks.length}</b> weeks</span><span><b>${total}</b> sessions</span><span>Goal <b>${esc(pl.goal || '')}</b></span><span>Avg weekly TSS <b>${Math.round(tssWeeks.reduce((a, b) => a + b, 0) / pl.weeks.length)}</b></span>${pl.src ? `<span class="dim">${esc(pl.src)}</span>` : ''}</div>
+          <div class="kv num" style="margin-top:6px"><span>${t(pl.weeks.length === 1 ? '<b>{n}</b> week' : '<b>{n}</b> weeks', { n: pl.weeks.length })}</span><span>${t(total === 1 ? '<b>{n}</b> session' : '<b>{n}</b> sessions', { n: total })}</span><span>${t('Goal')} <b>${esc(pl.goal || '')}</b></span><span>${t('Avg weekly TSS')} <b>${Math.round(tssWeeks.reduce((a, b) => a + b, 0) / pl.weeks.length)}</b></span>${pl.src ? `<span class="dim">${esc(pl.src)}</span>` : ''}</div>
           <div class="bar2"><i style="width:${total ? nDone / total * 100 : 0}%"></i></div>
         </div>
-        <div class="row"><span class="muted num" style="font-size:13px">${nDone}/${total} done</span><button class="btn sm">${open ? 'Hide' : 'Open'}</button></div>
+        <div class="row"><span class="muted num" style="font-size:13px">${t('{done}/{total} done', { done: nDone, total })}</span><button class="btn sm">${open ? t('Hide') : t('Open')}</button></div>
       </div>
-      ${open ? `<div class="weeks">${pl.weeks.map((wk, wi) => `<div class="week"><h4>Week ${wi + 1}${wk.focus ? ' · ' + esc(wk.focus) : ''} <span class="dim num">· ${wk.days.length} sessions · TSS ${Math.round(tssWeeks[wi])}</span></h4>
-        <div class="days">${wk.days.map((id, di) => { const w = findWorkout(id); const k = `${wi}-${di}`; if (!w) return `<div class="day dim">Missing workout: ${esc(id)}</div>`; const st = wStats(w);
-          return `<div class="day ${d[k] ? 'done' : ''} ${k === nextKey ? 'next' : ''}" data-wid="${esc(id)}" data-src='${esc(JSON.stringify({ plan: pl.id, key: k }))}'><b>${esc(w.name)}</b><div class="dim num" style="font-size:12px">${fmtDur(st.total)} · TSS ${Math.round(st.tss)} · ${esc(w.cat)}</div><div class="mini">${profileSVG(w, { W: 200, H: 26 })}</div></div>`; }).join('')}</div></div>`).join('')}
-        <div class="row" style="margin-top:4px"><button class="btn sm danger" data-preset="${esc(pl.id)}">Reset progress</button></div></div>` : ''}
+      ${open ? `<div class="weeks">${pl.weeks.map((wk, wi) => `<div class="week"><h4>${t('Week {n}', { n: wi + 1 })}${wk.focus ? ' · ' + esc(wk.focus) : ''} <span class="dim num">· ${t(wk.days.length === 1 ? '{n} session' : '{n} sessions', { n: wk.days.length })} · TSS ${Math.round(tssWeeks[wi])}</span></h4>
+        <div class="days">${wk.days.map((id, di) => { const w = findWorkout(id); const k = `${wi}-${di}`; if (!w) return `<div class="day dim">${t('Missing workout: {id}', { id: esc(id) })}</div>`; const st = wStats(w);
+          return `<div class="day ${d[k] ? 'done' : ''} ${k === nextKey ? 'next' : ''}" data-wid="${esc(id)}" data-src='${esc(JSON.stringify({ plan: pl.id, key: k }))}'><b>${esc(w.name)}</b><div class="dim num" style="font-size:12px">${fmtDur(st.total)} · TSS ${Math.round(st.tss)} · ${esc(t(w.cat))}</div><div class="mini">${profileSVG(w, { W: 200, H: 26 })}</div></div>`; }).join('')}</div></div>`).join('')}
+        <div class="row" style="margin-top:4px"><button class="btn sm danger" data-preset="${esc(pl.id)}">${t('Reset progress')}</button></div></div>` : ''}
     </div>`;
   }).join('');
   $$('[data-ptoggle]').forEach(h => h.onclick = () => { const id = h.dataset.ptoggle; openPlans.has(id) ? openPlans.delete(id) : openPlans.add(id); renderPlans(); });
-  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm('Reset progress for this plan?')) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); cloud.schedulePush(); renderPlans(); });
+  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm(t('Reset progress for this plan?'))) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); cloud.schedulePush(); renderPlans(); });
 }
 
 /* ---- builder ---- */
@@ -2024,22 +2030,22 @@ let builderSegs = null;
 function builderPreview() {
   try {
     const seg = parseText($('#bText').value);
-    if (!seg.length) throw new Error('Add at least one step');
+    if (!seg.length) throw new Error(t('Add at least one step'));
     builderSegs = seg; $('#bErr').textContent = '';
     const w = { id: '_preview', name: $('#bName').value, seg };
     $('#bProf').innerHTML = profileSVG(w, { W: 800, H: 170, axis: true });
     const st = workoutStats(w);
-    $('#bStats').innerHTML = `<span>Duration <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>Avg <b>${Math.round(st.avgF * S.ftp)} W</b></span>`;
+    $('#bStats').innerHTML = `<span>${t('Duration')} <b>${fmtTime(st.total)}</b></span><span>TSS <b>${Math.round(st.tss)}</b></span><span>IF <b>${st.IF.toFixed(2)}</b></span><span>${t('Avg')} <b>${Math.round(st.avgF * S.ftp)} W</b></span>`;
   } catch (e) { builderSegs = null; $('#bErr').textContent = e.message; }
 }
 function builderWorkout() {
   builderPreview(); if (!builderSegs) return null;
-  const name = $('#bName').value.trim() || 'My workout';
-  return { id: 'u-' + slug(name) + '-' + Date.now().toString(36), name, cat: $('#bCat').value, desc: 'Custom workout', src: 'Built in BTB', seg: builderSegs };
+  const name = $('#bName').value.trim() || t('My workout');
+  return { id: 'u-' + slug(name) + '-' + Date.now().toString(36), name, cat: $('#bCat').value, desc: t('Custom workout'), src: t('Built in BTB'), seg: builderSegs };
 }
 function addCustom(w) { CUSTOM.push(w); saveCustom(); refreshLibraries(); }
 function refreshLibraries() { statsCache.clear(); renderCats(); renderLib(); renderCustom(); }
-function renderCustom() { $('#customList').innerHTML = CUSTOM.length ? CUSTOM.map(w => wCard({ ...w, custom: true })).join('') : '<div class="empty card">Nothing yet. Save a workout above or import .zwo/.erg/.mrc files.</div>'; }
+function renderCustom() { $('#customList').innerHTML = CUSTOM.length ? CUSTOM.map(w => wCard({ ...w, custom: true })).join('') : `<div class="empty card">${t('Nothing yet. Save a workout above or import .zwo/.erg/.mrc files.')}</div>`; }
 async function importFiles(files) {
   let n = 0;
   for (const f of files) {
@@ -2051,12 +2057,12 @@ async function importFiles(files) {
       for (const w of list) {
         if (!w.seg || !w.seg.length) continue;
         w.seg.forEach(s => validateSeg(s, f.name));
-        { const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) throw new Error('workout too long'); }
-        CUSTOM.push({ id: 'u-' + slug(w.name || f.name) + '-' + (Date.now() + n).toString(36), name: w.name || f.name, cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: w.desc || `Imported from ${f.name}`, src: w.src || f.name, seg: w.seg }); n++;
+        { const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) throw new Error(t('workout too long')); }
+        CUSTOM.push({ id: 'u-' + slug(w.name || f.name) + '-' + (Date.now() + n).toString(36), name: w.name || f.name, cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: w.desc || t('Imported from {file}', { file: f.name }), src: w.src || f.name, seg: w.seg }); n++;
       }
     } catch (e) { toast(`${f.name}: ${e.message}`, 4000); }
   }
-  if (n) { saveCustom(); refreshLibraries(); toast(`Imported ${n} workout${n > 1 ? 's' : ''}`); }
+  if (n) { saveCustom(); refreshLibraries(); toast(n > 1 ? t('Imported {n} workouts', { n }) : t('Imported {n} workout', { n })); }
 }
 
 /* ---- per-second ride data: IndexedDB (localStorage only holds the history summaries) ---- */
@@ -2094,17 +2100,17 @@ function normStreams(st) {
 }
 // second-by-second data of a ride: inline (legacy), this device's IndexedDB, or the cloud (then cached on this device)
 async function rideStreams(r, { cache = true } = {}) {
-  if (!r) throw new Error('Ride not found');
-  if (r.demo) { const d = normStreams(DEMO.streams(r.id)); if (d) return d; throw new Error('Demo ride not available'); }
+  if (!r) throw new Error(t('Ride not found'));
+  if (r.demo) { const d = normStreams(DEMO.streams(r.id)); if (d) return d; throw new Error(t('Demo ride not available')); }
   let st = normStreams(r.p ? r : null) || normStreams(await sdb.get(r.id));
   if (st) return st;
   if (cloud.user && r.cloud) {
     st = normStreams(await cloud.fetchStreams(r.id));
-    if (!st) throw new Error('No per-second data stored for this ride');
+    if (!st) throw new Error(t('No per-second data stored for this ride'));
     if (cache && await sdb.put(r.id, st)) markRide(r.id, { hs: true });
     return st;
   }
-  throw new Error('Only a summary is stored for this ride');
+  throw new Error(t('Only a summary is stored for this ride'));
 }
 async function rideFull(r) { const st = await rideStreams(r); return { ...r, ...st, dd: st.dd || r.dd }; }
 // analysis summary (power curve, zones, intervals…) of one ride; null when the analysis code isn't available
@@ -2183,22 +2189,22 @@ function demoChanged() {
 }
 function renderHistory() {
   const h = viewHistory();
-  if (!h.length) { $('#hist').innerHTML = '<div class="empty card">No rides yet. Your finished rides will appear here.</div>'; return; }
+  if (!h.length) { $('#hist').innerHTML = `<div class="empty card">${t('No rides yet. Your finished rides will appear here.')}</div>`; return; }
   $('#hist').innerHTML = h.map(r => `<div class="card hist">
-      <div>${r.demo ? '<span class="badge" style="color:var(--warn);margin-right:6px">DEMO</span>' : ''}<b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString()}</span>
-      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ · ≈<b>${rideKcalText(r)}</b> kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
+      <div>${r.demo ? `<span class="badge" style="color:var(--warn);margin-right:6px">${t('DEMO')}</span>` : ''}<b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString(LOCALE)}</span>
+      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>${t('avg')} <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ · ≈<b>${rideKcalText(r)}</b> kcal</span>${r.avgHr ? `<span>${t('HR')} <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>${t('cad')} <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
         if (r.demo) return '';
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
         if (!stv.connected || !(r.p || r.hs || r.cloud || s.upload)) return '';
-        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.demo || r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">Analyse</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}${r.demo ? '' : `<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button>`}</div>
+        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? t('Uploading…') : s.pending ? t('Check Strava') : '↑ Strava'}</button>`; })()}${r.demo || r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">${t('Analyse')}</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : `<span class="dim" style="font-size:12px">${t('summary only')}</span>`}${r.demo ? '' : `<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button>`}</div>
       <div class="mini" data-ana="${r.demo || r.p || r.hs || r.cloud ? esc(r.id) : ''}">${rideSVG(r)}</div></div>`).join('');
   $$('[data-ana]').forEach(b => { if (b.dataset.ana) { b.style.cursor = 'pointer'; b.onclick = () => openRideAnalysis(b.dataset.ana); } });
-  $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast('Could not load ride: ' + e.message); } });
-  $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = 'Uploading…'; uploadToStrava(r, null).catch(() => { }); });
+  $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast(t('Could not load ride: {msg}', { msg: e.message })); } });
+  $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = t('Uploading…'); uploadToStrava(r, null).catch(() => { }); });
   $$('[data-hdel]').forEach(b => b.onclick = async () => {
-    if (!confirm(cloud.user ? 'Delete this ride everywhere (this device and your cloud space)?' : 'Delete this ride?')) return;
-    if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast('Could not delete from the cloud: ' + e.message, 5000); return; } }
+    if (!confirm(cloud.user ? t('Delete this ride everywhere (this device and your cloud space)?') : t('Delete this ride?'))) return;
+    if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast(t('Could not delete from the cloud: {msg}', { msg: e.message }), 5000); return; } }
     store('erglab.history', load('erglab.history', []).filter(x => x.id !== b.dataset.hdel)); sdb.del(b.dataset.hdel); renderHistory();
   });
 }
@@ -2221,59 +2227,59 @@ function testResult(r) {
   if (r.cat !== 'Test') return null;
   const id = ((r.wid || '') + ' ' + r.name).toLowerCase();
   const b = s => bestAvg(r.p, s), W = x => `${Math.round(x)} W`;
-  if (/ramp/.test(id)) { const m = b(60); return m && { est: m * 0.75, how: `75% of best 1-minute power (${W(m)}): standard ramp-test formula` }; }
+  if (/ramp/.test(id)) { const m = b(60); return m && { est: m * 0.75, how: t('75% of best 1-minute power ({w}): standard ramp-test formula', { w: W(m) }) }; }
   if (/cp|critical/.test(id)) {
     const p3 = b(180), p12 = b(720); if (!p3 || !p12) return null;
     const cp = (p12 * 720 - p3 * 180) / (720 - 180), wp = (p3 - cp) * 180;
-    return cp > 0 && { est: cp * 0.95, how: `Best 3-min ${W(p3)}, best 12-min ${W(p12)} → Critical Power ${W(cp)}, W′ ${(wp / 1000).toFixed(1)} kJ. FTP ≈ 95% of CP` };
+    return cp > 0 && { est: cp * 0.95, how: t('Best 3-min {p3}, best 12-min {p12} → Critical Power {cp}, W′ {wp} kJ. FTP ≈ 95% of CP', { p3: W(p3), p12: W(p12), cp: W(cp), wp: (wp / 1000).toFixed(1) }) };
   }
-  if (/8.?min|2x8/.test(id)) { const m = b(480); return m && { est: m * 0.9, how: `90% of best 8-minute power (${W(m)})` }; }
-  if (/20|ftp/.test(id)) { const m = b(1200); return m && { est: m * 0.95, how: `95% of best 20-minute power (${W(m)})` }; }
-  if (/5.?min|map/.test(id)) { const m = b(300); return m && { est: null, how: `Best 5-minute power (MAP proxy): <b>${W(m)}</b> = ${(m / S.weight).toFixed(2)} W/kg (${Math.round(m / S.ftp * 100)}% of current FTP; typically 110–125%)` }; }
-  if (/1.?min/.test(id)) { const m = b(60); return m && { est: null, how: `Best 1-minute power: <b>${W(m)}</b> = ${(m / S.weight).toFixed(2)} W/kg (${Math.round(m / S.ftp * 100)}% of FTP)` }; }
+  if (/8.?min|2x8/.test(id)) { const m = b(480); return m && { est: m * 0.9, how: t('90% of best 8-minute power ({w})', { w: W(m) }) }; }
+  if (/20|ftp/.test(id)) { const m = b(1200); return m && { est: m * 0.95, how: t('95% of best 20-minute power ({w})', { w: W(m) }) }; }
+  if (/5.?min|map/.test(id)) { const m = b(300); return m && { est: null, how: t('Best 5-minute power (MAP proxy): <b>{w}</b> = {wkg} W/kg ({pct}% of current FTP; typically 110–125%)', { w: W(m), wkg: (m / S.weight).toFixed(2), pct: Math.round(m / S.ftp * 100) }) }; }
+  if (/1.?min/.test(id)) { const m = b(60); return m && { est: null, how: t('Best 1-minute power: <b>{w}</b> = {wkg} W/kg ({pct}% of FTP)', { w: W(m), wkg: (m / S.weight).toFixed(2), pct: Math.round(m / S.ftp * 100) }) }; }
   const p5 = b(5) || Math.max(...r.p), p15 = b(15);
-  return { est: null, how: `Peak 5-second power <b>${W(p5)}</b>${p15 ? `, best 15 s ${W(p15)}` : ''} · max ${W(Math.max(...r.p))} (${(p5 / S.weight).toFixed(1)} W/kg)` };
+  return { est: null, how: t('Peak 5-second power <b>{p5}</b>{best15} · max {max} ({wkg} W/kg)', { p5: W(p5), best15: p15 ? t(', best 15 s {w}', { w: W(p15) }) : '', max: W(Math.max(...r.p)), wkg: (p5 / S.weight).toFixed(1) }) };
 }
 function summaryModal(r) {
   let ftpHtml = '';
-  const t = testResult(r);
-  if (t) {
+  const tr = testResult(r);
+  if (tr) {
     ftpHtml = `<div class="card pad" style="margin-top:12px;border-color:var(--z5)">
-      ${t.est ? `<h3>Estimated FTP: <span style="color:var(--z5)">${Math.round(t.est)} W</span> <span class="muted" style="font-size:14px">(${(t.est / S.weight).toFixed(2)} W/kg)</span></h3>` : `<h3>Test result</h3>`}
-      <p class="muted" style="margin:4px 0 10px;font-size:13.5px">${t.how}${t.est ? `. Current FTP: ${S.ftp} W.` : ''}</p>
-      ${t.est ? `<button class="btn primary" id="applyFtp" data-v="${Math.round(t.est)}">Set FTP to ${Math.round(t.est)} W</button>` : ''}</div>`;
+      ${tr.est ? `<h3>${t('Estimated FTP:')} <span style="color:var(--z5)">${Math.round(tr.est)} W</span> <span class="muted" style="font-size:14px">(${(tr.est / S.weight).toFixed(2)} W/kg)</span></h3>` : `<h3>${t('Test result')}</h3>`}
+      <p class="muted" style="margin:4px 0 10px;font-size:13.5px">${tr.how}${tr.est ? '. ' + t('Current FTP: {ftp} W.', { ftp: S.ftp }) : ''}</p>
+      ${tr.est ? `<button class="btn primary" id="applyFtp" data-v="${Math.round(tr.est)}">${t('Set FTP to {w} W', { w: Math.round(tr.est) })}</button>` : ''}</div>`;
   }
-  const m = openModal(`<h2>Ride complete ${r.completed ? '🎉' : ''}</h2><p class="muted" style="margin:4px 0 10px">${esc(r.name)}</p>
+  const m = openModal(`<h2>${t('Ride complete')} ${r.completed ? '🎉' : ''}</h2><p class="muted" style="margin:4px 0 10px">${esc(r.name)}</p>
     <div class="hist" style="padding:0"><div class="mini" style="height:70px">${rideSVG(r, 600, 70)}</div></div>
     <div class="statsrow sumstats">
-      <div class="card stat"><div class="k">Time</div><div class="v num">${fmtTime(r.dur)}</div></div>
-      <div class="card stat"><div class="k">Avg / NP</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
+      <div class="card stat"><div class="k">${t('Time')}</div><div class="v num">${fmtTime(r.dur)}</div></div>
+      <div class="card stat"><div class="k">${t('Avg / NP')}</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
       <div class="card stat"><div class="k">TSS · IF</div><div class="v num">${r.tss}<small>· ${r.IF}</small></div></div>
-      <div class="card stat"><div class="k">Energy (est.)</div><div class="v num">${rideKcalText(r)}<small>kcal · ${r.kj} kJ</small></div></div>
-      <div class="card stat"><div class="k">Max power</div><div class="v num">${r.maxP}<small>W</small></div></div>
-      <div class="card stat"><div class="k">Avg HR</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
-      <div class="card stat"><div class="k">Avg cadence</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>
-      <div class="card stat"><div class="k">Distance</div><div class="v num">${(r.dist / 1000).toFixed(1)}<small>km</small></div></div>
+      <div class="card stat"><div class="k">${t('Energy (est.)')}</div><div class="v num">${rideKcalText(r)}<small>kcal · ${r.kj} kJ</small></div></div>
+      <div class="card stat"><div class="k">${t('Max power')}</div><div class="v num">${r.maxP}<small>W</small></div></div>
+      <div class="card stat"><div class="k">${t('Avg HR')}</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
+      <div class="card stat"><div class="k">${t('Avg cadence')}</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>
+      <div class="card stat"><div class="k">${t('Distance')}</div><div class="v num">${(r.dist / 1000).toFixed(1)}<small>km</small></div></div>
     </div>${ftpHtml}
-    <div class="row" style="margin-top:14px">${stv.connected ? '<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Upload to Strava</button>' : ''}<button class="btn primary" id="sumAna">Analyse ride</button><button class="btn" id="sumTcx">Download TCX</button><button class="btn" id="sumClose">Close</button></div>
-    <p id="sumStvStatus" class="muted" style="font-size:13.5px;margin:10px 0 0">${stv.connected ? '' : 'Tip: connect Strava in Settings to upload rides automatically.'}</p>`, true);
+    <div class="row" style="margin-top:14px">${stv.connected ? `<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">${t('Upload to Strava')}</button>` : ''}<button class="btn primary" id="sumAna">${t('Analyse ride')}</button><button class="btn" id="sumTcx">${t('Download TCX')}</button><button class="btn" id="sumClose">${t('Close')}</button></div>
+    <p id="sumStvStatus" class="muted" style="font-size:13.5px;margin:10px 0 0">${stv.connected ? '' : t('Tip: connect Strava in Settings to upload rides automatically.')}</p>`, true);
   const sb = $('#sumStv', m), ss = $('#sumStvStatus', m);
   if (sb) {
     const upl = () => {
       sb.disabled = true;
       uploadToStrava(r, ss).then(() => sb.remove(), () => {
-        if (!stv.connected) { sb.disabled = false; sb.textContent = 'Reconnect Strava'; sb.onclick = () => { closeModal(); go('settings'); }; ss.innerHTML += '<br>The ride is saved: upload it later from History.'; }
-        else { sb.disabled = false; sb.textContent = 'Retry Strava upload'; }
+        if (!stv.connected) { sb.disabled = false; sb.textContent = t('Reconnect Strava'); sb.onclick = () => { closeModal(); go('settings'); }; ss.innerHTML += '<br>' + t('The ride is saved: upload it later from History.'); }
+        else { sb.disabled = false; sb.textContent = t('Retry Strava upload'); }
       });
     };
     sb.onclick = upl;
     const autoOk = r.dur >= 120 && r.avgP > 0;
-    if (S.stravaAuto !== false && !(stvOf(r) && stvOf(r).id)) { if (autoOk) upl(); else ss.textContent = 'Short or empty ride: not uploaded automatically.'; }
+    if (S.stravaAuto !== false && !(stvOf(r) && stvOf(r).id)) { if (autoOk) upl(); else ss.textContent = t('Short or empty ride: not uploaded automatically.'); }
   }
   $('#sumTcx', m).onclick = () => download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml');
   $('#sumClose', m).onclick = closeModal;
   $('#sumAna', m).onclick = () => { closeModal(); openRideAnalysis(r.id, r); };
-  const af = $('#applyFtp', m); if (af) af.onclick = () => { S.ftp = +af.dataset.v; saveSettings(); renderSettings(); refreshLibraries(); buildGauges(); toast(`FTP set to ${S.ftp} W`); af.disabled = true; };
+  const af = $('#applyFtp', m); if (af) af.onclick = () => { S.ftp = +af.dataset.v; saveSettings(); renderSettings(); refreshLibraries(); buildGauges(); toast(t('FTP set to {ftp} W', { ftp: S.ftp })); af.disabled = true; };
 }
 
 /* =====================================================================
@@ -2291,11 +2297,11 @@ const stv = {
   get connected() { if (cloud.on) return !!(cloud.stv && cloud.stv.connected); const t = this.tok(); return !!(t && t.refresh_token); },
   redirectUri() { return location.origin + location.pathname; },
   connect() {
-    if (rideInProgress()) { toast('Finish or end your ride before connecting Strava'); return; }
+    if (rideInProgress()) { toast(t('Finish or end your ride before connecting Strava')); return; }
     const a = cloud.on ? { clientId: String((cloud.stv && cloud.stv.client_id) || ''), secret: 'server' } : this.app();
-    if (!/^\d+$/.test(a.clientId)) { toast(cloud.on ? 'Strava is not set up on the server yet (STRAVA_CLIENT_ID missing)' : 'Enter your Strava Client ID first'); return; }
-    if (!a.secret && !a.relay) { toast('Enter your Client Secret (or a token relay URL)'); return; }
-    if (!/^https?:$/.test(location.protocol)) { toast('Strava login needs the app opened from an http(s) address, not a local file', 6000); return; }
+    if (!/^\d+$/.test(a.clientId)) { toast(cloud.on ? t('Strava is not set up on the server yet (STRAVA_CLIENT_ID missing)') : t('Enter your Strava Client ID first')); return; }
+    if (!a.secret && !a.relay) { toast(t('Enter your Client Secret (or a token relay URL)')); return; }
+    if (!/^https?:$/.test(location.protocol)) { toast(t('Strava login needs the app opened from an http(s) address, not a local file'), 6000); return; }
     const state = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
     store('erglab.stvState', { v: state, at: Date.now() });
     const q = new URLSearchParams({ client_id: a.clientId, redirect_uri: this.redirectUri(), response_type: 'code', approval_prompt: 'auto', scope: 'read,activity:write', state });
@@ -2308,16 +2314,16 @@ const stv = {
     if (a.relay) url = a.relay + '/token'; else body.set('client_secret', a.secret);
     let r;
     try { r = await fetch(url, { method: 'POST', body }); }
-    catch { throw new Error(a.relay ? 'Token relay unreachable' : 'Network error talking to Strava'); }
+    catch { throw new Error(a.relay ? t('Token relay unreachable') : t('Network error talking to Strava')); }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) {
       const appErr = Array.isArray(j.errors) && j.errors.some(x => /Application/i.test(x.resource || '') || /client_(id|secret)/i.test(x.field || ''));
       const msg = r.status === 409 && j.message ? j.message
-        : appErr ? (a.relay ? 'Strava rejected the relay\'s app credentials (check the relay setup)' : 'Strava rejected this Client ID / Client Secret. Check Settings › Strava.')
-        : (r.status === 400 || r.status === 401) ? 'Strava rejected the authorization' : (j.message || `Strava token error ${r.status}`);
+        : appErr ? (a.relay ? t('Strava rejected the relay\'s app credentials (check the relay setup)') : t('Strava rejected this Client ID / Client Secret. Check Settings › Strava.'))
+        : (r.status === 400 || r.status === 401) ? t('Strava rejected the authorization') : (j.message || t('Strava token error {status}', { status: r.status }));
       const e = new Error(msg); e.status = r.status; e.body = j; e.appErr = appErr; throw e;
     }
-    if (!j.access_token) throw new Error('Strava returned no access token');
+    if (!j.access_token) throw new Error(t('Strava returned no access token'));
     return j;
   },
   gen: 0,
@@ -2334,29 +2340,29 @@ const stv = {
     const expected = load('erglab.stvState', null);
     try { localStorage.removeItem('erglab.stvState'); } catch { }
     try { history.replaceState(null, '', location.pathname + '#settings'); } catch { }
-    if (!expected || expected.v !== q.get('state') || Date.now() - expected.at > 30 * 60000) { toast('Strava login could not be verified. Please try again.', 6000); return true; }
-    if (q.get('error')) { toast('Strava connection cancelled'); return true; }
-    if (!/activity:write/.test(q.get('scope') || '')) { toast('Strava: tick "Upload your activities" on the Strava permission screen, then connect again.', 8000); return true; }
+    if (!expected || expected.v !== q.get('state') || Date.now() - expected.at > 30 * 60000) { toast(t('Strava login could not be verified. Please try again.'), 6000); return true; }
+    if (q.get('error')) { toast(t('Strava connection cancelled')); return true; }
+    if (!/activity:write/.test(q.get('scope') || '')) { toast(t('Strava: tick "Upload your activities" on the Strava permission screen, then connect again.'), 8000); return true; }
     try {
       if (cloud.on) {
-        if (!cloud.user) throw new Error('Sign in first, then connect Strava again');
+        if (!cloud.user) throw new Error(t('Sign in first, then connect Strava again'));
         const j = await cloud.fn('/exchange', { method: 'POST', json: { code: q.get('code'), scope: q.get('scope') || '' } });
-        await cloud.stravaStatus(); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+        await cloud.stravaStatus(); toast(j.athlete && j.athlete.firstname ? t('Connected to Strava as {name}', { name: j.athlete.firstname }) : t('Connected to Strava'));
       } else {
         const j = await this.tokenCall({ code: q.get('code'), grant_type: 'authorization_code' });
-        this.save(j); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+        this.save(j); toast(j.athlete && j.athlete.firstname ? t('Connected to Strava as {name}', { name: j.athlete.firstname }) : t('Connected to Strava'));
       }
-    } catch (e) { toast('Strava: ' + e.message, 7000); }
+    } catch (e) { toast(t('Strava: {msg}', { msg: t(e.message) }), 7000); }
     renderStrava(); return true;
   },
   async token(force) {
-    const t = this.tok(); if (!t || !t.refresh_token) throw new Error('Not connected to Strava');
-    if (!force && t.access_token && t.expires_at * 1000 - Date.now() > 5 * 60000) return t.access_token;
+    const tk = this.tok(); if (!tk || !tk.refresh_token) throw new Error(t('Not connected to Strava'));
+    if (!force && tk.access_token && tk.expires_at * 1000 - Date.now() > 5 * 60000) return tk.access_token;
     // Strava rotates refresh tokens: refresh once at a time (also across tabs) and re-read what another refresh stored
     if (!this._refreshing) {
       const gen = this.gen;
       const doRefresh = async () => {
-        const cur = this.tok(); if (!cur || !cur.refresh_token) throw new Error('Not connected to Strava');
+        const cur = this.tok(); if (!cur || !cur.refresh_token) throw new Error(t('Not connected to Strava'));
         if (!force && cur.expires_at * 1000 - Date.now() > 5 * 60000) return cur.access_token; // another tab already refreshed
         try { const j = await this.tokenCall({ grant_type: 'refresh_token', refresh_token: cur.refresh_token }); this.save(j, gen); return j.access_token; }
         catch (e) {
@@ -2364,7 +2370,7 @@ const stv = {
           if (now && now.refresh_token !== cur.refresh_token && now.access_token) return now.access_token;
           if ((e.status === 400 || e.status === 401) && !e.appErr && now && now.refresh_token === cur.refresh_token) {
             try { localStorage.removeItem('erglab.strava'); } catch { } renderStrava();
-            throw new Error('Strava access expired or was revoked. Reconnect in Settings.');
+            throw new Error(t('Strava access expired or was revoked. Reconnect in Settings.'));
           }
           throw e;
         }
@@ -2378,18 +2384,18 @@ const stv = {
     const tk = await this.token(retried);
     let r;
     try { r = await fetch(STV_API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: 'Bearer ' + tk } }); }
-    catch { throw new Error('Network error talking to Strava'); }
+    catch { throw new Error(t('Network error talking to Strava')); }
     if (r.status === 401 && !retried) return this.api(path, opts, true);
-    if (r.status === 429) throw new Error('Strava rate limit reached. Try again in 15 minutes.');
+    if (r.status === 429) throw new Error(t('Strava rate limit reached. Try again in 15 minutes.'));
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) { const e = new Error(stvErr(j) || `Strava error ${r.status}`); e.status = r.status; e.body = j; throw e; }
+    if (!r.ok) { const e = new Error(stvErr(j) || t('Strava error {status}', { status: r.status })); e.status = r.status; e.body = j; throw e; }
     return j;
   },
   async poll(id, onStatus) {
     const waits = [1, 1.5, 2, 3, 4, 5, 6, 8, 10, 13];
     let up = null;
     for (const w of waits) {
-      onStatus('Strava is processing…');
+      onStatus(t('Strava is processing…'));
       await new Promise(r => setTimeout(r, w * 1000));
       try { up = await this.api('/uploads/' + id); }
       catch (e) { if (e.status === 404) return { gone: true }; return { pending: true, upload: id }; }
@@ -2405,8 +2411,8 @@ const stv = {
       const res = await this.poll(prev.upload, onStatus);
       if (res.activity_id || res.pending) return res;
     }
-    if (!ride.p || !ride.p.length) throw new Error('Only a summary is stored for this ride (no per-second data)');
-    onStatus('Uploading to Strava…');
+    if (!ride.p || !ride.p.length) throw new Error(t('Only a summary is stored for this ride (no per-second data)'));
+    onStatus(t('Uploading to Strava…'));
     let blob = new Blob([toTCX(ride)], { type: 'application/xml' }), type = 'tcx';
     const base = `erglab-${ride.id}.tcx`;
     if (window.CompressionStream) { try { blob = await new Response(blob.stream().pipeThrough(new CompressionStream('gzip'))).blob(); type = 'tcx.gz'; } catch { } }
@@ -2432,8 +2438,8 @@ const stv = {
   },
   async disconnect() {
     if (cloud.on) {
-      try { const j = await cloud.fn('/disconnect', { method: 'POST' }); toast(j.revoked ? 'Disconnected: BTB access removed from your Strava account' : 'Disconnected. To be sure, also remove the app under Strava › Settings › My Apps.', 6000); }
-      catch (e) { toast('Strava: ' + e.message, 6000); }
+      try { const j = await cloud.fn('/disconnect', { method: 'POST' }); toast(j.revoked ? t('Disconnected: BTB access removed from your Strava account') : t('Disconnected. To be sure, also remove the app under Strava › Settings › My Apps.'), 6000); }
+      catch (e) { toast(t('Strava: {msg}', { msg: t(e.message) }), 6000); }
       await cloud.stravaStatus(); renderStrava(); return;
     }
     let tk = null, ok = false;
@@ -2442,7 +2448,7 @@ const stv = {
     if (tk) { try { const r = await fetch('https://www.strava.com/oauth/deauthorize', { method: 'POST', body: new URLSearchParams({ access_token: tk }) }); ok = r.ok; } catch { } }
     try { localStorage.removeItem('erglab.strava'); } catch { }
     renderStrava();
-    toast(ok ? 'Disconnected: BTB access removed from your Strava account' : 'Disconnected here. To fully revoke, remove the app under Strava › Settings › My Apps.', 6000);
+    toast(ok ? t('Disconnected: BTB access removed from your Strava account') : t('Disconnected here. To fully revoke, remove the app under Strava › Settings › My Apps.'), 6000);
   },
 };
 function stvErr(j) {
@@ -2452,16 +2458,16 @@ function stvErr(j) {
 }
 function dupId(msg) { const m = /duplicate of (?:<a[^>]*>)?activity (\d+)/i.exec(String(msg || '')) || /duplicate of .*?activities\/(\d+)/i.exec(String(msg || '')); return m ? m[1] : null; }
 function rideDescription(r) {
-  const parts = [`${r.name}${r.completed ? '' : ' (partial)'}`, `NP ${r.np} W · avg ${r.avgP} W · IF ${r.IF} · TSS ${r.tss} · ${r.kj} kJ`];
-  if (r.avgHr) parts.push(`HR avg ${r.avgHr}${r.maxHr ? ' / max ' + r.maxHr : ''} bpm`);
-  if (r.avgC) parts.push(`Cadence avg ${r.avgC} rpm`);
-  parts.push(`FTP ${r.ftp} W · ridden in ERG mode with BTB`);
+  const parts = [`${r.name}${r.completed ? '' : ' ' + t('(partial)')}`, t('NP {np} W · avg {avg} W · IF {if} · TSS {tss} · {kj} kJ', { np: r.np, avg: r.avgP, if: r.IF, tss: r.tss, kj: r.kj })];
+  if (r.avgHr) parts.push(r.maxHr ? t('HR avg {avg} / max {max} bpm', { avg: r.avgHr, max: r.maxHr }) : t('HR avg {avg} bpm', { avg: r.avgHr }));
+  if (r.avgC) parts.push(t('Cadence avg {avg} rpm', { avg: r.avgC }));
+  parts.push(t('FTP {ftp} W · ridden in ERG mode with BTB', { ftp: r.ftp }));
   return parts.join('\n');
 }
 function stvOf(r) { const m = load('erglab.stravaIds', {}); return m[r.id] || r.strava || null; }
 function setRideStrava(id, info) {
   const m = load('erglab.stravaIds', {}); m[id] = info;
-  if (!store('erglab.stravaIds', m)) toast('Storage full: could not remember the Strava upload', 5000);
+  if (!store('erglab.stravaIds', m)) toast(t('Storage full: could not remember the Strava upload'), 5000);
   cloud.setStrava(id, info);
 }
 const stvLink = id => `https://www.strava.com/activities/${encodeURIComponent(id)}`;
@@ -2474,47 +2480,47 @@ async function uploadToStrava(ride, statusEl) {
   try {
     ride = await rideFull(ride);
     const res = await stv.upload(ride, msg => say(esc(msg)));
-    if (res.pending) { say('Uploaded. Strava is still processing it; it will appear in your feed shortly (History shows the link once it is ready).', 'var(--ok)'); setRideStrava(ride.id, { pending: true, upload: res.upload, at: Date.now() }); }
+    if (res.pending) { say(t('Uploaded. Strava is still processing it; it will appear in your feed shortly (History shows the link once it is ready).'), 'var(--ok)'); setRideStrava(ride.id, { pending: true, upload: res.upload, at: Date.now() }); }
     else {
       setRideStrava(ride.id, { id: res.activity_id, at: Date.now() });
-      say(`${res.duplicate ? 'Already on Strava' : 'Uploaded to Strava'}: <a href="${stvLink(res.activity_id)}" target="_blank" rel="noopener" style="color:#fc4c02;font-weight:700">View activity →</a>`, 'var(--ok)');
-      if (!statusEl || !statusEl.isConnected) toast(res.duplicate ? 'Ride was already on Strava' : 'Ride uploaded to Strava');
+      say(`${res.duplicate ? t('Already on Strava') : t('Uploaded to Strava')}: <a href="${stvLink(res.activity_id)}" target="_blank" rel="noopener" style="color:#fc4c02;font-weight:700">${t('View activity →')}</a>`, 'var(--ok)');
+      if (!statusEl || !statusEl.isConnected) toast(res.duplicate ? t('Ride was already on Strava') : t('Ride uploaded to Strava'));
     }
   } catch (e) {
-    say('Strava upload failed: ' + esc(e.message), 'var(--bad)');
-    if (!statusEl || !statusEl.isConnected) toast('Strava upload failed: ' + e.message, 6000);
+    say(t('Strava upload failed: {msg}', { msg: esc(t(e.message)) }), 'var(--bad)');
+    if (!statusEl || !statusEl.isConnected) toast(t('Strava upload failed: {msg}', { msg: t(e.message) }), 6000);
     throw e;
   } finally { stvBusy.delete(ride.id); renderHistory(); }
 }
 function renderStrava() {
   const on = stv.connected, a = stv.app();
-  const t = cloud.on ? { athlete: cloud.stv && cloud.stv.athlete } : stv.tok();
+  const tt = cloud.on ? { athlete: cloud.stv && cloud.stv.athlete } : stv.tok();
   $('#stvLocal').classList.toggle('hidden', cloud.on);
   $('#stvOn').classList.toggle('hidden', !on);
   $('#stvSetup').classList.toggle('hidden', on);
-  const b = $('#stvBadge'); b.textContent = on ? 'connected' : 'not connected'; b.style.color = on ? '#fc4c02' : 'var(--dim)';
-  if (on) $('#stvWho').textContent = t.athlete ? `${t.athlete.firstname || ''} ${t.athlete.lastname || ''}`.trim() || 'athlete ' + t.athlete.id : 'your Strava account';
-  $('#stvDomain').textContent = /^https?:$/.test(location.protocol) ? location.hostname : '(open the app from its web address first)';
+  const b = $('#stvBadge'); b.textContent = on ? t('connected') : t('not connected'); b.style.color = on ? '#fc4c02' : 'var(--dim)';
+  if (on) $('#stvWho').textContent = tt.athlete ? `${tt.athlete.firstname || ''} ${tt.athlete.lastname || ''}`.trim() || t('athlete {id}', { id: tt.athlete.id }) : t('your Strava account');
+  $('#stvDomain').textContent = /^https?:$/.test(location.protocol) ? location.hostname : t('(open the app from its web address first)');
   if (document.activeElement !== $('#stvId')) $('#stvId').value = load('erglab.stravaApp', {}).clientId || '';
   if (document.activeElement !== $('#stvRelay')) $('#stvRelay').value = load('erglab.stravaApp', {}).relay || '';
-  $('#stvSecret').placeholder = load('erglab.stravaApp', {}).secret ? '•••••••• (saved)' : (STRAVA_APP.clientSecret ? 'provided by this site' : '40-character secret');
-  if (STRAVA_APP.clientId && !load('erglab.stravaApp', {}).clientId) $('#stvId').placeholder = STRAVA_APP.clientId + ' (provided by this site)';
+  $('#stvSecret').placeholder = load('erglab.stravaApp', {}).secret ? t('•••••••• (saved)') : (STRAVA_APP.clientSecret ? t('provided by this site') : t('40-character secret'));
+  if (STRAVA_APP.clientId && !load('erglab.stravaApp', {}).clientId) $('#stvId').placeholder = t('{id} (provided by this site)', { id: STRAVA_APP.clientId });
   $('#stvAuto').value = S.stravaAuto === false ? '0' : '1';
   $('#stvSport').value = S.stravaSport || 'VirtualRide';
-  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? 'Needs the app opened from an http(s) address.' : cloud.on ? (cloud.stv ? '' : 'Checking Strava status…') : (a.clientId && (a.secret || a.relay)) ? '' : 'Fill in the fields above first.';
+  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? t('Needs the app opened from an http(s) address.') : cloud.on ? (cloud.stv ? '' : t('Checking Strava status…')) : (a.clientId && (a.secret || a.relay)) ? '' : t('Fill in the fields above first.');
 }
 function bindStrava() {
   const saveApp = () => {
     const cur = load('erglab.stravaApp', {});
     const id = $('#stvId').value.trim(), sec = $('#stvSecret').value.trim(), relay = $('#stvRelay').value.trim();
-    if (relay && !/^https:\/\//i.test(relay) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\b/i.test(relay)) { toast('The relay URL must start with https://'); return false; }
+    if (relay && !/^https:\/\//i.test(relay) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\b/i.test(relay)) { toast(t('The relay URL must start with https://')); return false; }
     store('erglab.stravaApp', { clientId: id, secret: sec || cur.secret || '', relay });
     if (sec) $('#stvSecret').value = '';
     renderStrava(); return true;
   };
   ['#stvId', '#stvSecret', '#stvRelay'].forEach(s => $(s).addEventListener('change', saveApp));
   $('#stvConnect').onclick = () => { if (saveApp() !== false) stv.connect(); };
-  $('#stvOff').onclick = () => { if (confirm('Disconnect from Strava? Rides already uploaded stay on Strava.')) stv.disconnect(); };
+  $('#stvOff').onclick = () => { if (confirm(t('Disconnect from Strava? Rides already uploaded stay on Strava.'))) stv.disconnect(); };
   $('#stvAuto').onchange = e => { S.stravaAuto = e.target.value === '1'; saveSettings(); };
   $('#stvSport').onchange = e => { S.stravaSport = e.target.value; saveSettings(); };
 }
@@ -2529,6 +2535,7 @@ function applySettings(o) {
   for (const k of Object.keys(DEFAULTS)) { const v = o[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v; }
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
+  if (!['', 'en', 'fr'].includes(S.lang)) S.lang = '';
   if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
   const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
   if (!(S.height >= 100 && S.height <= 250)) S.height = 0;
@@ -2565,7 +2572,7 @@ const cloud = {
     if (window.supabase && window.supabase.createClient) return Promise.resolve();
     return new Promise((res, rej) => {
       const s = document.createElement('script'); s.src = SUPABASE_JS.src; s.integrity = SUPABASE_JS.sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
-      s.onload = () => res(); s.onerror = () => rej(new Error('Could not load the sign-in library (offline?)'));
+      s.onload = () => res(); s.onerror = () => rej(new Error(t('Could not load the sign-in library (offline?)')));
       document.head.appendChild(s);
     });
   },
@@ -2590,9 +2597,9 @@ const cloud = {
       });
       const { data } = await this.sb.auth.getSession();
       if (fromLink) { try { history.replaceState(null, '', location.pathname + location.search + '#workouts'); } catch { } }
-      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast('Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.', 6000); }
-      else gate('email', linkErr ? 'That link has expired or was already used. Enter your email to get a sign-in code instead.' : undefined);
-    } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message || 'Cannot reach the server.'); }
+      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast(t('Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.'), 6000); }
+      else gate('email', linkErr ? t('That link has expired or was already used. Enter your email to get a sign-in code instead.') : undefined);
+    } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message ? t(e.message) : t('Cannot reach the server.')); }
   },
   async afterLogin() {
     // a different account than the one whose data is cached on this device → start clean
@@ -2601,37 +2608,37 @@ const cloud = {
     if (last && last !== this.user.id) {
       // another account used this device: keep its not-yet-uploaded rides aside for that account, then start clean
       const keep = unsynced.filter(r => !r.owner || r.owner === last);
-      if (keep.length && !store('erglab.pending.' + last, keep.concat(load('erglab.pending.' + last, []).filter(x => !keep.some(k => k.id === x.id))))) toast('Storage full: some rides of the previous account could not be kept', 6000);
+      if (keep.length && !store('erglab.pending.' + last, keep.concat(load('erglab.pending.' + last, []).filter(x => !keep.some(k => k.id === x.id))))) toast(t('Storage full: some rides of the previous account could not be kept'), 6000);
       wipeLocal(false, pendingIds()); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
-    } else if (!last && (localRides.length || CUSTOM.length) && !confirm(`This device has ${localRides.length} ride(s) and ${CUSTOM.length} custom workout(s) from before you signed in. Add them to ${this.user.email}?`)) {
+    } else if (!last && (localRides.length || CUSTOM.length) && !confirm(t('This device has {rides} ride(s) and {workouts} custom workout(s) from before you signed in. Add them to {email}?', { rides: localRides.length, workouts: CUSTOM.length, email: this.user.email }))) {
       wipeLocal(); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
     }
     store('erglab.lastUser', this.user.id);
     gate(null);
     $('#acctCard').classList.remove('hidden'); $('#acctEmail').textContent = this.user.email || '';
-    try { await this.pull(); } catch (e) { toast('Sync failed: ' + e.message, 5000); }
+    try { await this.pull(); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); }
     this.stravaStatus().then(renderStrava);
   },
   async sendCode(email) {
     const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-    if (error && /rate|seconds|too many/i.test(error.message)) throw new Error('Please wait a minute before asking for a new code.');
+    if (error && /rate|seconds|too many/i.test(error.message)) throw new Error(t('Please wait a minute before asking for a new code.'));
     if (error && !/signups? not allowed|not found|user/i.test(error.message)) throw new Error(error.message);
     // unknown addresses get the same answer as invited ones (no account enumeration)
   },
   async verify(email, code) {
     const { data, error } = await this.sb.auth.verifyOtp({ email, token: code, type: 'email' });
-    if (error || !data || !data.session) throw new Error(error && /expired|invalid/i.test(error.message) ? 'That code is wrong or expired.' : (error ? error.message : 'Sign-in failed'));
+    if (error || !data || !data.session) throw new Error(error && /expired|invalid/i.test(error.message) ? t('That code is wrong or expired.') : (error ? error.message : t('Sign-in failed')));
     this.user = data.session.user; await this.afterLogin();
   },
   async signOut() {
-    if (rideInProgress() && !confirm('A ride is in progress. Sign out anyway?')) return;
+    if (rideInProgress() && !confirm(t('A ride is in progress. Sign out anyway?'))) return;
     this._leaving = true;
     if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
     try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
     await wipeLocal(true); // nothing personal stays on this device
     location.replace(location.pathname);
   },
-  async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error('Signed out'); return data.session; },
+  async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error(t('Signed out')); return data.session; },
   profile() {
     const settings = {}; for (const k of Object.keys(DEFAULTS)) settings[k] = S[k]; settings.wlog = S.wlog;
     if (S.stravaSport) settings.stravaSport = S.stravaSport; if (typeof S.stravaAuto === 'boolean') settings.stravaAuto = S.stravaAuto;
@@ -2715,7 +2722,7 @@ const cloud = {
     storeHistory(merged);
     setTimeout(storageJobs, 300);
     afterSettings(); renderHistory(); renderPlans(); renderCustom();
-    if (unsynced.length) toast(`Synced ${unsynced.length} ride${unsynced.length > 1 ? 's' : ''} from this device to your cloud space`);
+    if (unsynced.length) toast(unsynced.length > 1 ? t('Synced {n} rides from this device to your cloud space', { n: unsynced.length }) : t('Synced {n} ride from this device to your cloud space', { n: unsynced.length }));
   },
   async fn(path, { method = 'GET', json, body } = {}) {
     const s = await this.session();
@@ -2723,10 +2730,10 @@ const cloud = {
     if (json !== undefined) { headers['Content-Type'] = 'application/json'; body = JSON.stringify(json); }
     let r;
     try { r = await fetch(`${CLOUD.url.replace(/\/+$/, '')}/functions/v1/strava${path}`, { method, headers, body }); }
-    catch { throw new Error('Network error talking to the BTB server'); }
+    catch { throw new Error(t('Network error talking to the BTB server')); }
     const j = await r.json().catch(() => ({}));
     if (r.status === 409) { this.stravaStatus().then(renderStrava); }
-    if (!r.ok) { const e = new Error(j.message || stvErr(j) || `Server error ${r.status}`); e.status = r.status; e.body = j; throw e; }
+    if (!r.ok) { const e = new Error(j.message || stvErr(j) || t('Server error {status}', { status: r.status })); e.status = r.status; e.body = j; throw e; }
     return j;
   },
   async stravaStatus() { if (!this.user) return null; try { this.stv = await this.fn('/status'); } catch (e) { console.warn('strava status', e); this.stv = this.stv || null; } return this.stv; },
@@ -2740,7 +2747,7 @@ function gate(mode, msg) {
   $('#gateEmailF').classList.toggle('hidden', mode !== 'email');
   $('#gateCodeF').classList.toggle('hidden', mode !== 'code');
   $('#gateOffline').classList.toggle('hidden', mode !== 'offline');
-  $('#gateMsg').textContent = msg || { loading: 'Connecting…', email: 'Enter the email address you were invited with.', code: `If ${gateEmail} is invited, a sign-in code is on its way. Check your inbox (and spam).`, offline: 'Cannot reach the server.' }[mode];
+  $('#gateMsg').textContent = msg || { loading: t('Connecting…'), email: t('Enter the email address you were invited with.'), code: t('If {email} is invited, a sign-in code is on its way. Check your inbox (and spam).', { email: gateEmail }), offline: t('Cannot reach the server.') }[mode];
   $('#gateMsg').style.color = '';
   setTimeout(() => { const f = mode === 'email' ? $('#gateEmail') : mode === 'code' ? $('#gateCode') : null; try { f && f.focus(); } catch { } }, 50);
 }
@@ -2748,20 +2755,20 @@ function bindCloud() {
   const err = m => { $('#gateMsg').textContent = m; $('#gateMsg').style.color = 'var(--bad)'; };
   $('#gateEmailF').onsubmit = async e => {
     e.preventDefault(); const em = $('#gateEmail').value.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return err('Enter a valid email address.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return err(t('Enter a valid email address.'));
     $('#gateSend').disabled = true;
-    try { await cloud.sendCode(em); gateEmail = em; gate('code'); } catch (x) { err(x.message); } finally { $('#gateSend').disabled = false; }
+    try { await cloud.sendCode(em); gateEmail = em; gate('code'); } catch (x) { err(t(x.message)); } finally { $('#gateSend').disabled = false; }
   };
   $('#gateCodeF').onsubmit = async e => {
     e.preventDefault(); const code = $('#gateCode').value.replace(/\D/g, '');
-    if (code.length < 6) return err('Enter the code from the email.');
+    if (code.length < 6) return err(t('Enter the code from the email.'));
     $('#gateVerify').disabled = true;
-    try { await cloud.verify(gateEmail, code); $('#gateCode').value = ''; } catch (x) { err(x.message); } finally { $('#gateVerify').disabled = false; }
+    try { await cloud.verify(gateEmail, code); $('#gateCode').value = ''; } catch (x) { err(t(x.message)); } finally { $('#gateVerify').disabled = false; }
   };
   $('#gateBack').onclick = () => gate('email');
-  $('#gateOfflineBtn').onclick = () => { gate(null); toast('Offline: rides are kept on this device and sync after you sign in.', 6000); };
-  $('#acctOut').onclick = () => { if (confirm('Sign out? Data on this device is removed; it stays in your cloud space.')) cloud.signOut(); };
-  $('#acctSync').onclick = async () => { try { await cloud.pull(); toast('Synced'); } catch (e) { toast('Sync failed: ' + e.message, 5000); } };
+  $('#gateOfflineBtn').onclick = () => { gate(null); toast(t('Offline: rides are kept on this device and sync after you sign in.'), 6000); };
+  $('#acctOut').onclick = () => { if (confirm(t('Sign out? Data on this device is removed; it stays in your cloud space.'))) cloud.signOut(); };
+  $('#acctSync').onclick = async () => { try { await cloud.pull(); toast(t('Synced')); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); } };
   window.addEventListener('online', () => { if (cloud.user) cloud.pull().catch(() => { }); });
 }
 
@@ -2774,20 +2781,21 @@ function renderAntCard() {
 }
 function renderSettings() {
   renderAntCard();
-  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme;
+  $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang;
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
-  $('#sAgeHint').textContent = age ? `Age ${age}` : '';
-  $('#sMaxHrHint').textContent = age ? `Used for heart-rate zones. Age-based estimate: ${Math.round(208 - 0.7 * age)} bpm (Tanaka); a measured max is better.` : 'Used for heart-rate zones.';
+  $('#sAgeHint').textContent = age ? t('Age {n}', { n: age }) : '';
+  $('#sMaxHrHint').textContent = age ? t('Used for heart-rate zones. Age-based estimate: {bpm} bpm (Tanaka); a measured max is better.', { bpm: Math.round(208 - 0.7 * age) }) : t('Used for heart-rate zones.');
   $('#sSmooth').value = S.smooth; $('#sAutoPause').value = S.autoPause ? '1' : '0'; $('#sSound').value = S.sound ? '1' : '0';
   $('#sSprintGrade').value = S.sprintGrade; $('#sSoftStart').value = S.softStart;
-  $('#sWkgHint').textContent = `FTP = ${(S.ftp / S.weight).toFixed(2)} W/kg`;
+  $('#sWkgHint').textContent = `FTP = ${tn(S.ftp / S.weight, 2)} W/kg`;
   $('#zoneTable').innerHTML = PZ.map(z => `<div style="background:${z.col}">${z.n}<span>${z.hi > 5 ? `> ${Math.round(z.lo * S.ftp)}` : `${Math.round(z.lo * S.ftp)}–${Math.round(z.hi * S.ftp)}`} W</span></div>`).join('');
 }
 function bindSettings() {
   const num = (id, key, lo, hi) => $(id).addEventListener('change', e => { const v = +e.target.value; if (isFinite(v) && v >= lo && v <= hi) { S[key] = v; saveSettings(); afterSettings(); } else e.target.value = S[key]; });
   num('#sFtp', 'ftp', 50, 700); num('#sWeight', 'weight', 25, 250); num('#sMaxHr', 'maxHr', 100, 240); num('#sRestHr', 'restHr', 25, 120);
   num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60); num('#sWprime', 'wprime', 5000, 60000);
+  $('#sLang').onchange = e => { S.lang = e.target.value; saveSettings(); langCheck(true); };
   $('#sTheme').onchange = e => { S.theme = e.target.value; saveSettings(); afterSettings(); renderHistory(); };
   $('#sWeight').addEventListener('change', () => { if (+$('#sWeight').value === S.weight) { const t = todayKey(), e = S.wlog.find(x => x.d === t); if (!e || e.kg !== S.weight) addWeightLog(t, S.weight, e && e.rhr); } });
   const opt = (id, key, ok, conv = v => v) => $(id).addEventListener('change', e => { const v = conv(e.target.value); if (ok(v)) { S[key] = v; saveSettings(); afterSettings(); } else renderSettings(); });
@@ -2799,7 +2807,7 @@ function bindSettings() {
   $('#sSmooth').onchange = e => { S.smooth = +e.target.value; saveSettings(); };
   $('#sAutoPause').onchange = e => { S.autoPause = e.target.value === '1'; saveSettings(); };
   $('#sSound').onchange = e => { S.sound = e.target.value === '1'; saveSettings(); };
-  $('#sReset').onclick = () => { if (confirm('Reset rider settings to defaults? (Your weight log is kept.)')) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
+  $('#sReset').onclick = () => { if (confirm(t('Reset rider settings to defaults? (Your weight log is kept.)'))) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
   $('#sExport').onclick = async () => {
     const history = [];
     for (const r of load('erglab.history', [])) { const st = r.p ? null : await sdb.get(r.id); const { hs, noData, ...x } = r; history.push(st ? { ...x, ...st } : x); }
@@ -2820,21 +2828,27 @@ function bindSettings() {
         Promise.all(ups).then(ids => { const ok = new Set(ids.filter(Boolean)); if (ok.size) { const h = load('erglab.history', []); h.forEach(x => { if (ok.has(x.id)) x.cloud = true; }); storeHistory(h); } setTimeout(storageJobs, 300); });
       }
       if (j.plandone && typeof j.plandone === 'object') { store('erglab.plandone', cleanPlanDone(j.plandone)); cloud.schedulePush(); }
-      afterSettings(); renderHistory(); toast('Backup restored');
-    } catch (err) { toast('Restore failed: ' + err.message); }
+      afterSettings(); renderHistory(); toast(t('Backup restored'));
+    } catch (err) { toast(t('Restore failed: {msg}', { msg: t(err.message) })); }
   };
 }
 function setTheme() { if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon'); }
-function afterSettings() { setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
+// the interface language is fixed for the page's lifetime: switch by reloading (never in the middle of a ride)
+function langCheck(asked) {
+  if (resolveLang(S.lang) === LANG || (load('erglab.settings', {}).lang || '') !== S.lang) return; // unchanged, or not stored (no reload loop)
+  if (rideInProgress()) { if (asked) toast(t('The new language applies after your ride.')); return; }
+  location.reload();
+}
+function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLibraries(); if (R.w) { buildGauges(); renderRide(true); } if ($('#v-progress').classList.contains('on')) renderProgress(); }
 
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
   const pt = $('#pillTrainer'); pt.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[trainer.status] || '');
-  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · power data only'} (tap to disconnect)` : `Connect your smart trainer (Bluetooth${antUsable() ? ' or ANT+' : ''})`;
+  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · ' + t('power data only')} ${t('(tap to disconnect)')}` : antUsable() ? t('Connect your smart trainer (Bluetooth or ANT+)') : t('Connect your smart trainer (Bluetooth)');
   const small = matchMedia('(max-width:860px)').matches;
-  $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? 'Trainer' : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? 'Connecting…' : trainer.status === 'reconnecting' ? 'Reconnecting…' : small ? 'Trainer' : 'Connect trainer';
+  $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? t('Trainer') : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? t('Connecting…') : trainer.status === 'reconnecting' ? t('Reconnecting…') : small ? t('Trainer') : t('Connect trainer');
   const ph = $('#pillHr'); ph.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[hrm.status] || '');
-  $('#lblHr').textContent = hrm.status === 'connected' ? (small ? 'HR' : hrm.name) : hrm.status === 'idle' || hrm.status === 'error' ? (small ? 'HR' : 'Connect HR') : 'HR…';
+  $('#lblHr').textContent = hrm.status === 'connected' ? (small ? t('HR') : hrm.name) : hrm.status === 'idle' || hrm.status === 'error' ? (small ? t('HR') : t('Connect HR')) : t('HR…');
   const cb = $('#rideConnect'); if (cb) cb.classList.toggle('hidden', trainer.connected || sim.on);
   $('#pillSim').className = 'pill ' + (sim.on ? 'sim' : '');
 }
@@ -2846,22 +2860,22 @@ function renderInstall() {
   card.classList.remove('hidden');
   const on = isStandalone();
   $('#installBadge').classList.toggle('hidden', !on);
-  const code = 'Sign in there once with the <b>code</b> from the email (don\'t tap the email link: it opens the browser, not the app).';
+  const code = t('Sign in there once with the <b>code</b> from the email (don\'t tap the email link: it opens the browser, not the app).');
   let html;
   if (on) html = isIOS
-    ? `<p style="margin:0">You're using BTB from your home screen.${cloud.on ? ' Workouts, plans, rides and Strava sync with your account.' : ''} Apple doesn't allow Bluetooth here, so to <b>ride</b> open BTB in <b>Bluefy</b>.</p>`
-    : `<p style="margin:0">You're using BTB as an installed app. Bluetooth works here as in the browser.</p>`;
+    ? `<p style="margin:0">${t('You\'re using BTB from your home screen.')}${cloud.on ? ' ' + t('Workouts, plans, rides and Strava sync with your account.') : ''} ${t('Apple doesn\'t allow Bluetooth here, so to <b>ride</b> open BTB in <b>Bluefy</b>.')}</p>`
+    : `<p style="margin:0">${t('You\'re using BTB as an installed app. Bluetooth works here as in the browser.')}</p>`;
   else if (isIOS) html = `<ol style="margin:0;padding-left:20px;line-height:1.6">
-      <li>Open this page in <b>Safari</b> or <b>Chrome</b>, tap <b>Share</b> <span aria-hidden="true">(□↑)</span>, then <b>Add to Home Screen</b> › <b>Add</b>.</li>
-      <li>Open BTB from the new icon. ${code}</li></ol>
-      <p style="margin:8px 0 0"><b>Note:</b> Apple doesn't allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and your rides. To <b>ride</b> with the trainer, keep using <b>Bluefy</b>${hasBt() ? ' (as you are now)' : ''}.</p>`;
-  else if (installEvt) html = `<p style="margin:0 0 10px">Install BTB to open it from your desktop, taskbar or home screen in its own window. Bluetooth keeps working.</p><button class="btn sm" id="installBtn">Install BTB</button>`;
-  else html = `<p style="margin:0">In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app. ${cloud.on ? code : ''}</p>`;
+      <li>${t('Open this page in <b>Safari</b> or <b>Chrome</b>, tap <b>Share</b> <span aria-hidden="true">(□↑)</span>, then <b>Add to Home Screen</b> › <b>Add</b>.')}</li>
+      <li>${t('Open BTB from the new icon.')} ${code}</li></ol>
+      <p style="margin:8px 0 0">${t('<b>Note:</b> Apple doesn\'t allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and your rides. To <b>ride</b> with the trainer, keep using <b>Bluefy</b>{now}.', { now: hasBt() ? ' ' + t('(as you are now)') : '' })}</p>`;
+  else if (installEvt) html = `<p style="margin:0 0 10px">${t('Install BTB to open it from your desktop, taskbar or home screen in its own window. Bluetooth keeps working.')}</p><button class="btn sm" id="installBtn">${t('Install BTB')}</button>`;
+  else html = `<p style="margin:0">${t('In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app.')} ${cloud.on ? code : ''}</p>`;
   $('#installBody').innerHTML = html;
   const b = $('#installBtn');
   if (b) b.onclick = async () => {
     const e = installEvt; installEvt = null; if (!e) return renderInstall();
-    try { e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') toast('BTB installed'); } catch { }
+    try { e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') toast(t('BTB installed')); } catch { }
     renderInstall();
   };
 }
@@ -2873,18 +2887,18 @@ function showBtHelp(force, why) {
   if ((hasBt() && !force) || (!force && load('erglab.btHelpHidden', 0))) { b.classList.add('hidden'); return; }
   b.classList.remove('hidden');
   const msg = why === 'security'
-    ? (iOS ? `<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.`
-      : `<b>The browser blocked Bluetooth for this page.</b> ${location.protocol === 'file:' ? 'Pages opened as a local file can be refused. ' : ''}Open the app from an <b>https://</b> address (GitHub Pages, Netlify…) or from <b>http://localhost</b>, as a normal tab (not inside an embedded preview).`)
+    ? (iOS ? t('<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.')
+      : `${t('<b>The browser blocked Bluetooth for this page.</b>')} ${location.protocol === 'file:' ? t('Pages opened as a local file can be refused.') + ' ' : ''}${t('Open the app from an <b>https://</b> address (GitHub Pages, Netlify…) or from <b>http://localhost</b>, as a normal tab (not inside an embedded preview).')}`)
     : iOS && isStandalone()
-    ? `<b>The home-screen app can't use Bluetooth.</b> On iPhone and iPad, Apple only lets apps like <b>Bluefy – Web BLE Browser</b> talk to trainers, not home-screen web apps. Use this app to browse workouts, follow your plan and look at your rides. To ride, open BTB in <b>Bluefy</b> (sign in there once with an email code).`
+    ? t('<b>The home-screen app can\'t use Bluetooth.</b> On iPhone and iPad, Apple only lets apps like <b>Bluefy – Web BLE Browser</b> talk to trainers, not home-screen web apps. Use this app to browse workouts, follow your plan and look at your rides. To ride, open BTB in <b>Bluefy</b> (sign in there once with an email code).')
     : iOS
-    ? `<b>Bluetooth isn't available in this browser.</b> On iPhone and iPad, Apple blocks Web Bluetooth in Safari and Chrome. Open this page in the free <b>Bluefy – Web BLE Browser</b> app (App Store) to connect your trainer. You can still browse workouts and try <b>Sim</b> mode here.`
+    ? t('<b>Bluetooth isn\'t available in this browser.</b> On iPhone and iPad, Apple blocks Web Bluetooth in Safari and Chrome. Open this page in the free <b>Bluefy – Web BLE Browser</b> app (App Store) to connect your trainer. You can still browse workouts and try <b>Sim</b> mode here.')
     : !window.isSecureContext
-      ? `<b>Bluetooth needs a secure page.</b> Open this file over <b>https://</b> or <b>localhost</b> (or from a local file in Chrome/Edge).`
-      : `<b>Web Bluetooth isn't available in this browser.</b> Use <b>Chrome</b> or <b>Edge</b> on Windows, macOS, Android or ChromeOS. On Linux, enable <i>chrome://flags/#enable-experimental-web-platform-features</i>. You can still use <b>Sim</b> mode.`;
-  b.innerHTML = `<button class="x" aria-label="Dismiss" style="float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>${msg}${iOS && !hasBt() ? ' <button class="btn sm" id="copyLink" style="margin-left:6px">Copy link for Bluefy</button>' : ''}`;
+      ? t('<b>Bluetooth needs a secure page.</b> Open this file over <b>https://</b> or <b>localhost</b> (or from a local file in Chrome/Edge).')
+      : t('<b>Web Bluetooth isn\'t available in this browser.</b> Use <b>Chrome</b> or <b>Edge</b> on Windows, macOS, Android or ChromeOS. On Linux, enable <i>chrome://flags/#enable-experimental-web-platform-features</i>. You can still use <b>Sim</b> mode.');
+  b.innerHTML = `<button class="x" aria-label="${t('Dismiss')}" style="float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>${msg}${iOS && !hasBt() ? ` <button class="btn sm" id="copyLink" style="margin-left:6px">${t('Copy link for Bluefy')}</button>` : ''}`;
   b.querySelector('.x').onclick = () => { store('erglab.btHelpHidden', 1); b.classList.add('hidden'); };
-  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname).then(() => toast('Link copied. Paste it into Bluefy.'), () => toast(location.href, 8000));
+  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname).then(() => toast(t('Link copied. Paste it into Bluefy.')), () => toast(location.href, 8000));
 }
 
 /* =====================================================================
@@ -2920,7 +2934,7 @@ function bind() {
     R.softFrom = R.elapsed; renderRide(true); applyControl();
   };
   $('#cErg').onclick = () => setMode(true); $('#cSlope').onclick = () => setMode(false);
-  $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm('End the ride and save it?')) finishRide(false); };
+  $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm(t('End the ride and save it?'))) finishRide(false); };
   $('#rideConnect').onclick = () => chooseLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cFull').classList.toggle('hidden', !fsOK);
@@ -2936,9 +2950,9 @@ function bind() {
     else if (e.key === 'e' || e.key === 'E') setMode(!(R.freeRide ? R.freeMode === 'erg' : R.ergOn));
   });
   // builder
-  $('#bCat').innerHTML = CATS.map(c => `<option ${c === 'Custom' ? 'selected' : ''}>${c}</option>`).join('');
+  $('#bCat').innerHTML = CATS.map(c => `<option value="${c}" ${c === 'Custom' ? 'selected' : ''}>${t(c)}</option>`).join('');
   $('#bText').addEventListener('input', builderPreview); $('#bName').addEventListener('input', builderPreview);
-  $('#bSave').onclick = () => { const w = builderWorkout(); if (w) { addCustom(w); toast('Saved to library'); } };
+  $('#bSave').onclick = () => { const w = builderWorkout(); if (w) { addCustom(w); toast(t('Saved to library')); } };
   $('#bRide').onclick = () => { const w = builderWorkout(); if (w) loadWorkout(w); };
   $('#bFile').onchange = e => { importFiles(e.target.files); e.target.value = ''; };
   // drag & drop import anywhere
@@ -2951,6 +2965,7 @@ function bind() {
 /*__PARTS_JS__*/
 
 function init() {
+  i18nStart();
   setTheme();
   buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false); renderInstall();
   const oauthReturn = /[?&]state=/.test(location.search) && /[?&](code|error)=/.test(location.search);
