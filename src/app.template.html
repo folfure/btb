@@ -576,6 +576,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     <div class="card pad hidden" style="margin-top:12px" id="acctCard">
       <div class="row"><h3>Account</h3><span class="spacer"></span><span class="badge" id="syncBadge" style="color:var(--ok)">cloud sync on</span></div>
       <p class="muted" style="margin:6px 0 10px;font-size:14px">Signed in as <b id="acctEmail"></b>. Settings, custom workouts, plan progress and rides are saved to your private cloud space (EU) and follow you to any device.</p>
+      <p class="muted hidden" id="acctWhy" style="font-size:12.5px;line-height:1.45;margin:0 0 10px"></p>
       <div class="row"><button class="btn sm" id="acctSync">Sync now</button><span class="spacer"></span><button class="btn sm danger" id="acctOut">Sign out</button></div>
     </div>
     <div class="card pad" style="margin-top:12px">
@@ -646,6 +647,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <button type="button" class="btn ghost sm" style="width:100%;margin-top:8px" id="gateBack">Use another email</button>
     </form>
     <div id="gateOffline" class="hidden" style="margin-top:12px"><button class="btn" style="width:100%" id="gateOfflineBtn">Ride offline (sync later)</button></div>
+    <p class="muted hidden" id="gateWhy" style="font-size:12.5px;line-height:1.45;margin:14px 0 0"></p>
     <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0" data-i18n>Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
   </div>
 </div>
@@ -721,9 +723,10 @@ function cleanRideView(o) {
   }
   return out;
 }
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', rideView: RIDE_VIEW_DEF, sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', lang: '', rideView: RIDE_VIEW_DEF, sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '', seenOn: {} };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
 S.rideView = cleanRideView(S.rideView);
+S.seenOn = cleanSeen(S.seenOn);
 // weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
 const WLOG_MAX = 1000;
 function cleanWlog(a) {
@@ -2916,6 +2919,7 @@ function applySettings(o) {
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
   if (!['', 'en', 'fr'].includes(S.lang)) S.lang = '';
   S.rideView = cleanRideView(S.rideView);
+  S.seenOn = cleanSeen(S.seenOn);
   if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
   const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
   if (!(S.height >= 100 && S.height <= 250)) S.height = 0;
@@ -2942,10 +2946,65 @@ function pendingIds() { const ids = new Set(); try { Object.keys(localStorage).f
 function wipeLocal(all = false, keepIds = null) {
   const keys = USER_KEYS.concat('erglab.profileDirty', all ? ['erglab.lastUser'] : []);
   keys.forEach(k => { try { localStorage.removeItem(k); } catch { } });
-  return keepIds && keepIds.size ? sdb.clearExcept(keepIds) : sdb.clear();
   if (all) { try { Object.keys(localStorage).filter(k => k.startsWith('erglab-auth') || /^sb-.*-auth-token/.test(k)).forEach(k => localStorage.removeItem(k)); } catch { } }
+  return keepIds && keepIds.size ? sdb.clearExcept(keepIds) : sdb.clear();
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.user && cloud.pushT) { clearTimeout(cloud.pushT); cloud.pushProfile(); } });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && cloud.user && cloud.pushT) { clearTimeout(cloud.pushT); cloud.pushProfile(); }
+  if (document.visibilityState === 'visible' && cloud.user) authWhy.seen();
+});
+// ---- why did this browser ask for a sign-in code? Kept apart from the rider's data (wipeLocal leaves it):
+// only a reason code and dates. Shown on the sign-in screen and in Settings › Account.
+const AUTH_WHY = 'erglab.authWhy';
+const authWhy = {
+  get() { const d = load(AUTH_WHY, null); return d && typeof d === 'object' && !Array.isArray(d) ? d : {}; },
+  signedIn(last) { const d = this.get(); store(AUTH_WHY, { in: 1, seen: Date.now(), last: last || d.last || null }); },
+  seen() { const d = this.get(); if (d.in === 1) store(AUTH_WHY, { ...d, seen: Date.now() }); },
+  ended(why) { const d = this.get(); store(AUTH_WHY, { in: 0, why, at: Date.now(), seen: +d.seen || 0, last: d.last || null }); },
+  // hadTok: a saved sign-in was in this browser's storage when the page opened
+  reason(hadTok) {
+    const d = this.get(), now = Date.now();
+    if (d.in === 0 && d.why) return { why: d.why, at: +d.at || now, seen: +d.seen || 0 };
+    if (d.in === 1) return { why: hadTok ? 'refused' : 'lost', at: now, seen: +d.seen || 0 };
+    return { why: hadTok ? 'refused' : 'none', at: now, seen: 0 };
+  },
+};
+// a short name for this browser, e.g. "iPhone Bluefy", "Mac Chrome", "iPhone Safari app"
+function browserLabel() {
+  const ua = navigator.userAgent || '';
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const os = /iPad/.test(ua) || (ios && !/iPhone|iPod/.test(ua)) ? 'iPad' : ios ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Mac OS X|Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : /CrOS/.test(ua) ? 'ChromeOS' : /Linux/.test(ua) ? 'Linux' : 'Other';
+  const br = /Bluefy/i.test(ua) || (ios && hasBt()) ? 'Bluefy' : /EdgiOS|Edg\//.test(ua) ? 'Edge' : /OPR\/|OPiOS/.test(ua) ? 'Opera' : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : ios ? 'in-app browser' : 'browser';
+  let app = false; try { app = !!(navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)); } catch { }
+  return os + ' ' + br + (app ? ' app' : '');
+}
+function cleanSeen(o) {
+  const out = {}; if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
+  Object.entries(o).filter(([k, v]) => /^[\w .()-]{1,40}$/.test(k) && Number.isFinite(+v) && +v > 0)
+    .sort((a, b) => b[1] - a[1]).slice(0, 12).forEach(([k, v]) => { out[k] = Math.round(+v); });
+  return out;
+}
+const fmtWhen = ms => { try { return new Date(ms).toLocaleString(LOCALE, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch { return ''; } };
+function whyText(w) {
+  if (!w) return '';
+  const when = w.at ? fmtWhen(w.at) : '', seen = w.seen ? ' ' + t('Last open while signed in: {when}.', { when: fmtWhen(w.seen) }) : '';
+  switch (w.why) {
+    case 'you': return t('You signed out on this device ({when}).', { when });
+    case 'server': return t('The server ended your session ({when}): it would not renew it. Usually the phone slept or lost the network just as BTB was renewing the sign-in, or you signed out on another device.', { when }) + seen;
+    case 'refused': return t('The server no longer accepted the sign-in saved in this browser. Usually the phone slept or lost the network just as BTB was renewing it, or you signed out on another device.') + seen;
+    case 'lost': return t('This browser deleted your saved sign-in but kept BTB’s other data.') + seen;
+    case 'erased': return t('{browser} was signed in before (last open {when}) and has since erased its website data. iPhone and iPad do that after about 7 days without opening a site; clearing the history or private browsing does it too.', { browser: w.br || '', when: w.seen ? fmtWhen(w.seen) : '?' });
+    case 'first': return t('First sign-in recorded for this browser ({browser}).', { browser: w.br || '' });
+    default: return t('This browser has no saved sign-in: either you never signed in here, or it erased its website data (iPhone and iPad do that after about 7 days without opening a site; clearing the history or private browsing does it too).');
+  }
+}
+function renderAcctWhy() {
+  const el = $('#acctWhy'); if (!el) return;
+  const l = authWhy.get().last;
+  el.textContent = l && l.why ? t('Last time a code was needed ({when}, {browser}): {why}', { when: fmtWhen(l.code || l.at), browser: l.br || '?', why: whyText(l) }) : '';
+  el.classList.toggle('hidden', !el.textContent);
+}
+const hasSavedSignIn = () => { try { return !!localStorage.getItem('erglab-auth'); } catch { return false; } };
 const cloud = {
   on: !!(CLOUD && CLOUD.url && CLOUD.key), sb: null, user: null, stv: null, pushT: null, offline: false,
   loadLib() {
@@ -2965,23 +3024,69 @@ const cloud = {
       const frag = new URLSearchParams((location.hash || '').replace(/^#/, ''));
       const linkErr = frag.get('error_description') || frag.get('error');
       const fromLink = frag.has('access_token') || !!linkErr;
+      const hadTok = hasSavedSignIn();
       this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'erglab-auth' } });
       this.sb.auth.onAuthStateChange((ev, session) => {
         if (ev === 'SIGNED_OUT' && this.user && !this._leaving) {
           this._leaving = true;
+          const d = authWhy.get(); // a Sign out in another tab of this browser already noted 'you'
+          if (!(d.in === 0 && d.why === 'you' && Date.now() - d.at < 120000)) authWhy.ended('server');
           const uns = load('erglab.history', []).filter(r => !r.cloud && (!r.owner || r.owner === this.user.id));
           if (uns.length) store('erglab.pending.' + this.user.id, uns.concat(load('erglab.pending.' + this.user.id, []).filter(x => !uns.some(u => u.id === x.id))));
           Promise.resolve(wipeLocal(false, pendingIds())).finally(() => location.replace(location.pathname)); return;
         }
         if (session && session.user) this.user = session.user;
       });
-      const { data } = await this.sb.auth.getSession();
+      const { data, error } = await this.sb.auth.getSession();
       if (fromLink) { try { history.replaceState(null, '', location.pathname + location.search + '#workouts'); } catch { } }
       if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast(t('Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.'), 6000); }
-      else gate('email', linkErr ? t('That link has expired or was already used. Enter your email to get a sign-in code instead.') : undefined);
+      // an expired access token that could not be renewed for lack of network: the sign-in is still saved, so wait
+      // for the network instead of asking for a code (this used to happen when opening BTB on a phone just woken up)
+      else if (!fromLink && this.netError(error) && hasSavedSignIn()) this.waitNet();
+      else this.needCode(fromLink ? null : authWhy.reason(hadTok), linkErr ? t('That link has expired or was already used. Enter your email to get a sign-in code instead.') : undefined);
     } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message ? t(e.message) : t('Cannot reach the server.')); }
   },
+  netError(e) { return !!e && (window.supabase.isAuthRetryableFetchError ? window.supabase.isAuthRetryableFetchError(e) : e.name === 'AuthRetryableFetchError'); },
+  needCode(why, msg) {
+    this.why = why; this.offline = false;
+    if (why && why.why === 'refused') authWhy.ended('refused');
+    gate('email', msg);
+  },
+  // the saved sign-in could not be renewed yet (no network, phone just woke up, server asleep): keep it and retry
+  waitNet() {
+    this.offline = true;
+    gate('offline', t('Can’t reach the server yet. You stay signed in; BTB keeps trying.'));
+    let busy = false, n = 0, timer = 0, lost = false;
+    const done = () => { clearTimeout(timer); window.removeEventListener('online', again); document.removeEventListener('visibilitychange', again); };
+    const later = () => { clearTimeout(timer); timer = setTimeout(again, [3000, 6000, 10000][n++] || 20000); };
+    const again = async () => {
+      if (busy || this.user || document.visibilityState === 'hidden') { if (!this.user) later(); return; }
+      if (lost) { if (!rideInProgress()) { done(); this.needCode(authWhy.reason(true)); } else later(); return; }
+      busy = true;
+      try {
+        try { this.sb.auth.lastRefreshFailure = null; } catch { } // supabase-js 2.118 waits 60 s after a failed renewal; retry now
+        const { data, error } = await this.sb.auth.getSession();
+        if (data && data.session) { done(); this.offline = false; this.user = data.session.user; await this.afterLogin(); return; }
+        if (!this.netError(error) || !hasSavedSignIn()) lost = true; // the server refused it: a code is needed (after the ride, if one is going)
+      } catch (e) { console.warn(e); } finally { busy = false; }
+      if (lost && !rideInProgress()) { done(); this.needCode(authWhy.reason(true)); } else later();
+    };
+    window.addEventListener('online', again); document.addEventListener('visibilitychange', again);
+    later();
+  },
+  // remember in the profile when this browser was last used, to tell a first sign-in here from a browser that erased its data
+  noteBrowser() {
+    const br = browserLabel(), prev = +(S.seenOn || {})[br] || 0, d = authWhy.get(), l = d.last;
+    if (l && l.why === 'none' && l.code && Date.now() - l.code < 10 * 60000) {
+      d.last = prev ? { ...l, why: 'erased', seen: prev } : { ...l, why: 'first' }; store(AUTH_WHY, d);
+      if (prev) toast(whyText(d.last), 9000);
+    }
+    if (Date.now() - prev > 6 * 3600000) { S.seenOn = cleanSeen({ ...S.seenOn, [br]: Date.now() }); store('erglab.settings', S); this.schedulePush(); }
+    renderAcctWhy();
+  },
   async afterLogin() {
+    const why = this.why; this.why = null;
+    authWhy.signedIn(why ? { ...why, code: Date.now(), br: browserLabel() } : null);
     // a different account than the one whose data is cached on this device → start clean
     const last = load('erglab.lastUser', null);
     const localRides = load('erglab.history', []), unsynced = localRides.filter(r => !r.cloud);
@@ -2996,7 +3101,8 @@ const cloud = {
     store('erglab.lastUser', this.user.id);
     gate(null);
     $('#acctCard').classList.remove('hidden'); $('#acctEmail').textContent = this.user.email || '';
-    try { await this.pull(); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); }
+    renderAcctWhy();
+    try { await this.pull(); this.noteBrowser(); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); }
     this.stravaStatus().then(renderStrava);
   },
   async sendCode(email) {
@@ -3012,9 +3118,10 @@ const cloud = {
   },
   async signOut() {
     if (rideInProgress() && !confirm(t('A ride is in progress. Sign out anyway?'))) return;
-    this._leaving = true;
+    this._leaving = true; authWhy.ended('you');
     if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
-    try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
+    // scope 'local': end this device's session only (the default, 'global', signed out every phone and computer)
+    try { await this.sb.auth.signOut({ scope: 'local' }); } catch { }
     await wipeLocal(true); // nothing personal stays on this device
     location.replace(location.pathname);
   },
@@ -3129,6 +3236,8 @@ function gate(mode, msg) {
   $('#gateOffline').classList.toggle('hidden', mode !== 'offline');
   $('#gateMsg').textContent = msg || { loading: t('Connecting…'), email: t('Enter the email address you were invited with.'), code: t('If {email} is invited, a sign-in code is on its way. Check your inbox (and spam).', { email: gateEmail }), offline: t('Cannot reach the server.') }[mode];
   $('#gateMsg').style.color = '';
+  const why = (mode === 'email' || mode === 'code') && cloud.why ? whyText(cloud.why) : '';
+  $('#gateWhy').textContent = why ? t('Why a code? {why}', { why }) : ''; $('#gateWhy').classList.toggle('hidden', !why);
   setTimeout(() => { const f = mode === 'email' ? $('#gateEmail') : mode === 'code' ? $('#gateCode') : null; try { f && f.focus(); } catch { } }, 50);
 }
 function bindCloud() {
