@@ -834,5 +834,63 @@
     ]
    }
   ]
+ },
+ {
+  "id": "relay-24h-cambre-6wk",
+  "name": "24h Relay: Bois de la Cambre",
+  "level": "Beginner",
+  "goal": "Strong, repeatable relay turns for 24 hours",
+  "desc": "Six weeks to get a scout team ready for the 24h vélo du Bois de la Cambre in Brussels, a 24-hour relay where each rider takes turns of 1 to 4 laps (about 5 to 15 minutes hard), again and again through the day and the night. Three 30-60 minute sessions a week fit around school: lap-length efforts with a hard start and a strong finish, relay simulations that teach you to go hard again after resting, short accelerations, and easy Zone 2 rides to recover and build your base. Week 1 starts with a ramp test to set your FTP, week 4 is lighter and week 6 is a taper that ends with a short opener a day or two before race weekend. Pacing a turn: go hard but not all-out on the first lap (sprint for 20-30 seconds after the change, then settle), hold a steady pace you can keep for the whole turn, and only empty the tank in the last few hundred metres before you hand over. Between turns: drink, eat something, put on warm clothes straight away, and at night sleep a little whenever your next turn is more than about two hours away. Ride the sessions in order and leave a rest day between the two hard sessions of the week.",
+  "src": "Race-specific build (lap-length threshold intervals, relay simulations); lighter week 4 and a one-week taper",
+  "weeks": [
+   {
+    "focus": "Find your FTP",
+    "days": [
+     "b-test-ramp",
+     "relay-z2-45",
+     "relay-quick-laps-30"
+    ]
+   },
+   {
+    "focus": "Single-lap turns",
+    "days": [
+     "relay-one-lap-4x4",
+     "relay-z2-30",
+     "relay-overtake-surges-45"
+    ]
+   },
+   {
+    "focus": "Longer turns",
+    "days": [
+     "relay-two-lap-3x8",
+     "relay-z2-45",
+     "relay-sim-4x5"
+    ]
+   },
+   {
+    "focus": "Lighter week",
+    "days": [
+     "relay-accelerations-30",
+     "a-recovery-spin-30",
+     "relay-z2-30"
+    ]
+   },
+   {
+    "focus": "Race simulation",
+    "days": [
+     "relay-multi-lap-2x12",
+     "a-endurance-45",
+     "relay-sim-3x10"
+    ]
+   },
+   {
+    "focus": "Taper + opener",
+    "days": [
+     "relay-quick-laps-30",
+     "relay-z2-30",
+     "relay-opener-30"
+    ]
+   }
+  ]
  }
 ]

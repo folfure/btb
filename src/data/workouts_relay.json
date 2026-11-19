@@ -1,0 +1,842 @@
+[
+ {
+  "id": "relay-z2-30",
+  "name": "Relay Base Z2 30",
+  "cat": "Endurance",
+  "desc": "A short, easy aerobic ride for busy school days or the day after a hard session. Ride at 63-68% FTP, where you can still talk in full sentences, with two brief high-cadence minutes to keep the legs quick. This aerobic engine is what lets you recover between turns and ride well again hours later.",
+  "src": "Coggan Zone 2 endurance; aerobic base for repeated race efforts",
+  "seg": [
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.45,
+    "p1": 0.62,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 600,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.68,
+      "c": 105,
+      "lbl": "Zone 2 high cadence"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.66,
+      "c": 90,
+      "lbl": "Zone 2"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.6,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-z2-45",
+  "name": "Relay Base Z2 45",
+  "cat": "Endurance",
+  "desc": "Forty-five minutes of steady Zone 2 at 65-68% FTP with three one-minute high-cadence pickups. Keep it easy enough to breathe through your nose most of the time; it should feel almost too easy. These rides build the aerobic base that helps you recover between turns over 24 hours, without adding much fatigue.",
+  "src": "Coggan Zone 2 endurance; aerobic base for repeated race efforts",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.63,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 900,
+    "p": 0.66,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.68,
+      "c": 105,
+      "lbl": "Zone 2 high cadence"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.67,
+      "c": 90,
+      "lbl": "Zone 2"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.62,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-quick-laps-30",
+  "name": "Quick Laps 3x3",
+  "cat": "Threshold",
+  "desc": "Three short lap-length efforts of 3 minutes in a 30-minute session: a 20-second hard start like taking over from a teammate, about 102% FTP for the lap, then a strong last 30 seconds. Recover with 3 minutes of easy spinning between efforts. A gentle first taste of relay pacing that fits a school evening.",
+  "src": "Threshold-to-VO2 intervals (Coggan zones 4-5) shaped like a relay turn",
+  "seg": [
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.95,
+    "c": 95,
+    "lbl": "Opener"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.25,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 130,
+      "p": 1.02,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.1,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 180,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 180,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-one-lap-4x4",
+  "name": "Single-Lap Turns 4x4",
+  "cat": "Threshold",
+  "desc": "Four 4-minute efforts, each about one lap of the Bois de la Cambre circuit: 20 seconds hard to launch after the relay change, a little above FTP (103%) for the lap, then a strong last 30 seconds to hand over at speed. Recover 4 minutes easy between efforts. Teaches you to start fast without blowing up and to finish your turn strong.",
+  "src": "Threshold/VO2 intervals (Coggan zones 4-5); relay-turn pacing",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.68,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 95,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.6,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.3,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 190,
+      "p": 1.03,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.12,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Hand over - easy"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-overtake-surges-45",
+  "name": "Overtake Surges 3x6",
+  "cat": "Over-Under",
+  "desc": "Three 6-minute blocks just under threshold (92% FTP) with a 20-second surge to 140% every 2 minutes, like accelerating to pass slower riders or to close a gap after a bend. Recover 4 minutes easy between blocks. Learn to surge and settle straight back into a sustainable pace without stopping to breathe.",
+  "src": "Over-under / surge intervals (common coaching practice for racing)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.75,
+    "c": 90,
+    "lbl": "Tempo"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 100,
+      "p": 0.92,
+      "c": 92,
+      "lbl": "Threshold low"
+     },
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Overtake surge"
+     },
+     {
+      "t": "s",
+      "d": 100,
+      "p": 0.92,
+      "c": 92,
+      "lbl": "Threshold low"
+     },
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Overtake surge"
+     },
+     {
+      "t": "s",
+      "d": 100,
+      "p": 0.92,
+      "c": 92,
+      "lbl": "Threshold low"
+     },
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.4,
+      "c": 105,
+      "lbl": "Overtake surge"
+     },
+     {
+      "t": "s",
+      "d": 240,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Recovery"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-two-lap-3x8",
+  "name": "Two-Lap Turns 3x8",
+  "cat": "Threshold",
+  "desc": "Three 8-minute efforts, about two laps each: 30 seconds hard at the relay change, settle at FTP (100%) and hold it, then lift to 107% for the final minute. Recover 5 minutes easy between efforts. The key is a controlled first lap: if you are gasping after two minutes, you started too hard.",
+  "src": "Classic threshold intervals (Coggan zone 4) with a hard start and finish",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 95,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.6,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.25,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 390,
+      "p": 1,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.07,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 300,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Hand over - easy"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-multi-lap-2x12",
+  "name": "Multi-Lap Turns 2x12",
+  "cat": "Threshold",
+  "desc": "Two 12-minute efforts, the length of a three- to four-lap turn: a 30-second hard start, 10 minutes at 96% FTP, then 90 seconds at 105% to finish strong. Recover 6 minutes easy between them. Ride the middle part at a pace you could hold a little longer, and keep a steady cadence around 90 rpm.",
+  "src": "Threshold intervals (Coggan zone 4); long relay-turn pacing",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.7,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1,
+      "c": 95,
+      "lbl": "Opener"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 0.55,
+      "lbl": "Easy"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.6,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 600,
+      "p": 0.96,
+      "c": 90,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 1.05,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 360,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Hand over - easy"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-sim-4x5",
+  "name": "Relay Simulation 4x5",
+  "cat": "Mixed",
+  "desc": "Four 5-minute race turns (hard start, lap pace at 103% FTP, strong finish) with 8 minutes of very easy riding between them, like waiting for your next turn. Use the easy minutes the way you will on race day: drink, eat a little and keep warm. Practises going hard again after resting, which is the whole game in a 24-hour relay.",
+  "src": "Race simulation; repeated threshold/VO2 efforts with long recoveries",
+  "seg": [
+   {
+    "t": "r",
+    "d": 420,
+    "p0": 0.45,
+    "p1": 0.68,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.95,
+    "c": 95,
+    "lbl": "Opener"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.3,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 220,
+      "p": 1.03,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 60,
+      "p": 1.1,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 480,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Between turns - eat, drink, stay warm"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 20,
+    "p": 1.3,
+    "c": 100,
+    "lbl": "Relay change - hard start"
+   },
+   {
+    "t": "s",
+    "d": 220,
+    "p": 1.03,
+    "c": 92,
+    "lbl": "Lap pace"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 1.1,
+    "c": 95,
+    "lbl": "Strong finish"
+   },
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-sim-3x10",
+  "name": "Relay Simulation 3x10",
+  "cat": "Mixed",
+  "desc": "Three 10-minute race turns of two to three laps (30 seconds hard, 98% FTP, then 106% for the last 90 seconds) with 8 minutes of very easy riding between them. Treat the easy minutes like the relay tent: drink, eat and stay warm. The last turn should feel as good as the first; if it does not, pace the first one a little lower.",
+  "src": "Race simulation; repeated threshold efforts with long recoveries",
+  "seg": [
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.45,
+    "p1": 0.68,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.95,
+    "c": 95,
+    "lbl": "Opener"
+   },
+   {
+    "t": "s",
+    "d": 60,
+    "p": 0.55,
+    "lbl": "Easy"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.25,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 480,
+      "p": 0.98,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 1.06,
+      "c": 95,
+      "lbl": "Strong finish"
+     },
+     {
+      "t": "s",
+      "d": 480,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Between turns - eat, drink, stay warm"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 30,
+    "p": 1.25,
+    "c": 100,
+    "lbl": "Relay change - hard start"
+   },
+   {
+    "t": "s",
+    "d": 480,
+    "p": 0.98,
+    "c": 92,
+    "lbl": "Lap pace"
+   },
+   {
+    "t": "s",
+    "d": 90,
+    "p": 1.06,
+    "c": 95,
+    "lbl": "Strong finish"
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-accelerations-30",
+  "name": "Relay Accelerations 30",
+  "cat": "Anaerobic",
+  "desc": "Short, sharp work for the moments that make a difference in a relay: six 15-second bursts at 150% FTP, then four 30-second surges at 125%, each with easy spinning between. Spin fast (100+ rpm) and stay relaxed in the upper body. Builds the punch to launch after the relay change, pass riders and close gaps, with little overall fatigue.",
+  "src": "Short anaerobic intervals (Coggan zone 6); common race-preparation practice",
+  "seg": [
+   {
+    "t": "r",
+    "d": 360,
+    "p0": 0.45,
+    "p1": 0.68,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 120,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 6,
+    "s": [
+     {
+      "t": "s",
+      "d": 15,
+      "p": 1.5,
+      "c": 105,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 45,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "s",
+    "d": 180,
+    "p": 0.55,
+    "c": 90,
+    "lbl": "Easy spin"
+   },
+   {
+    "t": "x",
+    "n": 4,
+    "s": [
+     {
+      "t": "s",
+      "d": 30,
+      "p": 1.25,
+      "c": 100,
+      "lbl": "Surge"
+     },
+     {
+      "t": "s",
+      "d": 90,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 300,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ },
+ {
+  "id": "relay-opener-30",
+  "name": "Relay Race Opener 30",
+  "cat": "Endurance",
+  "desc": "A short session for one or two days before the race. Mostly easy riding, with two short lap rehearsals (20 seconds hard, then FTP for under 2 minutes) and three 10-second bursts to wake the legs up. You should finish feeling fresh and sharp, not tired.",
+  "src": "Classic pre-race opener routine (common coaching practice)",
+  "seg": [
+   {
+    "t": "r",
+    "d": 480,
+    "p0": 0.45,
+    "p1": 0.65,
+    "lbl": "Warm-up"
+   },
+   {
+    "t": "s",
+    "d": 300,
+    "p": 0.65,
+    "c": 90,
+    "lbl": "Zone 2"
+   },
+   {
+    "t": "x",
+    "n": 2,
+    "s": [
+     {
+      "t": "s",
+      "d": 20,
+      "p": 1.2,
+      "c": 100,
+      "lbl": "Relay change - hard start"
+     },
+     {
+      "t": "s",
+      "d": 100,
+      "p": 1,
+      "c": 92,
+      "lbl": "Lap pace"
+     },
+     {
+      "t": "s",
+      "d": 120,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "x",
+    "n": 3,
+    "s": [
+     {
+      "t": "s",
+      "d": 10,
+      "p": 1.4,
+      "c": 110,
+      "lbl": "Burst"
+     },
+     {
+      "t": "s",
+      "d": 80,
+      "p": 0.5,
+      "c": 85,
+      "lbl": "Easy spin"
+     }
+    ]
+   },
+   {
+    "t": "r",
+    "d": 270,
+    "p0": 0.55,
+    "p1": 0.4,
+    "lbl": "Cool-down"
+   }
+  ]
+ }
+]
