@@ -52,29 +52,39 @@ const TRAINER_PROTO = (() => {
       const g = clamp(Math.round(grade * 100), -32768, 32767), ws = clamp(Math.round(wind * 1000), -32768, 32767);
       return [0x11, ...u16(ws), ...u16(g), clamp(Math.round(crr * 10000), 0, 255), clamp(Math.round(cw * 100), 0, 255)];
     },
+    // Spin Down Control (calibration): 0x01 start, 0x02 ignore a spin-down the trainer asked for
+    spinDown: (start = true) => [0x13, start ? 0x01 : 0x02],
+    // Spin-down response parameters: target speed low / high, uint16 0.01 km/h each (rider pedals above "high", then coasts)
+    parseSpinDownTargets(params) {
+      if (!params || params.length < 4) return null;
+      const lo = (params[0] | params[1] << 8) / 100, hi = (params[2] | params[3] << 8) / 100;
+      return hi > 0 ? { low: lo, high: Math.max(lo, hi) } : null;
+    },
+    SPIN: { 1: 'requested', 2: 'success', 3: 'error', 4: 'stop' }, // Fitness Machine Status 0x14 parameter
     // Fallback when simulation is not supported: map grade onto the resistance level (uint8, 0.1 units)
     resistanceForGrade: grade => [0x04, clamp(Math.round(20 + grade * 8), 0, 200)],
     parseFeatures(x) {
       const v = dvOf(x); if (v.byteLength < 8) return null;
       const machine = v.getUint32(0, true), target = v.getUint32(4, true);
       // power/sim/resistance: target-setting bits 3/13/2 (what can be controlled); powerData/hr: machine bits 14/10 (what is reported)
-      return { machine, target, power: !!((target >> 3) & 1), sim: !!((target >> 13) & 1), resistance: !!((target >> 2) & 1), powerData: !!((machine >> 14) & 1), hr: !!((machine >> 10) & 1) };
+      return { machine, target, power: !!((target >> 3) & 1), sim: !!((target >> 13) & 1), resistance: !!((target >> 2) & 1), spinDown: !!((target >> 15) & 1), powerData: !!((machine >> 14) & 1), hr: !!((machine >> 10) & 1) };
     },
     parsePowerRange(x) {
       const v = dvOf(x); if (v.byteLength < 6) return null;
       const min = v.getInt16(0, true), max = v.getInt16(2, true), inc = v.getUint16(4, true);
       return max > min && max > 0 ? { min, max, inc: Math.max(1, inc) } : null;
     },
-    // Control point indication: [0x80, requestOp, result]
+    // Control point indication: [0x80, requestOp, result, ...response parameters]
     parseResponse(x) {
       const v = dvOf(x); if (v.byteLength < 3 || v.getUint8(0) !== 0x80) return null;
-      return { op: v.getUint8(1), result: v.getUint8(2) };
+      const params = []; for (let i = 3; i < v.byteLength; i++) params.push(v.getUint8(i));
+      return { op: v.getUint8(1), result: v.getUint8(2), params };
     },
     // Fitness Machine Status: 0x01 reset, 0xFF control permission lost -> request control again and resend
     parseStatus(x) {
       const v = dvOf(x); if (!v.byteLength) return null;
       const op = v.getUint8(0);
-      return { op, reset: op === 0x01, lost: op === 0xff };
+      return { op, reset: op === 0x01, lost: op === 0xff, spinDown: op === 0x14 && v.byteLength > 1 ? v.getUint8(1) : null };
     },
     // Indoor Bike Data. Fields absent from the packet are absent from the result.
     parseIndoorBikeData(x) {

@@ -37,7 +37,7 @@ check(`all ${nKeys} t() keys translated`, !missing.size, `${missing.size} missin
 
 // static markup of the page (before the inline script): text nodes, a few attributes, data-i18n elements
 {
-  const html = readFileSync(join(src, 'app.template.html'), 'utf8'), body = html.slice(html.indexOf('<body'), html.indexOf('<script>'));
+  const html = readFileSync(join(src, 'app.template.html'), 'utf8'), b0 = html.indexOf('<body'), body = html.slice(b0, html.indexOf('<script>', b0)); // the app script after <body> (not the error reporter in <head>)
   const VOID = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'wbr', 'col', 'area', 'base', 'embed', 'param', 'track', 'use', 'path', 'rect', 'circle', 'line', 'stop', 'polyline', 'polygon', 'ellipse']);
   const SKIP = new Set(['script', 'style', 'svg', 'pattern', 'defs']);
   const stack = [], miss = [];

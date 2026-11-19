@@ -555,6 +555,11 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <p class="muted" style="margin:6px 0 10px;font-size:14px">Signed in as <b id="acctEmail"></b>. Settings, custom workouts, plan progress and rides are saved to your private cloud space (EU) and follow you to any device.</p>
       <div class="row"><button class="btn sm" id="acctSync">Sync now</button><span class="spacer"></span><button class="btn sm danger" id="acctOut">Sign out</button></div>
     </div>
+    <div class="card pad" style="margin-top:12px">
+      <h3 style="margin-bottom:6px">Trainer calibration</h3>
+      <p class="muted" style="font-size:13.5px;margin:0 0 10px">Spin-down calibration keeps the power reading accurate. Do it with the trainer connected and warm (after about 10 minutes of riding), with no ride open.</p>
+      <button class="btn" id="sCal">Calibrate trainer</button>
+    </div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
       <div class="row"><h3 data-i18n><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
@@ -1054,11 +1059,32 @@ class FtmsTrainer {
     return r;
   }
   reset() { return this.t.cmd(TRAINER_PROTO.ftms.reset()); }
+  // Spin-down calibration. Resolves { ok, targets: { low, high } km/h | null, why }; then the trainer reports through
+  // onSpin(code): 4 stop pedalling, 2 success, 3 error (1 = the trainer itself asks for a calibration).
+  get canCalibrate() { return !!this.t.cp && !(this.features && !this.features.spinDown); }
+  async calibrate(onSpin) {
+    const P = TRAINER_PROTO.ftms, tr = this.t;
+    this.onSpin = onSpin;
+    await this.requestControl();
+    tr.lastAck = null;
+    const r = await tr.cmd(P.spinDown(true), { timeout: 4000 });
+    if (r !== 1 && r !== -1) { this.onSpin = null; return { ok: false, why: P.RESULT[r] || t('no reply from the trainer') }; }
+    const a = tr.lastAck;
+    return { ok: true, targets: a && a.op === 0x13 ? P.parseSpinDownTargets(a.params) : null };
+  }
+  endCalibration(cancel) { this.onSpin = null; return (cancel ? this.reset() : Promise.resolve()).then(() => this.requestControl()); } // take control back (resets during the spin-down were ignored)
   goodbye(ch) { return this.t.cmd(TRAINER_PROTO.ftms.reset(), { ch, ack: false }); } // reset also releases control
   describe(r) { return TRAINER_PROTO.ftms.RESULT[r]; }
-  onCP(v) { const m = TRAINER_PROTO.ftms.parseResponse(v); if (m) this.t.ack(m.op, m.result); }
+  onCP(v) { const m = TRAINER_PROTO.ftms.parseResponse(v); if (m) this.t.ack(m.op, m.result, m.params); }
   onStatus(v) {
-    const m = TRAINER_PROTO.ftms.parseStatus(v); if (!m || !(m.reset || m.lost)) return;
+    const m = TRAINER_PROTO.ftms.parseStatus(v); if (!m) return;
+    if (m.spinDown != null) {
+      if (this.onSpin) this.onSpin(m.spinDown);
+      else if (m.spinDown === 1) toast(t('Your trainer asks for a calibration: Settings › Calibrate trainer.'), 7000);
+      return;
+    }
+    if (this.onSpin && m.reset) return; // some trainers reset themselves at the end of a spin-down
+    if (!(m.reset || m.lost)) return;
     // reset / control permission lost → request control again and resend (some trainers reset themselves after a stop)
     const tr = this.t; tr.applied = null; this.lostCount++;
     if (m.lost && this.lostCount > 3) { toast(t('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).'), 7000); return; }
@@ -1283,8 +1309,8 @@ class Trainer {
     this.queue = next.catch(() => { });
     return next;
   }
-  ack(op, result) { // a reply arrived on the control channel
-    this.sawAck = true; this.timeouts = 0; this.ackTimeout = 2500;
+  ack(op, result, params = []) { // a reply arrived on the control channel
+    this.sawAck = true; this.timeouts = 0; this.ackTimeout = 2500; this.lastAck = { op, result, params };
     if (this.pending && this.pending.op === op) this.pending.res(result);
   }
   setPower(w) {
@@ -1318,6 +1344,9 @@ class Trainer {
     } finally { if (kg === this.kickGen) this.kicking = false; }
   }
   release() { if (!this.cp || !this.ad) return; this.canSim ? this.setSim(0) : this.ad.reset?.(); }
+  get canCalibrate() { return this.connected && !!this.ad && !!this.ad.calibrate && this.ad.canCalibrate; }
+  calibrate(onSpin) { if (!this.connected || !this.ad || !this.ad.calibrate) return Promise.resolve({ ok: false, why: t('no reply from the trainer') }); this.desired = null; this.applied = null; return this.ad.calibrate(onSpin); }
+  endCalibration(cancel) { const r = this.ad && this.ad.endCalibration ? this.ad.endCalibration(cancel) : null; this.applied = null; return r; }
   /* ---- Cycling Power Measurement (power meters, Wahoo, FTMS trainers without power in their bike data) ---- */
   onCPM(v, usePower = true, useCad = true) {
     const P = TRAINER_PROTO.cps, m = P.parseMeasurement(v); if (!m) return;
@@ -1375,6 +1404,75 @@ class HrStrap {
   }
   disconnect() { this.user = true; clearTimeout(this.timer); this.timer = null; this.gen++; try { this.dev?.gatt?.disconnect(); } catch { } this.status = 'idle'; updateConnUI(); }
 }
+// ---- trainer calibration (FTMS spin-down), guided step by step
+function openCalibration() {
+  if (!trainer.connected) { toast(t('Connect your trainer first.')); connectLink('trainer'); return; }
+  if (R.w && R.state !== 'done') { toast(t('Close the current ride first (End & save or Cancel).'), 5000); return; }
+  if (!trainer.canCalibrate) {
+    openModal(`<h2>${t('Calibrate trainer')}</h2><p class="muted" style="margin-top:8px">${t('{name} does not offer calibration over Bluetooth (FTMS spin-down). Calibrate it in the maker’s app (Elite: My E-Training / Elite app), close that app, then connect it here again.', { name: esc(trainer.name) })}</p>`, true);
+    return;
+  }
+  let step = 'intro', targets = null, timer = 0, finished = false;
+  const m = openModal(`<h2>${t('Calibrate trainer')}</h2><div id="calBody"></div>`, true);
+  const body = () => $('#calBody', m);
+  const stop = () => { clearInterval(timer); timer = 0; };
+  const finish = (cancel) => { if (finished) return; finished = true; stop(); trainer.endCalibration(cancel); };
+  const close = () => { finish(step !== 'done' && step !== 'fail' && step !== 'intro'); closeModal(); };
+  m.querySelector('.x').onclick = e => { e.stopPropagation(); close(); };
+  m.addEventListener('click', e => { if (e.target === m) close(); }, true);
+  const draw = () => {
+    const spd = live.speed != null && liveFresh('Power', 5000) ? live.speed : null;
+    if (step === 'intro') body().innerHTML = `
+      <p class="muted" style="margin:8px 0 10px">${t('Calibration (spin-down) makes the power reading of {name} accurate. Do it after about 10 minutes of riding, when the trainer is warm.', { name: esc(trainer.name) })}</p>
+      <ol style="margin:0;padding-left:20px;line-height:1.6"><li>${t('Pedal up to the target speed shown here.')}</li><li>${t('When told, <b>stop pedalling</b> and let the flywheel coast to a stop.')}</li><li>${t('The trainer reports whether it worked.')}</li></ol>
+      <div class="row" style="gap:8px;margin-top:16px"><button class="btn primary" id="calGo">${t('Start calibration')}</button><span class="spacer"></span><button class="btn ghost" id="calNo">${t('Cancel')}</button></div>`;
+    else if (step === 'starting') body().innerHTML = `<p style="margin:14px 0">${t('Asking the trainer…')}</p>`;
+    else if (step === 'speed') {
+      const hi = targets ? targets.high : null, pct = hi && spd != null ? Math.min(100, spd / hi * 100) : 0;
+      body().innerHTML = `<p style="margin:10px 0 4px;font-weight:700">${hi ? t('Pedal up to {v} km/h', { v: hi.toFixed(1) }) : t('Pedal hard, about 35 km/h')}</p>
+        <div class="num" style="font-size:56px;font-weight:850;line-height:1.1">${spd != null ? spd.toFixed(1) : '–'}<small style="font-size:18px;color:var(--muted);margin-left:6px">km/h</small></div>
+        <div class="prog" style="height:10px;background:var(--bg2);border-radius:6px;overflow:hidden;margin:8px 0"><i style="display:block;height:100%;width:${pct}%;background:${pct >= 100 ? 'var(--ok)' : 'var(--z4)'}"></i></div>
+        <p class="muted" style="font-size:13px;margin:6px 0 0">${t('Keep going until the trainer says to stop.')}</p>
+        <div class="row" style="margin-top:14px"><span class="spacer"></span><button class="btn ghost" id="calNo">${t('Cancel')}</button></div>`;
+    } else if (step === 'coast') body().innerHTML = `<p style="font-size:30px;font-weight:850;margin:14px 0 6px;color:var(--warn)">${t('Stop pedalling!')}</p>
+        <p class="muted" style="margin:0">${t('Let the flywheel spin down on its own. Don’t touch the pedals.')}</p>
+        <div class="num" style="font-size:40px;font-weight:800;margin-top:10px">${spd != null ? spd.toFixed(1) : '–'}<small style="font-size:16px;color:var(--muted);margin-left:6px">km/h</small></div>`;
+    else if (step === 'done') body().innerHTML = `<p style="font-size:24px;font-weight:850;margin:14px 0 6px;color:var(--ok)">${t('Calibration done ✓')}</p>
+        <p class="muted" style="margin:0">${t('The trainer stored the new calibration. You can ride.')}</p>
+        <div class="row" style="margin-top:16px"><span class="spacer"></span><button class="btn primary" id="calOk">${t('Close')}</button></div>`;
+    else if (step === 'fail') body().innerHTML = `<p style="font-size:22px;font-weight:850;margin:14px 0 6px;color:var(--bad,#ff4d6d)">${t('Calibration failed')}</p>
+        <p class="muted" style="margin:0">${esc(failWhy || t('Try again: pedal a little faster before stopping, and don’t touch the pedals while it coasts.'))}</p>
+        <div class="row" style="gap:8px;margin-top:16px"><button class="btn primary" id="calGo">${t('Try again')}</button><span class="spacer"></span><button class="btn ghost" id="calNo">${t('Close')}</button></div>`;
+  };
+  let failWhy = '', spinT = 0;
+  const onSpin = code => {
+    if (finished && step !== 'speed' && step !== 'coast') return;
+    if (code === 4) { step = 'coast'; clearTimeout(spinT); spinT = setTimeout(() => { if (step === 'coast') { failWhy = t('No result from the trainer.'); step = 'fail'; finish(false); draw(); } }, 90000); }
+    else if (code === 2) { step = 'done'; clearTimeout(spinT); finish(false); }
+    else if (code === 3) { step = 'fail'; failWhy = ''; clearTimeout(spinT); finish(false); }
+    draw();
+  };
+  const go = async () => {
+    finished = false; failWhy = ''; step = 'starting'; draw();
+    const res = await trainer.calibrate(onSpin), calAd = trainer.ad;
+    if (finished && step === 'starting') { if (res.ok) trainer.endCalibration(true); return; } // closed while asking
+    if (!res.ok) { step = 'fail'; failWhy = t('The trainer refused the calibration ({why}). Close other apps using it and try again.', { why: res.why }); finished = true; draw(); return; }
+    if (step === 'starting') { targets = res.targets; step = 'speed'; }
+    clearTimeout(spinT); spinT = setTimeout(() => { if (step === 'speed') { failWhy = t('The trainer never asked to stop pedalling. Pedal faster, or calibrate in the maker’s app.'); step = 'fail'; finish(true); draw(); } }, 120000);
+    stop(); timer = setInterval(() => {
+      if (step !== 'speed' && step !== 'coast') return;
+      if (!trainer.connected || trainer.ad !== calAd) { clearTimeout(spinT); failWhy = t('The trainer disconnected during calibration. Try again once it is connected.'); step = 'fail'; finish(false); draw(); return; }
+      draw();
+    }, 300);
+    draw();
+  };
+  m.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'calGo') go(); else if (b.id === 'calNo' || b.id === 'calOk') close();
+  });
+  draw();
+}
+
 // the trainer and the heart-rate strap (Bluetooth)
 const trainer = new Trainer(), hrm = new HrStrap();
 function connectLink(kind) {
@@ -3171,6 +3269,7 @@ function bind() {
   $('#rideConnect').onclick = () => connectLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cCustom').onclick = openRideCustom;
+  $('#sCal').onclick = openCalibration;
   $('#cFull').classList.toggle('hidden', !fsOK);
   $('#cFull').onclick = () => { const d = document, el = d.documentElement;
     if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);

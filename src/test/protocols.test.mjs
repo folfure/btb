@@ -49,10 +49,12 @@ test('FTMS: features, power range, replies, status', () => {
   assert.deepEqual(P.ftms.parsePowerRange([0x00, 0x00, 0xdc, 0x05, 0x01, 0x00]), { min: 0, max: 1500, inc: 1 });
   assert.deepEqual(P.ftms.parsePowerRange([0x00, 0x00, 0x20, 0x08, 0x00, 0x00]), { min: 0, max: 2080, inc: 1 }); // inc 0 -> 1
   assert.equal(P.ftms.parsePowerRange([0x00, 0x00, 0x00, 0x00, 0x01, 0x00]), null);
-  assert.deepEqual(P.ftms.parseResponse([0x80, 0x05, 0x01]), { op: 5, result: 1 });
+  assert.deepEqual(P.ftms.parseResponse([0x80, 0x05, 0x01]), { op: 5, result: 1, params: [] });
+  assert.deepEqual(P.ftms.parseResponse([0x80, 0x13, 0x01, 0xd0, 0x07, 0xac, 0x0d]), { op: 0x13, result: 1, params: [0xd0, 0x07, 0xac, 0x0d] });
   assert.equal(P.ftms.parseResponse([0x08, 0xfa, 0x00]), null);
-  assert.deepEqual(P.ftms.parseStatus([0xff]), { op: 0xff, reset: false, lost: true });
-  assert.deepEqual(P.ftms.parseStatus([0x01]), { op: 1, reset: true, lost: false });
+  assert.deepEqual(P.ftms.parseStatus([0xff]), { op: 0xff, reset: false, lost: true, spinDown: null });
+  assert.deepEqual(P.ftms.parseStatus([0x01]), { op: 1, reset: true, lost: false, spinDown: null });
+  assert.deepEqual(P.ftms.parseStatus([0x14, 0x04]), { op: 0x14, reset: false, lost: false, spinDown: 4 });
 });
 
 test('FTMS: Indoor Bike Data', () => {
@@ -212,6 +214,31 @@ test('Trainer: requestDevice lists every protocol, plus trainer names; "show all
   const all = env.requests[1];
   assert.equal(all.acceptAllDevices, true); assert.equal(all.filters, undefined);
   for (const u of opt) assert.ok(all.optionalServices.includes(u), 'all: optional ' + u);
+});
+
+test('Trainer: FTMS spin-down calibration (targets, stop pedalling, success; unsupported trainers say so)', async () => {
+  // control point: 0x13 answers with target speeds 20.00 / 35.00 km/h, everything else plain success
+  const cp = new FakeChar(0x2ad9, { onWrite: (ch, b) => setTimeout(() => ch.notify(b[0] === 0x13 ? [0x80, 0x13, 0x01, 0xd0, 0x07, 0xac, 0x0d] : [0x80, b[0], 0x01]), 5) });
+  const st = new FakeChar(0x2ada);
+  const dev = fakeDevice('DIRETO X 123', { 0x1826: [cp, new FakeChar(0x2ad2), st, new FakeChar(0x2acc, { value: [0x02, 0x44, 0, 0, 0x08, 0xa0, 0, 0] }), new FakeChar(0x2ad8, { value: [0, 0, 0xe8, 0x03, 0x05, 0x00] })] });
+  const env = makeEnv(dev), t = env.trainer;
+  await t.connect();
+  assert.ok(t.canCalibrate, 'feature bit 15 = spin-down supported');
+  const codes = [];
+  const res = await t.calibrate(c => codes.push(c));
+  assert.equal(res.ok, true); assert.deepEqual(res.targets, { low: 20, high: 35 });
+  assert.deepEqual(cp.writes.slice(-2).map(w => w.bytes), [[0x00], [0x13, 0x01]], 'request control, then start the spin-down');
+  st.notify([0x14, 0x04]); st.notify([0x01]); st.notify([0x14, 0x02]);
+  assert.deepEqual(codes, [4, 2], 'stop pedalling, then success; the reset in between does not re-take control');
+  await new Promise(r => setTimeout(r, 1700));
+  assert.ok(!cp.writes.slice(4).some(w => w.bytes[0] === 0x00), 'no control request after the reset during calibration');
+  const nw = cp.writes.length; await t.endCalibration(false);
+  assert.deepEqual(cp.writes.slice(nw).map(w => w.bytes), [[0x00]], 'control requested again after the calibration');
+  // a trainer without spin-down support (bit 15 clear) is not offered the calibration
+  const dev2 = fakeDevice('Other', { 0x1826: [new FakeChar(0x2ad9, { onWrite: ftmsReply }), new FakeChar(0x2ad2), new FakeChar(0x2acc, { value: [0x02, 0x44, 0, 0, 0x08, 0x20, 0, 0] })] });
+  const env2 = makeEnv(dev2); await env2.trainer.connect();
+  assert.equal(env2.trainer.canCalibrate, false);
+  t.disconnect(); env2.trainer.disconnect();
 });
 
 test('Trainer: FTMS ERG + simulation, power range clamp, trainer HR', async () => {
