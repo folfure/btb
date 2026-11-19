@@ -20,7 +20,7 @@ for (const [name, env] of variants) {
   const html = readFileSync(out, 'utf8'), m = html.match(/<script>([\s\S]*?)<\/script>/);
   check(`${name}: one inline script`, !!m);
   try { new Function(m[1]); check(`${name}: script parses`, true); } catch (e) { check(`${name}: script parses`, false, e.message); }
-  for (const g of ['const AN =', 'const BODY =', 'const ANUI =', 'const DEMO =', 'function makeGauge', 'function applyTheme']) check(`${name}: has ${g}`, m[1].includes(g));
+  for (const g of ['const AN =', 'const BODY =', 'const ANUI =', 'const DEMO =', 'function makeGauge', 'function applyTheme', 'const TRAINER_PROTO =', 'const ANT =']) check(`${name}: has ${g}`, m[1].includes(g));
   const hash = createHash('sha256').update(m[1], 'utf8').digest('base64');
   check(`${name}: CSP hash matches`, html.includes(`'sha256-${hash}'`));
   check(`${name}: LF line endings`, !html.includes('\r'));

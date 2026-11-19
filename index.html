@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Structured indoor cycling workouts with ERG control for Bluetooth smart trainers, live gauges, training plans and ride analytics.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ujlta61Q93fzfXsKkNxlwTjwnNSoWSHvCbSAYVRl4/4='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src blob: mediastream:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Rr7icfecfe5mufcUjb/sY00w5uKDVhRLWqZ6m1m9gQU='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src blob: mediastream:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>ERGlab</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d13'/%3E%3Cpath d='M6 44h10l6-20 8 30 8-38 6 28h14' fill='none' stroke='%23ff8a1f' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -627,6 +627,24 @@ body.anx-lock{overflow:hidden}
   .anx-rec td[data-ride],.anx-ints tbody tr{transition:none}
 }
 
+/* ---- parts/c1-ant.css ---- */
+/* ANT+ settings card (markup from ANT.settingsCard() in c1-ant.js) */
+.ant-card{margin-top:12px}
+.ant-card .ant-sub{font-weight:600;font-size:.8em}
+.ant-card .ant-p{margin:6px 0 12px;font-size:14px}
+.ant-card .ant-keyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ant-card .ant-keyrow input{flex:1 1 220px;min-width:0;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;padding:9px 11px;outline:none;color:inherit;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.04em}
+.ant-card .ant-keyrow input:focus{border-color:var(--accent)}
+.ant-card .hint.ant-ok{color:var(--ok)} .ant-card .hint.ant-warn{color:var(--warn)} .ant-card .hint.ant-bad{color:var(--bad)}
+.ant-card .badge.ant-ok{color:var(--ok)} .ant-card .badge.ant-warn{color:var(--warn)} .ant-card .badge.ant-dim{color:var(--dim)}
+.ant-card .ant-help{margin-top:10px;font-size:13.5px;line-height:1.55}
+.ant-card .ant-help summary{cursor:pointer;color:var(--muted);font-size:13px}
+.ant-card .ant-help ol,.ant-card .ant-help ul{margin:8px 0;padding-left:20px}
+.ant-card .ant-help li{margin:3px 0}
+.ant-card .ant-help p{margin:6px 0 0;color:var(--muted)}
+.ant-card .ant-help code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;background:var(--bg2);border:1px solid var(--line2);border-radius:6px;padding:1px 5px;word-break:break-all}
+.ant-card a{color:var(--accent)}
+
 /* ---- parts/z1-theme.css ---- */
 /* =====================================================================
    THEMES: "Neon Miami" (default, :root[data-theme="neon"]) and "Classic" (the original look).
@@ -980,7 +998,7 @@ body.anx-lock{overflow:hidden}
     <nav class="tabs" id="tabs"></nav>
     <div class="spacer"></div>
     <div class="conn">
-      <button class="pill" id="pillTrainer" title="Connect smart trainer (FTMS)"><i class="dot"></i><span class="lbl" id="lblTrainer">Trainer</span></button>
+      <button class="pill" id="pillTrainer" title="Connect your smart trainer (Bluetooth)"><i class="dot"></i><span class="lbl" id="lblTrainer">Trainer</span></button>
       <button class="pill" id="pillHr" title="Connect heart-rate strap"><i class="dot"></i><span class="lbl" id="lblHr">HR</span></button>
       <button class="pill" id="pillSim" title="Simulator (no trainer needed)"><i class="dot"></i><span class="lbl">Sim</span></button>
     </div>
@@ -1152,6 +1170,7 @@ body.anx-lock{overflow:hidden}
       <p class="muted" style="margin:6px 0 10px;font-size:14px">Signed in as <b id="acctEmail"></b>. Settings, custom workouts, plan progress and rides are saved to your private cloud space (EU) and follow you to any device.</p>
       <div class="row"><button class="btn sm" id="acctSync">Sync now</button><span class="spacer"></span><button class="btn sm danger" id="acctOut">Sign out</button></div>
     </div>
+    <div id="antHost" style="margin-top:12px"></div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
       <div class="row"><h3><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
@@ -1187,7 +1206,8 @@ body.anx-lock{overflow:hidden}
     <div class="card pad" style="margin-top:12px">
       <h3>Connection notes</h3>
       <ul class="muted" style="font-size:14px;margin:8px 0 0;padding-left:18px">
-        <li>Uses the standard Bluetooth <b>FTMS</b> (Fitness Machine Service) protocol, supported by almost every current smart trainer (Wahoo, Tacx, Elite, Saris, JetBlack, Zwift Hub and more). Heart rate comes from a separate Bluetooth strap or from the trainer if it relays one.</li>
+        <li><b>Connect trainer</b> works with any smart trainer that has ERG over Bluetooth. The app picks the protocol after connecting: the standard <b>FTMS</b> (Fitness Machine Service, used by almost every current trainer), <b>Tacx FE-C over Bluetooth</b> (older Tacx firmware) or the <b>Wahoo</b> trainer protocol (older Wahoo firmware). A power meter or a trainer without control connects read-only: you see your power, but ERG is not available. Updating the trainer firmware usually adds FTMS.</li>
+        <li>Heart rate comes from a separate Bluetooth strap (<b>Connect HR</b>) or, if your trainer relays one, from the trainer itself.</li>
         <li>Close Zwift, MyWhoosh, the trainer maker's app and similar apps first. The trainer accepts only one Bluetooth controller at a time.</li>
         <li><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
         <li><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
@@ -1562,13 +1582,14 @@ function toERG(w) {
 }
 
 /* =====================================================================
-   BLUETOOTH: FTMS trainer + HR strap
+   BLUETOOTH: smart trainer + HR strap
+   "Connect trainer" works with any ERG-capable Bluetooth trainer. After connecting, the protocol is detected:
+   FTMS (the standard) > Tacx FE-C over BLE > Wahoo legacy > FTMS / Cycling Power read-only.
+   Byte layouts live in parts/c0-trainer-proto.js (TRAINER_PROTO, inlined later in this script, so it is only
+   referenced inside methods). Trainer owns the connection, the one-command-in-flight queue, throttling and
+   reconnects; a small adapter per protocol turns targets into bytes and notifications into live samples.
    ===================================================================== */
-const UUID = {
-  FTMS: 0x1826, IBD: 0x2ad2, CP: 0x2ad9, STATUS: 0x2ada, FEAT: 0x2acc, PRANGE: 0x2ad8, MSTATE: 0x2ad3,
-  CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37,
-};
-const FTMS_RESULT = { 1: 'success', 2: 'not supported', 3: 'invalid parameter', 4: 'operation failed', 5: 'control not permitted' };
+const UUID = { CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37 };
 const live = { power: null, cadence: null, hr: null, speed: null, tPower: 0, tCad: 0, tHr: 0, powerHist: [] };
 
 function liveFresh(field, ms = 3500) { return performance.now() - live['t' + field] < ms; }
@@ -1584,28 +1605,159 @@ function onHrSample(h, src) {
   live.hr = h; live.tHr = performance.now();
 }
 
+/* ---- protocol adapters: setup(found, stale) sets trainer.cp when the device can be controlled; start() runs once
+   control is available; send(d) returns 1 ok, -1 sent but unconfirmed, anything else = failed ---- */
+class FtmsTrainer {
+  constructor(t) { this.t = t; this.name = 'FTMS'; this.features = null; this.range = null; this.simUnsupported = false; this.lostCount = 0; this.ibdPower = false; this.ibdCad = false; }
+  get canSim() { return !this.simUnsupported && !(this.features && !this.features.sim); }
+  async setup(s, stale) {
+    const P = TRAINER_PROTO, t = this.t, svc = s.ftms;
+    try { this.features = P.ftms.parseFeatures(await (await svc.getCharacteristic(P.UUID.FEAT)).readValue()); } catch { }
+    try { this.range = P.ftms.parsePowerRange(await (await svc.getCharacteristic(P.UUID.PRANGE)).readValue()); } catch { }
+    if (stale()) return;
+    await t.listen(await svc.getCharacteristic(P.UUID.IBD), v => this.onIBD(v));
+    try { await t.listen(await svc.getCharacteristic(P.UUID.STATUS), v => this.onStatus(v)); } catch { }
+    // Trainers whose FTMS data has no power field (feature bit 14 clear) still send it on the Cycling Power service
+    if (s.cps && this.features && !this.features.powerData) try { await t.listen(await s.cps.getCharacteristic(P.UUID.CPM), v => t.onCPM(v, !this.ibdPower, !this.ibdCad)); } catch { }
+    if (stale() || !s.ftmsCp) return;
+    try { await t.listen(s.ftmsCp, v => this.onCP(v)); if (!stale()) t.cp = s.ftmsCp; } // enables indications (required before writing)
+    catch (e) { console.warn('FTMS control point unavailable', e); }
+  }
+  async start() {
+    const P = TRAINER_PROTO.ftms;
+    if (this.features && !this.features.power) toast('This trainer does not report ERG (power target) support. Trying anyway.', 5000);
+    const r = await this.requestControl();
+    if (r !== 1 && r !== -1) toast('Trainer did not grant control (' + (P.RESULT[r] || 'error') + '). Close other apps using it.', 5000);
+    await this.t.cmd(P.start()); // start / resume (tolerate "not supported")
+  }
+  requestControl() { return this.t.cmd(TRAINER_PROTO.ftms.requestControl()); }
+  async send(d) {
+    const P = TRAINER_PROTO.ftms, t = this.t, bytes = () => d.kind === 'power' ? P.targetPower(d.w) : P.simulation(d.grade);
+    let r = await t.cmd(bytes());
+    if (r === 5) { await this.requestControl(); r = await t.cmd(bytes()); } // control lost silently: take it back once
+    if (r === 2 && d.kind === 'sim') { // simulation not supported → leave ERG another way
+      this.simUnsupported = true;
+      const r2 = this.features && this.features.resistance ? await t.cmd(P.resistanceForGrade(d.grade)) : 2;
+      if (r2 !== 1) { await t.cmd(P.reset()); await this.requestControl(); }
+      r = 1;
+    }
+    return r;
+  }
+  reset() { return this.t.cmd(TRAINER_PROTO.ftms.reset()); }
+  goodbye(ch) { return this.t.cmd(TRAINER_PROTO.ftms.reset(), { ch, ack: false }); } // reset also releases control
+  describe(r) { return TRAINER_PROTO.ftms.RESULT[r]; }
+  onCP(v) { const m = TRAINER_PROTO.ftms.parseResponse(v); if (m) this.t.ack(m.op, m.result); }
+  onStatus(v) {
+    const m = TRAINER_PROTO.ftms.parseStatus(v); if (!m || !(m.reset || m.lost)) return;
+    // reset / control permission lost → request control again and resend (some trainers reset themselves after a stop)
+    const t = this.t; t.applied = null; this.lostCount++;
+    if (m.lost && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, the trainer maker\'s app, a head unit).', 7000); return; }
+    if (m.lost) toast('Another app took control of the trainer');
+    setTimeout(() => { if (t.ad === this && t.cp) this.requestControl().then(() => { t.applied = null; applyControl(); }); }, 1500);
+  }
+  onIBD(v) {
+    const d = TRAINER_PROTO.ftms.parseIndoorBikeData(v);
+    if (d.speed != null) live.speed = d.speed;
+    if (d.cadence != null) { this.ibdCad = true; onCadSample(d.cadence); }
+    if (d.power != null) { this.ibdPower = true; onPowerSample(d.power, 'trainer'); }
+    if (d.hr) onHrSample(d.hr, 'trainer');
+  }
+}
+
+class FecTrainer { // Tacx FE-C over BLE: ANT+ FE-C pages in ANT acknowledged messages, no per-write reply over BLE
+  constructor(t) { this.t = t; this.name = 'Tacx FE-C'; this.range = null; this.caps = null; this.simUnsupported = false; }
+  get canSim() { return !this.simUnsupported && !(this.caps && !this.caps.sim); }
+  async setup(s, stale) {
+    const P = TRAINER_PROTO, t = this.t;
+    const rx = await s.fec.getCharacteristic(P.UUID.FEC_NOTIFY), tx = await s.fec.getCharacteristic(P.UUID.FEC_WRITE);
+    if (stale()) return;
+    await t.listen(rx, v => this.onData(v));
+    if (!stale()) t.cp = tx;
+  }
+  async start() {
+    const P = TRAINER_PROTO.fec;
+    await this.page(P.encodeUserConfig(S.weight || 75, 9, 0.7)); // rider weight makes simulation mode realistic
+    await this.page(P.encodeRequestPage(54));                    // ask for the capabilities page (ERG / simulation support)
+  }
+  page(p, ch) { return this.t.cmd(TRAINER_PROTO.fec.wrap(p), { ch, ack: false, noResponse: true }); }
+  send(d) {
+    const P = TRAINER_PROTO.fec;
+    if (d.kind === 'power') return this.page(P.encodeTargetPower(d.w));
+    if (this.canSim) return this.page(P.encodeTrackResistance(d.grade));
+    return this.page(P.encodeBasicResistance(10 + d.grade * 4)); // no simulation: approximate the grade with plain resistance
+  }
+  reset() { return this.page(TRAINER_PROTO.fec.encodeBasicResistance(0)); }
+  goodbye(ch) { return this.page(TRAINER_PROTO.fec.encodeTrackResistance(0), ch); } // leave ERG so the trainer spins freely
+  describe(r) { return { 1: 'failed', 2: 'not supported', 3: 'rejected' }[r]; }
+  onData(v) {
+    const P = TRAINER_PROTO.fec;
+    for (const m of P.unwrapAll(v)) {
+      const d = P.parsePage(m.page); if (!d) continue;
+      if (d.page === 25) { if (d.power != null) onPowerSample(d.power, 'trainer'); if (d.cadence != null) onCadSample(d.cadence); }
+      else if (d.page === 16) { if (d.speed != null) live.speed = d.speed; if (d.hr) onHrSample(d.hr, 'trainer'); }
+      else if (d.page === 54) this.caps = d;
+      else if (d.page === 71 && d.lastCommand === 0x33 && d.status === 2) this.simUnsupported = true;
+    }
+  }
+}
+
+class WahooTrainer { // older KICKR / Snap / Core firmware: Wahoo control characteristic inside the Cycling Power service
+  constructor(t) { this.t = t; this.name = 'Wahoo'; this.range = null; this.mode = null; }
+  get canSim() { return true; }
+  async setup(s, stale) {
+    const P = TRAINER_PROTO, t = this.t;
+    if (s.cps) await t.listen(await s.cps.getCharacteristic(P.UUID.CPM), v => t.onCPM(v));
+    if (stale()) return;
+    await t.listen(s.wahooCp, v => this.onCP(v)); // indications carry the replies
+    if (!stale()) t.cp = s.wahooCp;
+  }
+  async start() {
+    this.mode = null;
+    const r = await this.t.cmd(TRAINER_PROTO.wahoo.unlock());
+    if (r !== 1 && r !== -1) toast('The trainer did not accept the control unlock. Close other apps using it, then reconnect.', 5000);
+  }
+  async send(d) {
+    const W = TRAINER_PROTO.wahoo, t = this.t, ok = r => r === 1 || r === -1;
+    if (d.kind === 'power') { const r = await t.cmd(W.erg(d.w)); if (ok(r)) this.mode = 'erg'; return r; }
+    if (this.mode !== 'sim') { const r = await t.cmd(W.simMode((S.weight || 75) + 9)); if (!ok(r)) return r; this.mode = 'sim'; }
+    return t.cmd(W.grade(d.grade));
+  }
+  reset() { return this.send({ kind: 'sim', grade: 0 }); }
+  goodbye(ch) { const W = TRAINER_PROTO.wahoo; this.t.cmd(W.simMode((S.weight || 75) + 9), { ch, ack: false }); return this.t.cmd(W.grade(0), { ch, ack: false }); }
+  describe() { return 'rejected'; }
+  onCP(v) { const m = TRAINER_PROTO.wahoo.parseResponse(v); if (m) this.t.ack(m.op, m.ok ? 1 : 4); }
+}
+
+class ReadOnlyTrainer { // power meter, or a trainer that offers no control we can use
+  constructor(t) { this.t = t; this.name = 'Power meter'; this.range = null; }
+  get canSim() { return false; }
+  async setup(s) { await this.t.listen(await s.cps.getCharacteristic(TRAINER_PROTO.UUID.CPM), v => this.t.onCPM(v)); }
+}
+
 class Trainer {
   constructor() {
-    this.dev = null; this.server = null; this.cp = null; this.status = 'idle'; this.name = '';
+    this.dev = null; this.server = null; this.cp = null; this.ad = null; this.status = 'idle'; this.name = ''; this.protocol = '';
     this.queue = Promise.resolve(); this.pending = null; this.desired = null; this.applied = null; this.appliedAt = 0; this.sentAt = 0;
-    this.kicking = false; this.kickGen = 0; this.range = { min: 0, max: 2000, inc: 1 }; this.features = null; this.hasFTMS = false;
+    this.kicking = false; this.kickGen = 0; this.subs = [];
     this.userDisconnect = false; this.reconnTries = 0; this.reconnTimer = null; this.gen = 0; this.crank = null;
-    this.lastFail = null; this.sawIndication = false; this.timeouts = 0; this.cpTimeout = 2500; this.simUnsupported = false; this.lostCount = 0;
-    this._ibd = e => this.onIBD(e.target.value); this._cp = e => this.onCP(e.target.value);
-    this._cpm = e => this.onCPM(e.target.value); this._st = e => this.onStatus(e.target.value);
+    this.lastFail = null; this.sawAck = false; this.timeouts = 0; this.ackTimeout = 2500;
     this._disc = () => this.onDisconnect();
   }
   get connected() { return this.status === 'connected'; }
-  get canSim() { return !this.simUnsupported && !(this.features && !((this.features.target >> 13) & 1)); }
+  get canControl() { return !!this.cp; }
+  get canSim() { return !!this.ad && this.ad.canSim; }
+  get features() { return this.ad?.features || null; }
+  get range() { return this.ad?.range || { min: 0, max: 2000, inc: 1 }; }
   setStatus(s, msg) { this.status = s; updateConnUI(msg); }
   async connect() {
     if (!navigator.bluetooth) { showBtHelp(true); return; }
     initAudio();
+    const U = TRAINER_PROTO.UUID;
     try {
-      // must be the first await in the click handler (user-gesture requirement)
+      // must be the first await in the click handler (user-gesture requirement). No name filters: any brand.
       const dev = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [UUID.FTMS] }, { services: [UUID.CPS] }],
-        optionalServices: [UUID.FTMS, UUID.CPS, UUID.HRS, 'device_information', 'battery_service'],
+        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }],
+        optionalServices: [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.HRS, 'device_information', 'battery_service'],
       });
       if (this.dev && this.dev !== dev) this.disconnect();
       clearTimeout(this.reconnTimer); this.reconnTimer = null;
@@ -1616,7 +1768,7 @@ class Trainer {
     } catch (e) {
       if (e && e.name === 'NotFoundError') {
         if (/adapter|not available|unavailable/i.test(e.message || '')) toast('No Bluetooth adapter found. Turn Bluetooth on, or plug in a Bluetooth 4.0+ dongle.', 7000);
-        this.setStatus(this.dev && this.dev.gatt.connected && this.cp ? 'connected' : 'idle'); return;
+        this.setStatus(this.dev && this.dev.gatt.connected && this.ad ? 'connected' : 'idle'); return;
       }
       console.error(e); this.setStatus('error', e.message);
       if (e && (e.name === 'SecurityError' || e.name === 'NotAllowedError')) showBtHelp(true, 'security');
@@ -1624,54 +1776,50 @@ class Trainer {
     }
   }
   async setup(gen) {
-    const stale = () => gen !== this.gen;
+    const stale = () => gen !== this.gen, P = TRAINER_PROTO, U = P.UUID;
     this.setStatus('connecting');
-    this.pending?.res(-2); this.cp = null; this.queue = Promise.resolve(); this.crank = null;
-    this.kicking = false; this.kickGen++; this.sawIndication = false; this.timeouts = 0; this.cpTimeout = 2500; this.lastFail = null;
+    this.pending?.res(-2); this.cp = null; this.ad = null; this.queue = Promise.resolve(); this.crank = null; this.unlisten();
+    this.kicking = false; this.kickGen++; this.sawAck = false; this.timeouts = 0; this.ackTimeout = 2500; this.lastFail = null;
     const server = await this.dev.gatt.connect(); if (stale()) return; this.server = server;
-    let ftms = null;
-    try { ftms = await server.getPrimaryService(UUID.FTMS); } catch { }
+    // detect the protocol: one GATT request at a time (Chrome rejects concurrent ones)
+    const svc = async u => { try { return await server.getPrimaryService(u); } catch { return null; } };
+    const chr = async (s, u) => { if (!s) return null; try { return await s.getCharacteristic(u); } catch { return null; } };
+    const found = { ftms: await svc(U.FTMS) };
+    found.ftmsCp = await chr(found.ftms, U.CP);
+    found.cps = await svc(U.CPS);
+    found.fec = found.ftmsCp ? null : await svc(U.FEC);
+    found.wahooCp = found.ftmsCp || found.fec ? null : (await chr(found.cps, U.WAHOO_CP)) || (await chr(await svc(U.WAHOO_SVC), U.WAHOO_CP));
     if (stale()) return;
-    this.hasFTMS = !!ftms;
-    if (ftms) {
-      try { const v = await (await ftms.getCharacteristic(UUID.FEAT)).readValue(); this.features = { machine: v.getUint32(0, true), target: v.getUint32(4, true) }; } catch { }
-      try { const v = await (await ftms.getCharacteristic(UUID.PRANGE)).readValue(); const mn = v.getInt16(0, true), mx = v.getInt16(2, true); if (mx > mn && mx > 0) this.range = { min: mn, max: mx, inc: Math.max(1, v.getUint16(4, true)) }; } catch { }
-      if (stale()) return;
-      const ibd = await ftms.getCharacteristic(UUID.IBD);
-      ibd.removeEventListener('characteristicvaluechanged', this._ibd); ibd.addEventListener('characteristicvaluechanged', this._ibd);
-      await ibd.startNotifications();
-      try { const st = await ftms.getCharacteristic(UUID.STATUS); st.removeEventListener('characteristicvaluechanged', this._st); st.addEventListener('characteristicvaluechanged', this._st); await st.startNotifications(); } catch { }
-      try {
-        const cp = await ftms.getCharacteristic(UUID.CP);
-        cp.removeEventListener('characteristicvaluechanged', this._cp); cp.addEventListener('characteristicvaluechanged', this._cp);
-        await cp.startNotifications(); // enables indications on the control point (required before writing)
-        if (stale()) return;
-        this.cp = cp;
-      } catch (e) { console.warn('No FTMS control point', e); }
-    } else {
-      // read-only fallback: Cycling Power Service
-      const cps = await server.getPrimaryService(UUID.CPS);
-      const cpm = await cps.getCharacteristic(UUID.CPM);
-      cpm.removeEventListener('characteristicvaluechanged', this._cpm); cpm.addEventListener('characteristicvaluechanged', this._cpm);
-      await cpm.startNotifications();
-    }
+    const kind = P.pick({ ftms: !!found.ftms, ftmsCp: !!found.ftmsCp, fec: !!found.fec, wahoo: !!found.wahooCp, cps: !!found.cps });
+    if (!kind) throw new Error('No supported service found (FTMS, Tacx FE-C, Wahoo or Cycling Power). Is it a smart trainer or power meter?');
+    const ad = new ({ ftms: FtmsTrainer, fec: FecTrainer, wahoo: WahooTrainer, cps: ReadOnlyTrainer })[kind](this);
+    this.ad = ad; this.protocol = ad.name;
+    await ad.setup(found, stale);
     if (stale()) return;
     this.reconnTries = 0;
     this.setStatus('connected');
     if (sim.on) { sim.stop(); toast('Simulator turned off: trainer connected'); }
-    if (this.cp && this.features && !((this.features.target >> 3) & 1)) toast('This trainer does not report ERG (power target) support. Trying anyway.', 5000);
-    if (this.cp) {
-      const r = await this.requestControl();
-      if (r !== 1 && r !== -1) toast('Trainer did not grant control (' + (FTMS_RESULT[r] || 'error') + '). Close other apps using it.', 5000);
-      await this.cmd([0x07]); // start / resume (tolerate "not supported")
-      this.applied = null; this.kick(); applyControl();
-      toast(`${this.name} connected · ERG ready`);
-    } else toast(`${this.name} connected (power data only, no control)`, 4000);
+    if (!this.cp) {
+      const why = kind === 'cps' ? 'power data only, ERG is not available on this device' : 'data only: the trainer offers no control';
+      toast(`${this.name} connected (${this.protocol}): ${why}`, 5000); return;
+    }
+    await ad.start?.();
+    if (stale() || !this.cp) return;
+    this.applied = null; this.kick(); applyControl();
+    toast(`${this.name} connected · ${this.protocol} · ERG ready`);
   }
+  // subscribe to notifications / indications; every listener is removed again on reconnect / disconnect
+  listen(ch, fn) {
+    const h = e => fn(e.target.value);
+    ch.addEventListener('characteristicvaluechanged', h); this.subs.push([ch, h]);
+    return ch.startNotifications();
+  }
+  unlisten(subs = this.subs) { for (const [ch, h] of subs) { try { ch.removeEventListener('characteristicvaluechanged', h); } catch { } } if (subs === this.subs) this.subs = []; }
   disconnect() {
     this.userDisconnect = true; clearTimeout(this.reconnTimer); this.reconnTimer = null; this.gen++;
-    if (this.cp) { try { this.cmd([0x01]); } catch { } } // reset: release ERG
-    setTimeout(() => { try { if (this.dev?.gatt?.connected) this.dev.gatt.disconnect(); } catch { } }, 300);
+    const ch = this.cp, ad = this.ad, subs = this.subs, g = this.gen; this.subs = [];
+    if (ch && ad?.goodbye) { try { ad.goodbye(ch); } catch { } } // release ERG before dropping the link
+    setTimeout(() => { this.unlisten(subs); if (g !== this.gen) return; try { if (this.dev?.gatt?.connected) this.dev.gatt.disconnect(); } catch { } }, 400);
     this.cp = null; this.setStatus('idle');
   }
   onDisconnect() {
@@ -1693,45 +1841,42 @@ class Trainer {
     };
     this.reconnTimer = setTimeout(tryIt, 800);
   }
-  /* ---- control point: strictly one command in flight, each with its own timeout ---- */
-  cmd(bytes, timeout = this.cpTimeout) {
+  /* ---- control channel: strictly one command in flight. With ack (FTMS, Wahoo) a command waits for its reply
+     (matched by opcode) or a timeout; without (FE-C) a successful write counts as done. ---- */
+  async write(ch, bytes, noResponse) {
+    const data = new Uint8Array(bytes), pr = ch.properties || {};
+    if (noResponse && ch.writeValueWithoutResponse && pr.writeWithoutResponse !== false) return ch.writeValueWithoutResponse(data);
+    if (ch.writeValueWithResponse && pr.write !== false) return ch.writeValueWithResponse(data);
+    if (ch.writeValueWithoutResponse && pr.writeWithoutResponse) return ch.writeValueWithoutResponse(data);
+    return ch.writeValue(data); // older Web Bluetooth (e.g. Bluefy)
+  }
+  cmd(bytes, o = {}) {
     const run = async () => {
-      if (!this.cp) return -2;
-      const op = bytes[0]; let entry;
+      const ch = o.ch || this.cp; if (!ch) return -2;
+      this.sentAt = performance.now();
+      if (o.ack === false) {
+        try { await this.write(ch, bytes, o.noResponse); return 1; } catch (e) { console.warn('Trainer write failed', e); return -3; }
+      }
+      let entry;
       const p = new Promise(res => {
-        entry = { op, done: false, res: v => { if (entry.done) return; entry.done = true; clearTimeout(entry.t); if (this.pending === entry) this.pending = null; res(v); } };
-        entry.t = setTimeout(() => entry.res(-1), timeout);
+        entry = { op: bytes[0], done: false, res: v => { if (entry.done) return; entry.done = true; clearTimeout(entry.t); if (this.pending === entry) this.pending = null; res(v); } };
+        entry.t = setTimeout(() => entry.res(-1), o.timeout || this.ackTimeout);
         this.pending = entry;
       });
-      try {
-        const data = new Uint8Array(bytes);
-        if (this.cp.writeValueWithResponse) await this.cp.writeValueWithResponse(data); else await this.cp.writeValue(data);
-      } catch (e) { console.warn('CP write failed', e); entry.res(-3); }
+      try { await this.write(ch, bytes, o.noResponse); } catch (e) { console.warn('Trainer write failed', e); entry.res(-3); }
       return p;
     };
     const next = this.queue.then(run, run);
     this.queue = next.catch(() => { });
     return next;
   }
-  onCP(v) {
-    if (v.byteLength < 3 || v.getUint8(0) !== 0x80) return;
-    this.sawIndication = true; this.timeouts = 0; this.cpTimeout = 2500;
-    const op = v.getUint8(1), res = v.getUint8(2);
-    if (this.pending && this.pending.op === op) this.pending.res(res);
+  ack(op, result) { // a reply arrived on the control channel
+    this.sawAck = true; this.timeouts = 0; this.ackTimeout = 2500;
+    if (this.pending && this.pending.op === op) this.pending.res(result);
   }
-  onStatus(v) {
-    if (!v.byteLength) return;
-    const op = v.getUint8(0);
-    if (op === 0x01 || op === 0xff) { // reset / control permission lost → re-request and resend
-      this.applied = null; this.lostCount++;
-      if (op === 0xff && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, the trainer brand app, a head unit).', 7000); return; }
-      if (op === 0xff) toast('Another app took control of the trainer');
-      setTimeout(() => this.requestControl().then(() => { this.applied = null; applyControl(); }), 1500);
-    }
-  }
-  requestControl() { return this.cmd([0x00]); }
   setPower(w) {
-    w = clamp(Math.round(w / this.range.inc) * this.range.inc, Math.max(0, this.range.min), this.range.max || 2000);
+    const rg = this.range;
+    w = clamp(Math.round(w / rg.inc) * rg.inc, Math.max(0, rg.min), rg.max || 2000);
     this.desired = { kind: 'power', w }; this.kick();
   }
   setSim(grade) {
@@ -1739,7 +1884,7 @@ class Trainer {
   }
   same(a, b) { return a && b && a.kind === b.kind && (a.kind === 'power' ? a.w === b.w : a.grade === b.grade); }
   async kick() {
-    if (this.kicking || !this.cp) return;
+    if (this.kicking || !this.cp || !this.ad) return;
     this.kicking = true; const kg = this.kickGen;
     try {
       while (this.desired && this.cp && kg === this.kickGen) {
@@ -1748,64 +1893,27 @@ class Trainer {
         if (this.lastFail && this.same(d, this.lastFail.d) && performance.now() - this.lastFail.at < 5000) continue; // back off on rejected targets
         const wait = 900 - (performance.now() - this.sentAt); // never more than ~1 command per second
         if (wait > 0) { await new Promise(r => setTimeout(r, wait)); if (this.desired || kg !== this.kickGen) { if (!this.desired) this.desired = d; continue; } }
-        this.sentAt = performance.now();
-        let r = await this.send(d);
+        const r = await this.ad.send(d);
         if (kg !== this.kickGen) return;
-        if (r === 5) { await this.requestControl(); r = await this.send(d); }
-        if (r === 2 && d.kind === 'sim') { // simulation not supported → leave ERG another way
-          this.simUnsupported = true;
-          const r2 = (this.features && (this.features.target >> 2) & 1) ? await this.cmd([0x04, clamp(Math.round(20 + d.grade * 8), 0, 200)]) : 2;
-          if (r2 !== 1) { await this.cmd([0x01]); await this.requestControl(); }
-          r = 1;
-        }
-        if (r === -1) { // no indication arrived; if the trainer never indicates (some iOS bridges), confirm on write instead
+        if (r === -1) { // no reply arrived; if the trainer never replies (some iOS bridges), confirm on write instead
           this.timeouts++;
-          if (!this.sawIndication && this.timeouts >= 2 && this.cpTimeout !== 300) { this.cpTimeout = 300; console.warn('FTMS: no control-point indications, using write-confirmed mode'); }
+          if (!this.sawAck && this.timeouts >= 2 && this.ackTimeout !== 300) { this.ackTimeout = 300; console.warn(`${this.protocol}: no control replies, using write-confirmed mode`); }
         }
         if (r === 1 || r === -1) { this.applied = d; this.appliedAt = performance.now(); this.lastFail = null; }
-        else { this.lastFail = { d, at: performance.now() }; if (r > 1) console.warn('FTMS command failed', d, FTMS_RESULT[r]); }
+        else { this.lastFail = { d, at: performance.now() }; if (r > 1) console.warn(`${this.protocol} command failed`, d, this.ad.describe?.(r) || r); }
       }
     } finally { if (kg === this.kickGen) this.kicking = false; }
   }
-  send(d) {
-    if (d.kind === 'power') return this.cmd([0x05, d.w & 0xff, (d.w >> 8) & 0xff]);
-    const g = Math.round(d.grade * 100); // 0.01 %
-    // wind 0 m/s, grade, Crr 0.004 (0.0001 units), Cw 0.51 kg/m (0.01 units)
-    return this.cmd([0x11, 0, 0, g & 0xff, (g >> 8) & 0xff, 40, 51]);
-  }
-  release() { if (!this.cp) return; this.canSim ? this.setSim(0) : this.cmd([0x01]); }
-  /* ---- data parsing ---- */
-  onIBD(v) {
-    try {
-      const f = v.getUint16(0, true); let o = 2;
-      if (!(f & 0x0001)) { live.speed = v.getUint16(o, true) / 100; o += 2; } // inverted "more data"
-      if (f & 0x0002) o += 2;                   // avg speed
-      if (f & 0x0004) { onCadSample(v.getUint16(o, true) / 2); o += 2; }
-      if (f & 0x0008) o += 2;                   // avg cadence
-      if (f & 0x0010) o += 3;                   // total distance
-      if (f & 0x0020) {                         // resistance level: sint16 in FTMS 1.0, uint8 in newer GSS: infer from length
-        const rest = (f & 0x40 ? 2 : 0) + (f & 0x80 ? 2 : 0) + (f & 0x100 ? 5 : 0) + (f & 0x200 ? 1 : 0) + (f & 0x400 ? 1 : 0) + (f & 0x800 ? 2 : 0) + (f & 0x1000 ? 2 : 0);
-        o += (v.byteLength - o - rest) === 1 ? 1 : 2;
-      }
-      if (f & 0x0040) { onPowerSample(v.getInt16(o, true), 'trainer'); o += 2; }
-      if (f & 0x0080) o += 2;                   // avg power
-      if (f & 0x0100) o += 5;                   // expended energy
-      if (f & 0x0200) { onHrSample(v.getUint8(o), 'trainer'); o += 1; }
-    } catch (e) { /* malformed / partial packet */ }
-  }
-  onCPM(v) {
-    try {
-      const f = v.getUint16(0, true); onPowerSample(v.getInt16(2, true), 'trainer'); let o = 4;
-      if (f & 0x01) o += 1; if (f & 0x04) o += 2; if (f & 0x10) o += 6;
-      if (f & 0x20) {
-        const revs = v.getUint16(o, true), t = v.getUint16(o + 2, true), now = performance.now();
-        if (this.crank) {
-          const dr = (revs - this.crank.revs + 65536) % 65536, dt = ((t - this.crank.t + 65536) % 65536) / 1024;
-          if (dr > 0 && dt > 0) { onCadSample(dr / dt * 60); this.crank = { revs, t, at: now }; }
-          else if (now - this.crank.at > 3000) onCadSample(0);
-        } else this.crank = { revs, t, at: now };
-      }
-    } catch { }
+  release() { if (!this.cp || !this.ad) return; this.canSim ? this.setSim(0) : this.ad.reset?.(); }
+  /* ---- Cycling Power Measurement (power meters, Wahoo, FTMS trainers without power in their bike data) ---- */
+  onCPM(v, usePower = true, useCad = true) {
+    const P = TRAINER_PROTO.cps, m = P.parseMeasurement(v); if (!m) return;
+    if (usePower) onPowerSample(m.power, 'trainer');
+    if (!useCad || !m.crank) return;
+    const now = performance.now(), rpm = P.cadence(this.crank, m.crank);
+    if (rpm != null) { onCadSample(rpm); this.crank = { ...m.crank, at: now }; }
+    else if (!this.crank) this.crank = { ...m.crank, at: now };
+    else if (now - this.crank.at > 3000) onCadSample(0);
   }
 }
 
@@ -1852,8 +1960,28 @@ class HrStrap {
   }
   disconnect() { this.user = true; clearTimeout(this.timer); this.timer = null; this.gen++; try { this.dev?.gatt?.disconnect(); } catch { } this.status = 'idle'; updateConnUI(); }
 }
-const trainer = new Trainer();
-const hrm = new HrStrap();
+// the active trainer / HR source: Bluetooth by default, an ANT+ USB stick when the rider picks it
+const bleTrainer = new Trainer(), bleHr = new HrStrap();
+let trainer = bleTrainer, hrm = bleHr, antTrainer = null, antHr = null;
+const antUsable = () => typeof ANT !== 'undefined' && ANT.supported();
+// connect: Bluetooth directly, or a small chooser when this browser can also use an ANT+ USB stick (WebUSB)
+function chooseLink(kind) {
+  const isHr = kind === 'hr', cur = isHr ? hrm : trainer;
+  if (cur.connected) { if (confirm(`Disconnect ${cur.name}?`)) cur.disconnect(); return; }
+  const ble = () => { if (isHr) { hrm = bleHr; bleHr.connect(); } else { trainer = bleTrainer; bleTrainer.connect(); } };
+  if (!antUsable()) { ble(); return; }
+  const m = openModal(`<h2>${isHr ? 'Connect heart rate' : 'Connect your trainer'}</h2>
+    <p class="muted" style="margin:6px 0 14px">${isHr ? 'Pick how your heart-rate strap talks to this computer.' : 'Pick how your smart trainer talks to this computer. Both control ERG.'}</p>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn primary lg" id="lkBle">Bluetooth</button><button class="btn lg" id="lkAnt">ANT+ USB stick</button><span class="spacer"></span><button class="btn ghost" id="lkX">Cancel</button></div>
+    <p class="dim" style="font-size:12.5px;margin:12px 0 0">${ANT.hasKey() ? 'ANT+ needs a USB stick plugged in (on Windows with the WinUSB driver, see Settings › ANT+).' : 'ANT+ needs a USB stick and your ANT+ network key, set once in Settings › ANT+.'}</p>`, true);
+  $('#lkX', m).onclick = closeModal;
+  $('#lkBle', m).onclick = () => { closeModal(); ble(); };
+  $('#lkAnt', m).onclick = () => {
+    closeModal();
+    if (isHr) { antHr ||= new AntHr(); hrm = antHr; antHr.connect(); }
+    else { antTrainer ||= new AntFeC(); trainer = antTrainer; antTrainer.connect(); }
+  };
+}
 
 /* =====================================================================
    SIMULATOR (rides the workout for you — great for previewing)
@@ -3336,7 +3464,14 @@ function bindCloud() {
 }
 
 /* ---- settings ---- */
+function renderAntCard() {
+  const host = $('#antHost'); if (!host || typeof ANT === 'undefined') return;
+  if (!('usb' in navigator)) { host.innerHTML = ''; return; } // iPhone / Safari / Firefox: no USB access for web pages
+  if (!host.firstChild) { host.innerHTML = ANT.settingsCard(); ANT.hooks.needKey = () => { go('settings'); setTimeout(() => { const c = $('#antCard'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); }; }
+  ANT.bindSettings(host);
+}
 function renderSettings() {
+  renderAntCard();
   $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme;
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
@@ -3393,6 +3528,7 @@ function afterSettings() { setTheme(); renderSettings(); refreshLibraries(); if 
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
   const pt = $('#pillTrainer'); pt.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[trainer.status] || '');
+  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · power data only'} (tap to disconnect)` : `Connect your smart trainer (Bluetooth${antUsable() ? ' or ANT+' : ''})`;
   const small = matchMedia('(max-width:860px)').matches;
   $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? 'Trainer' : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? 'Connecting…' : trainer.status === 'reconnecting' ? 'Reconnecting…' : small ? 'Trainer' : 'Connect trainer';
   const ph = $('#pillHr'); ph.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[hrm.status] || '');
@@ -3453,11 +3589,8 @@ function showBtHelp(force, why) {
    WIRING
    ===================================================================== */
 function bind() {
-  $('#pillTrainer').onclick = () => {
-    if (trainer.connected) { if (confirm(`Disconnect ${trainer.name}?`)) trainer.disconnect(); }
-    else trainer.connect();
-  };
-  $('#pillHr').onclick = () => { if (hrm.connected) { if (confirm(`Disconnect ${hrm.name}?`)) hrm.disconnect(); } else hrm.connect(); };
+  $('#pillTrainer').onclick = () => chooseLink('trainer');
+  $('#pillHr').onclick = () => chooseLink('hr');
   $('#pillSim').onclick = () => { initAudio(); sim.on ? sim.stop() : sim.start(); };
   ['#q', '#sort', '#durf'].forEach(s => $(s).addEventListener('input', renderLib));
   $('#frErg').onclick = () => startFreeRide('erg');
@@ -3486,7 +3619,7 @@ function bind() {
   };
   $('#cErg').onclick = () => setMode(true); $('#cSlope').onclick = () => setMode(false);
   $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm('End the ride and save it?')) finishRide(false); };
-  $('#rideConnect').onclick = () => trainer.connect();
+  $('#rideConnect').onclick = () => chooseLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cFull').classList.toggle('hidden', !fsOK);
   $('#cFull').onclick = () => { const d = document, el = d.documentElement;
@@ -5659,6 +5792,978 @@ const DEMO = (() => {
 // what the history and analytics views show: the user's own rides, plus the demo rider while the simulator is on
 function viewHistory() { const own = load('erglab.history', []); return DEMO.active ? own.concat(DEMO.rides()).sort((a, b) => String(b.date).localeCompare(String(a.date))) : own; }
 function viewS() { return DEMO.active ? Object.assign({}, S, DEMO.body()) : S; }
+
+/* ---- parts/c0-trainer-proto.js ---- */
+// Smart-trainer wire protocols: pure encoders / decoders, no DOM, no Bluetooth calls, no globals except TRAINER_PROTO.
+// The stateful Trainer class (app.template.html) picks a protocol after connecting and uses these helpers:
+//   FTMS (Bluetooth SIG Fitness Machine Service, 0x1826): the standard on current trainers.
+//   Tacx FE-C over BLE: ANT+ FE-C data pages wrapped in ANT messages, sent over a Nordic-UART-style service.
+//   Wahoo legacy: Cycling Power service + Wahoo's trainer control characteristic (KICKR / Snap / Core before FTMS).
+//   Power meter: Cycling Power service only (read-only).
+// Encoders return plain number arrays (bytes); decoders take a DataView, a typed array or a number array.
+// See src/protocol_notes.md for the byte layouts and sources. src/test/protocols.test.mjs covers every helper.
+const TRAINER_PROTO = (() => {
+  const dvOf = x => x instanceof DataView ? x : ArrayBuffer.isView(x) ? new DataView(x.buffer, x.byteOffset, x.byteLength) : new DataView(Uint8Array.from(x).buffer);
+  const bytesOf = x => x instanceof Uint8Array ? x : x instanceof DataView ? new Uint8Array(x.buffer, x.byteOffset, x.byteLength) : Uint8Array.from(x);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const u16 = v => [v & 0xff, (v >> 8) & 0xff];
+
+  const UUID = {
+    FTMS: 0x1826, IBD: 0x2ad2, CP: 0x2ad9, STATUS: 0x2ada, FEAT: 0x2acc, PRANGE: 0x2ad8,
+    CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37,
+    FEC: '6e40fec1-b5a3-f393-e0a9-e50e24dcca9e',      // Tacx FE-C over BLE service
+    FEC_NOTIFY: '6e40fec2-b5a3-f393-e0a9-e50e24dcca9e',   // trainer -> app (notify)
+    FEC_WRITE: '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',   // app -> trainer (write)
+    WAHOO_CP: 'a026e005-0a7d-4ab3-97fa-f1500f9feb8b', // Wahoo trainer control (write + indicate), inside the Cycling Power service
+    WAHOO_SVC: 'a026ee01-0a7d-4ab3-97fa-f1500f9feb8b', // Wahoo vendor service (some firmware): only probed, never required
+  };
+  const NAMES = { ftms: 'FTMS', fec: 'Tacx FE-C', wahoo: 'Wahoo', cps: 'Power meter' };
+
+  // Which protocol to drive, from what the connected device exposes. Prefer one that can control the trainer.
+  // has: { ftms, ftmsCp (FTMS control point usable), fec, wahoo, cps }
+  function pick(has) {
+    if (has.ftms && has.ftmsCp) return 'ftms';
+    if (has.fec) return 'fec';
+    if (has.wahoo) return 'wahoo';
+    if (has.ftms) return 'ftms'; // FTMS without a control point: data only
+    if (has.cps) return 'cps';
+    return null;
+  }
+
+  /* ---------------- FTMS ---------------- */
+  const ftms = {
+    RESULT: { 1: 'success', 2: 'not supported', 3: 'invalid parameter', 4: 'operation failed', 5: 'control not permitted' },
+    requestControl: () => [0x00],
+    reset: () => [0x01],
+    start: () => [0x07],
+    targetPower: w => [0x05, ...u16(clamp(Math.round(w), -32768, 32767))],
+    // grade in %, wind m/s, Crr (unitless), Cw kg/m
+    simulation: (grade, crr = 0.004, cw = 0.51, wind = 0) => {
+      const g = clamp(Math.round(grade * 100), -32768, 32767), ws = clamp(Math.round(wind * 1000), -32768, 32767);
+      return [0x11, ...u16(ws), ...u16(g), clamp(Math.round(crr * 10000), 0, 255), clamp(Math.round(cw * 100), 0, 255)];
+    },
+    // Fallback when simulation is not supported: map grade onto the resistance level (uint8, 0.1 units)
+    resistanceForGrade: grade => [0x04, clamp(Math.round(20 + grade * 8), 0, 200)],
+    parseFeatures(x) {
+      const v = dvOf(x); if (v.byteLength < 8) return null;
+      const machine = v.getUint32(0, true), target = v.getUint32(4, true);
+      // power/sim/resistance: target-setting bits 3/13/2 (what can be controlled); powerData/hr: machine bits 14/10 (what is reported)
+      return { machine, target, power: !!((target >> 3) & 1), sim: !!((target >> 13) & 1), resistance: !!((target >> 2) & 1), powerData: !!((machine >> 14) & 1), hr: !!((machine >> 10) & 1) };
+    },
+    parsePowerRange(x) {
+      const v = dvOf(x); if (v.byteLength < 6) return null;
+      const min = v.getInt16(0, true), max = v.getInt16(2, true), inc = v.getUint16(4, true);
+      return max > min && max > 0 ? { min, max, inc: Math.max(1, inc) } : null;
+    },
+    // Control point indication: [0x80, requestOp, result]
+    parseResponse(x) {
+      const v = dvOf(x); if (v.byteLength < 3 || v.getUint8(0) !== 0x80) return null;
+      return { op: v.getUint8(1), result: v.getUint8(2) };
+    },
+    // Fitness Machine Status: 0x01 reset, 0xFF control permission lost -> request control again and resend
+    parseStatus(x) {
+      const v = dvOf(x); if (!v.byteLength) return null;
+      const op = v.getUint8(0);
+      return { op, reset: op === 0x01, lost: op === 0xff };
+    },
+    // Indoor Bike Data. Fields absent from the packet are absent from the result.
+    parseIndoorBikeData(x) {
+      const v = dvOf(x), r = {};
+      try {
+        const f = v.getUint16(0, true); let o = 2;
+        if (!(f & 0x0001)) { r.speed = v.getUint16(o, true) / 100; o += 2; } // km/h; bit 0 is inverted ("more data")
+        if (f & 0x0002) o += 2;
+        if (f & 0x0004) { r.cadence = v.getUint16(o, true) / 2; o += 2; }
+        if (f & 0x0008) o += 2;
+        if (f & 0x0010) { r.distance = v.getUint16(o, true) | (v.getUint8(o + 2) << 16); o += 3; }
+        if (f & 0x0020) { // resistance level: sint16 in FTMS 1.0, uint8 in newer GSS; infer from the packet length
+          const rest = (f & 0x40 ? 2 : 0) + (f & 0x80 ? 2 : 0) + (f & 0x100 ? 5 : 0) + (f & 0x200 ? 1 : 0) + (f & 0x400 ? 1 : 0) + (f & 0x800 ? 2 : 0) + (f & 0x1000 ? 2 : 0);
+          o += (v.byteLength - o - rest) === 1 ? 1 : 2;
+        }
+        if (f & 0x0040) { r.power = v.getInt16(o, true); o += 2; }
+        if (f & 0x0080) o += 2;
+        if (f & 0x0100) o += 5;
+        if (f & 0x0200) { const h = v.getUint8(o); if (h > 0 && h < 255) r.hr = h; o += 1; }
+        if (f & 0x0400) o += 1;
+        if (f & 0x0800) { r.elapsed = v.getUint16(o, true); o += 2; }
+      } catch { /* partial packet: keep what was read */ }
+      return r;
+    },
+  };
+
+  /* ---------------- Cycling Power Measurement (0x2A63) ---------------- */
+  const cps = {
+    parseMeasurement(x) {
+      const v = dvOf(x); if (v.byteLength < 4) return null;
+      const f = v.getUint16(0, true), r = { power: v.getInt16(2, true), crank: null }; let o = 4;
+      if (f & 0x01) o += 1; if (f & 0x04) o += 2; if (f & 0x10) o += 6;
+      if ((f & 0x20) && v.byteLength >= o + 4) r.crank = { revs: v.getUint16(o, true), t: v.getUint16(o + 2, true) };
+      return r;
+    },
+    // rpm between two crank samples (uint16 wrap, event time 1/1024 s); null when no new revolution
+    cadence(prev, cur) {
+      if (!prev || !cur) return null;
+      const dr = (cur.revs - prev.revs + 65536) % 65536, dt = ((cur.t - prev.t + 65536) % 65536) / 1024;
+      return dr > 0 && dt > 0 ? dr / dt * 60 : null;
+    },
+  };
+
+  /* ---------------- Tacx FE-C over BLE (ANT messages) ---------------- */
+  // ANT message: [0xA4 sync, length (=9: channel + 8-byte page), msg id, channel, page x8, XOR checksum]
+  const fec = {
+    SYNC: 0xa4, BROADCAST: 0x4e, ACK: 0x4f, CHANNEL: 5,
+    checksum: bytes => { let c = 0; for (const b of bytes) c ^= b; return c; },
+    wrap(page, msgId = 0x4f, channel = 5) {
+      const p = Array.from(page); if (p.length !== 8) throw new Error('FE-C page must be 8 bytes');
+      const m = [0xa4, 9, msgId, channel, ...p];
+      return [...m, fec.checksum(m)];
+    },
+    // One ANT message -> { msgId, channel, page: number[8] } or null (bad sync / length / checksum)
+    unwrap(x) {
+      const b = bytesOf(x);
+      if (b.length < 13 || b[0] !== 0xa4 || b[1] !== 9) return null;
+      if (fec.checksum(b.subarray(0, 12)) !== b[12]) return null;
+      return { msgId: b[2], channel: b[3], page: Array.from(b.subarray(4, 12)) };
+    },
+    // A notification can carry one message, several, or junk around them: return every valid data message.
+    unwrapAll(x) {
+      const b = bytesOf(x), out = [];
+      for (let i = 0; i + 13 <= b.length; i++) {
+        if (b[i] !== 0xa4) continue;
+        const m = fec.unwrap(b.subarray(i, i + 13));
+        if (m && (m.msgId === 0x4e || m.msgId === 0x4f)) { out.push(m); i += 12; }
+      }
+      return out;
+    },
+    // Page 49 (0x31) Target Power, 0.25 W units
+    encodeTargetPower: w => [0x31, 0xff, 0xff, 0xff, 0xff, 0xff, ...u16(clamp(Math.round(w * 4), 0, 65532))],
+    // Page 51 (0x33) Track Resistance: grade 0.01 % with +200 % offset; Crr in 5e-5 units (0xFF = trainer default)
+    encodeTrackResistance(grade, crr = 0.004) {
+      const g = clamp(Math.round((grade + 200) * 100), 0, 40000);
+      const c = crr == null ? 0xff : clamp(Math.round(crr / 0.00005), 0, 254);
+      return [0x33, 0xff, 0xff, 0xff, 0xff, ...u16(g), c];
+    },
+    // Page 48 (0x30) Basic Resistance: 0.5 % of the trainer's maximum resistance
+    encodeBasicResistance: pct => [0x30, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, clamp(Math.round(pct * 2), 0, 200)],
+    // Page 50 (0x32) Wind Resistance: coefficient 0.01 kg/m, wind speed km/h offset 127, drafting factor 0.01
+    encodeWindResistance: (cw = 0.51, windKmh = 0, draft = 1) =>
+      [0x32, 0xff, 0xff, 0xff, 0xff, clamp(Math.round(cw * 100), 0, 254), clamp(Math.round(windKmh + 127), 0, 254), clamp(Math.round(draft * 100), 0, 100)],
+    // Page 55 (0x37) User Configuration: user weight 0.01 kg, bike weight 0.05 kg (12 bit), wheel diameter 0.01 m
+    encodeUserConfig(userKg = 75, bikeKg = 9, wheelM = 0.7) {
+      const u = clamp(Math.round(userKg * 100), 0, 65534), bk = clamp(Math.round(bikeKg * 20), 0, 1000), wd = clamp(Math.round(wheelM * 100), 0, 254);
+      return [0x37, ...u16(u), 0xff, 0x0f | ((bk & 0x0f) << 4), (bk >> 4) & 0xff, wd, 0x00];
+    },
+    // Page 70 (0x46) Request Data Page (e.g. 54 = FE capabilities): transmit twice, as a data page
+    encodeRequestPage: page => [0x46, 0xff, 0xff, 0xff, 0xff, 0x02, page & 0xff, 0x01],
+    // Decode one 8-byte FE-C data page.
+    parsePage(x) {
+      const p = bytesOf(x); if (p.length < 8) return null;
+      switch (p[0]) {
+        case 0x10: { // General FE Data
+          const spd = p[4] | (p[5] << 8);
+          return {
+            page: 16, equipment: p[1], elapsed: p[2] / 4, distance: p[3], // elapsed rolls over at 64 s, distance at 256 m
+            speed: spd === 0xffff ? null : spd * 3.6 / 1000, // 0.001 m/s -> km/h
+            hr: p[6] === 0xff || p[6] === 0 ? null : p[6], hrSource: p[7] & 0x03,
+            state: (p[7] >> 4) & 0x07,
+          };
+        }
+        case 0x19: { // Specific Trainer / Stationary Bike Data
+          const pw = p[5] | ((p[6] & 0x0f) << 8);
+          return {
+            page: 25, events: p[1], cadence: p[2] === 0xff ? null : p[2], accPower: p[3] | (p[4] << 8),
+            power: pw === 0xfff ? null : pw, trainerStatus: (p[6] >> 4) & 0x0f,
+            target: p[7] & 0x03, // 0 at target power, 1 speed too low, 2 speed too high, 3 undetermined
+            state: (p[7] >> 4) & 0x07,
+          };
+        }
+        case 0x36: // FE Capabilities
+          return { page: 54, maxResistance: p[5] | (p[6] << 8), basic: !!(p[7] & 1), power: !!(p[7] & 2), sim: !!(p[7] & 4) };
+        case 0x47: // Command Status (reply to the last control page)
+          return { page: 71, lastCommand: p[1], seq: p[2], status: p[3] }; // status 0 pass, 1 fail, 2 not supported, 3 rejected, 4 pending, 255 none
+        default: return { page: p[0] };
+      }
+    },
+  };
+
+  /* ---------------- Wahoo legacy trainer control (a026e005 in the Cycling Power service) ---------------- */
+  // Opcodes as used by GoldenCheetah (BT40Device.cpp) and qdomyos-zwift (wahookickrsnapbike); response = [0x01 ok, op, ...]
+  const wahoo = {
+    OP: { UNLOCK: 0x20, RESISTANCE: 0x40, STANDARD: 0x41, ERG: 0x42, SIM: 0x43, CRR: 0x44, WIND_RES: 0x45, GRADE: 0x46, WIND_SPEED: 0x47, WHEEL: 0x48 },
+    unlock: () => [0x20, 0xee, 0xfc],
+    erg: w => [0x42, ...u16(clamp(Math.round(w), 0, 65535))],
+    // Enter simulation mode: rider+bike weight kg x100, Crr x10000, wind resistance coefficient (kg/m) x1000
+    simMode: (kg = 84, crr = 0.004, cw = 0.51) => [0x43, ...u16(clamp(Math.round(kg * 100), 0, 65535)), ...u16(clamp(Math.round(crr * 10000), 0, 65535)), ...u16(clamp(Math.round(cw * 1000), 0, 65535))],
+    // Grade in %: -100 % .. +100 % mapped onto 0 .. 65535 with 0 % at 32767.5
+    grade: g => [0x46, ...u16(Math.round((clamp(g / 100, -1, 1) + 1) * 65535 / 2))],
+    windSpeed: ms => [0x47, ...u16(clamp(Math.round((ms + 32.768) * 1000), 0, 65535))],
+    wheel: mm => [0x48, ...u16(clamp(Math.round(mm * 10), 0, 65535))],
+    parseResponse(x) {
+      const v = dvOf(x); if (v.byteLength < 2) return null;
+      return { ok: v.getUint8(0) === 0x01, op: v.getUint8(1) };
+    },
+  };
+
+  return { UUID, NAMES, pick, ftms, cps, fec, wahoo };
+})();
+
+/* ---- parts/c1-ant.js ---- */
+// ANT+ through a USB stick (WebUSB): ANT+ FE-C smart trainers (ERG + slope), ANT+ heart-rate straps and ANT+ power
+// meters. Works in Chrome / Edge on Windows, macOS, Linux and Android (USB OTG). Not on iPhone / iPad (no WebUSB).
+//
+// Sticks: Garmin / Dynastream ANT USB2 (0FCF:1008), ANT USB-m (0FCF:1009) and their clones (CooSpo, Anself...), which
+// expose one vendor interface with a bulk IN and a bulk OUT endpoint; the old ANT USB1 (0FCF:1004) is a CP210x
+// USB-serial bridge and gets a 115200 8N1 UART setup first. One stick serves several channels at once
+// (trainer + heart rate + power meter): AntStick hands out channel numbers.
+//
+// The ANT+ network key is NOT in this file: it is licensed to ANT+ adopters and may not be redistributed in public
+// source. The rider pastes it once in Settings (ANT.settingsCard / ANT.bindSettings); it is kept in localStorage under
+// 'erglab.antKey' on this device only (not one of the synced USER_KEYS).
+//
+// Public surface of AntFeC / AntHr / AntPower matches the Bluetooth Trainer / HrStrap classes: status, name, connected,
+// connect(), disconnect(), setPower(w), setSim(grade), release(), canSim, cp, protocol ('ant'). Live data goes to the
+// app's onPowerSample(w, 'ant'), onCadSample(rpm), onHrSample(bpm, src); status changes call updateConnUI().
+// All app globals are reached through ANT.hooks (typeof-guarded), so the part also runs in Node for the tests.
+// Tests: node src/test/ant.test.mjs
+const ANT = (() => {
+  const VENDOR = 0x0fcf;
+  const PRODUCTS = { 0x1008: 'ANT USB2 stick', 0x1009: 'ANT USB-m stick', 0x1004: 'ANT USB stick' };
+  const KEY_STORE = 'erglab.antKey';
+  const MSG = {
+    EVENT: 0x40, UNASSIGN: 0x41, ASSIGN: 0x42, PERIOD: 0x43, SEARCH_TIMEOUT: 0x44, RF: 0x45, NETKEY: 0x46, RESET: 0x4a,
+    OPEN: 0x4b, CLOSE: 0x4c, REQUEST: 0x4d, BROADCAST: 0x4e, ACK: 0x4f, BURST: 0x50, CHANNEL_ID: 0x51, CAPS: 0x54,
+    LP_SEARCH_TIMEOUT: 0x63, STARTUP: 0x6f, SERIAL_ERROR: 0xae,
+  };
+  // channel events (0x40 messages whose message-id byte is 1)
+  const EV = { RX_SEARCH_TIMEOUT: 1, RX_FAIL: 2, TX: 3, TRANSFER_RX_FAILED: 4, TX_COMPLETED: 5, TX_FAILED: 6, CHANNEL_CLOSED: 7, RX_FAIL_GO_TO_SEARCH: 8, COLLISION: 9 };
+  // ANT+ device profiles: device type, channel period (32768 / Hz), what to call it
+  const PROFILE = {
+    fec: { devType: 17, period: 8192, title: 'ANT+ trainer', what: 'trainer' },
+    power: { devType: 11, period: 8182, title: 'ANT+ power', what: 'power meter' },
+    hr: { devType: 120, period: 8070, title: 'ANT+ HR', what: 'heart-rate strap' },
+  };
+  const RF = 57;          // 2457 MHz, the ANT+ frequency
+  const SEARCH = 12;      // search timeout in 2.5 s units (30 s), then the stick closes the channel and we reopen it
+  // timings (ms); the tests shorten them
+  const T = { cmd: 1000, ack: 2000, reset: 1500, resend: 2000, tick: 500, lost: 5000, coast: 3000, idleClose: 1500, reopen: 500, retry: 3000 };
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const u16 = v => [v & 0xff, (v >> 8) & 0xff];
+  const now = () => performance.now();
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const hex = n => '0x' + n.toString(16).padStart(2, '0');
+  const named = (name, message) => Object.assign(new Error(message), { name });
+
+  /* ---------------- app hooks (globals of the page; absent in Node tests) ---------------- */
+  const H = {
+    power: (w, src) => { if (typeof onPowerSample === 'function') onPowerSample(w, src); },
+    cad: rpm => { if (typeof onCadSample === 'function') onCadSample(rpm); },
+    hr: (bpm, src) => { if (typeof onHrSample === 'function') onHrSample(bpm, src); },
+    speed: kmh => { if (typeof live === 'object' && live) live.speed = kmh; },
+    ui: msg => { if (typeof updateConnUI === 'function') { try { updateConnUI(msg); } catch (e) { console.warn(e); } } },
+    toast: (m, ms) => { if (typeof toast === 'function') toast(m, ms); else console.log('[ANT]', m); },
+    initAudio: () => { try { if (typeof initAudio === 'function') initAudio(); } catch { } },
+    simOff: () => { if (typeof sim === 'object' && sim && sim.on && typeof sim.stop === 'function') { sim.stop(); H.toast('Simulator turned off: trainer connected'); } },
+    applyControl: () => { try { if (typeof applyControl === 'function') applyControl(); } catch (e) { console.warn(e); } },
+    riderKg: () => (typeof S === 'object' && S && S.weight > 0 ? S.weight : 75),
+    needKey: () => { }, // the app can open Settings here
+  };
+
+  /* ---------------- ANT serial messages ---------------- */
+  // [0xA4 sync, data length, message id, ...data, XOR of every byte before it]
+  function frame(id, data = []) {
+    const out = new Uint8Array(data.length + 4);
+    out[0] = 0xa4; out[1] = data.length; out[2] = id; out.set(data, 3);
+    let c = 0; for (let i = 0; i < out.length - 1; i++) c ^= out[i];
+    out[out.length - 1] = c;
+    return out;
+  }
+  // Byte stream -> { msgs: [{ id, data }], rest }. Skips noise and bad checksums; keeps an incomplete tail in rest.
+  function parse(b) {
+    const msgs = []; let i = 0;
+    while (i < b.length) {
+      if (b[i] !== 0xa4) { i++; continue; }
+      if (i + 1 >= b.length) break;
+      const len = b[i + 1];
+      if (len < 1 || len > 40) { i++; continue; } // real ANT messages are 1..~20 data bytes
+      if (i + len + 4 > b.length) break;           // wait for the rest
+      let c = 0; for (let j = i; j < i + len + 3; j++) c ^= b[j];
+      if (c !== b[i + len + 3]) { i++; continue; }
+      msgs.push({ id: b[i + 2], data: b.slice(i + 3, i + 3 + len) });
+      i += len + 4;
+    }
+    return { msgs, rest: b.slice(i) };
+  }
+  // The commands that set up and open one receive channel. The low-priority search (0x63) does not interrupt the
+  // other open channels; sticks that don't know it get a normal 30 s search instead (see AntChannel.setup).
+  function channelSetup(ch, { devType, period, devNum = 0, transType = 0, net = 0, search = SEARCH }) {
+    return [
+      [MSG.ASSIGN, [ch, 0x00, net]],                                        // 0x00 = bidirectional slave
+      [MSG.CHANNEL_ID, [ch, ...u16(devNum), devType, transType]],           // device number 0 / trans type 0 = wildcard
+      [MSG.LP_SEARCH_TIMEOUT, [ch, search]],
+      [MSG.SEARCH_TIMEOUT, [ch, 0]],                                         // high-priority search off
+      [MSG.PERIOD, [ch, ...u16(period)]],
+      [MSG.RF, [ch, RF]],
+      [MSG.OPEN, [ch]],
+    ];
+  }
+
+  /* ---------------- network key (device-only setting) ---------------- */
+  // Accepts "B9A521...", "B9 A5 21 ...", "0xB9, 0xA5, ..." etc. Returns 16 upper-case hex chars or null.
+  function normKey(s) {
+    const h = String(s == null ? '' : s).trim().replace(/0x/gi, '').replace(/[\s,:;._\-{}[\]()]/g, '');
+    return /^[0-9a-f]{16}$/i.test(h) ? h.toUpperCase() : null;
+  }
+  function getKey() {
+    try {
+      const v = localStorage.getItem(KEY_STORE); if (!v) return '';
+      let s = v; try { const j = JSON.parse(v); if (typeof j === 'string') s = j; } catch { }
+      return normKey(s) || '';
+    } catch { return ''; }
+  }
+  function setKey(input) {
+    if (input == null || String(input).trim() === '') {
+      try { localStorage.removeItem(KEY_STORE); } catch { }
+      if (stick) stick.keySent = null;
+      return { ok: true, cleared: true };
+    }
+    const k = normKey(input);
+    if (!k) {
+      const n = String(input).replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '').length;
+      return { ok: false, error: /[g-wyz]/i.test(String(input).replace(/0x/gi, '')) ? 'The key may only contain hex digits (0-9, A-F).' : `The key must be 8 bytes = 16 hex digits (got ${n}).` };
+    }
+    try { localStorage.setItem(KEY_STORE, JSON.stringify(k)); } catch { return { ok: false, error: 'Could not save: browser storage is blocked.' }; }
+    if (stick) stick.keySent = null; // sent again before the next channel opens
+    return { ok: true, key: k, warn: /^0+$/.test(k) ? 'Saved, but this is the public ANT network key (all zeros): ANT+ devices use the ANT+ network key.' : '' };
+  }
+  const keyBytes = k => Array.from({ length: 8 }, (_, i) => parseInt(k.slice(i * 2, i * 2 + 2), 16));
+
+  /* ---------------- ANT+ data pages ---------------- */
+  const fec = {
+    targetPower: w => [0x31, 0xff, 0xff, 0xff, 0xff, 0xff, ...u16(clamp(Math.round(w * 4), 0, 16000))],          // page 49, 0.25 W
+    trackResistance(grade, crr = 0.004) {                                                                        // page 51
+      const g = clamp(Math.round((grade + 200) * 100), 0, 40000);                                               // 0.01 %, offset -200 %
+      return [0x33, 0xff, 0xff, 0xff, 0xff, ...u16(g), crr == null ? 0xff : clamp(Math.round(crr / 0.00005), 0, 254)];
+    },
+    basicResistance: pct => [0x30, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, clamp(Math.round(pct * 2), 0, 200)],     // page 48, 0.5 %
+    userConfig(userKg = 75, bikeKg = 10, wheelM = 0.7) {                                                         // page 55
+      const u = clamp(Math.round(userKg * 100), 0, 65534), bk = clamp(Math.round(bikeKg * 20), 0, 1000), wd = clamp(Math.round(wheelM * 100), 0, 254);
+      return [0x37, ...u16(u), 0xff, 0x0f | ((bk & 0x0f) << 4), (bk >> 4) & 0xff, wd, 0x00];
+    },
+    requestPage: page => [0x46, 0xff, 0xff, 0xff, 0xff, 0x02, page & 0xff, 0x01],                               // page 70, send twice
+    // grade -> basic resistance %, for trainers without simulation mode
+    gradeToPct: g => clamp(5 + g * 4, 0, 100),
+    parse(p) {
+      switch (p[0]) {
+        case 0x10: { // General FE Data
+          const spd = p[4] | (p[5] << 8);
+          return { page: 16, equipment: p[1] & 0x1f, elapsed: p[2] / 4, distance: p[3], speed: spd === 0xffff ? null : spd * 0.0036, hr: p[6] === 0xff || p[6] === 0 ? null : p[6], state: (p[7] >> 4) & 0x07 };
+        }
+        case 0x19: { // Specific Trainer / Stationary Bike Data
+          const pw = p[5] | ((p[6] & 0x0f) << 8);
+          return { page: 25, events: p[1], cadence: p[2] === 0xff ? null : p[2], acc: p[3] | (p[4] << 8), power: pw === 0xfff ? null : pw, trainerStatus: (p[6] >> 4) & 0x0f, target: p[7] & 0x03, state: (p[7] >> 4) & 0x07 };
+        }
+        case 0x36: return { page: 54, maxResistance: p[5] | (p[6] << 8), basic: !!(p[7] & 1), power: !!(p[7] & 2), sim: !!(p[7] & 4) };
+        case 0x47: return { page: 71, lastCommand: p[1], seq: p[2], status: p[3] }; // 0 pass, 1 fail, 2 not supported, 3 rejected, 4 pending
+        default: return common(p) || { page: p[0] };
+      }
+    },
+  };
+  // common pages 80 / 81 (every ANT+ profile)
+  function common(p) {
+    if (p[0] === 0x50) return { page: 80, hw: p[3], manufacturer: p[4] | (p[5] << 8), model: p[6] | (p[7] << 8) };
+    if (p[0] === 0x51) return { page: 81, sw: p[3] + (p[2] !== 0xff ? p[2] / 100 : 0), serial: (p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24)) >>> 0 };
+    return null;
+  }
+  const hr = { parse: p => { const b = p[7]; return { page: p[0] & 0x7f, toggle: p[0] >> 7, beatTime: (p[4] | (p[5] << 8)) / 1024, beats: p[6], hr: b > 0 && b < 255 ? b : null }; } };
+  const power = {
+    parse(p) {
+      if (p[0] === 0x10) { const pw = p[6] | (p[7] << 8); return { page: 16, events: p[1], balance: p[2] === 0xff ? null : p[2], cadence: p[3] === 0xff ? null : p[3], acc: p[4] | (p[5] << 8), power: pw === 0xffff ? null : pw }; }
+      return common(p) || { page: p[0] };
+    },
+  };
+  // Average power since the previous message from the accumulated-power counters (8-bit event count, 16-bit watts):
+  // robust to dropped messages and to both counters rolling over. Returns { w, st } (st = state for the next call).
+  function accPower(prev, events, acc, inst, t = now()) {
+    if (!prev) return { w: inst, st: { ev: events, acc, t, w: inst } };
+    const de = (events - prev.ev + 256) & 0xff, da = (acc - prev.acc + 65536) & 0xffff;
+    if (!de) { // no new power event: hold the last value, then 0 once the rider has stopped (coasting)
+      const w = t - prev.t > T.coast ? 0 : prev.w;
+      return { w, st: { ...prev, w } };
+    }
+    let w = da / de; if (!(w >= 0 && w <= 3000)) w = inst;
+    w = w == null ? null : Math.round(w);
+    return { w, st: { ev: events, acc, t, w } };
+  }
+
+  /* ---------------- the USB stick ---------------- */
+  let stick = null;
+  const getStick = () => stick || (stick = new AntStick());
+  const isStick = d => d && d.vendorId === VENDOR;
+
+  class AntStick {
+    constructor() {
+      this.dev = null; this.ready = false; this.gen = 0; this.iface = 0; this.epIn = 1; this.epOut = 1; this.packet = 64;
+      this.buf = new Uint8Array(0); this.wq = Promise.resolve(); this.cq = Promise.resolve(); this.waiters = new Set();
+      this.channels = []; this.maxChannels = 8; this.maxNetworks = 3; this.keySent = null; this.keyP = null;
+      this.opening = null; this.closing = null; this.idleT = null; this.listening = false; this.lostOwners = new Set(); this.name = '';
+    }
+    get open() { return !!this.dev && this.ready; }
+    // Open the stick: a stick this site was already allowed to use opens without a prompt; otherwise the browser's
+    // USB chooser opens (needs the click that called connect()).
+    ensure() {
+      clearTimeout(this.idleT); this.idleT = null;
+      if (this.open) return Promise.resolve(this);
+      if (!this.opening) this.opening = (async () => {
+        if (this.closing) await this.closing;
+        const usb = typeof navigator !== 'undefined' && navigator.usb;
+        if (!usb) throw named('NotSupportedError', 'WebUSB is not available in this browser');
+        this.listen();
+        let dev = null;
+        try { const list = (await usb.getDevices()).filter(isStick); if (list.length === 1) dev = list[0]; } catch { }
+        if (!dev) dev = await usb.requestDevice({ filters: [{ vendorId: VENDOR }] });
+        await this.attach(dev);
+        return this;
+      })().finally(() => { this.opening = null; });
+      return this.opening;
+    }
+    listen() {
+      if (this.listening || !navigator.usb || !navigator.usb.addEventListener) return;
+      this.listening = true;
+      navigator.usb.addEventListener('disconnect', e => { if (this.dev && e.device === this.dev) this.onLost(new Error('ANT stick unplugged')); });
+      navigator.usb.addEventListener('connect', e => {
+        if (!isStick(e.device) || this.dev || !this.lostOwners.size) return;
+        const owners = [...this.lostOwners]; this.lostOwners.clear();
+        setTimeout(() => owners.forEach(o => o.resume()), 700); // replugged: pick up where we were
+      });
+    }
+    async attach(dev) {
+      const gen = ++this.gen;
+      try {
+        if (!dev.opened) await dev.open();
+        if (!dev.configuration || dev.configuration.configurationValue !== 1) await dev.selectConfiguration(1);
+        let iface = 0, epIn = 1, epOut = 1;
+        for (const i of (dev.configuration && dev.configuration.interfaces) || []) {
+          const eps = ((i.alternate || (i.alternates && i.alternates[0]) || {}).endpoints) || [];
+          const ein = eps.find(e => e.direction === 'in' && e.type === 'bulk'), eout = eps.find(e => e.direction === 'out' && e.type === 'bulk');
+          if (ein && eout) { iface = i.interfaceNumber; epIn = ein.endpointNumber; epOut = eout.endpointNumber; this.packet = ein.packetSize || 64; break; }
+        }
+        await dev.claimInterface(iface);
+        if (dev.productId === 0x1004) await this.cp210x(dev, iface);
+        Object.assign(this, { dev, iface, epIn, epOut, buf: new Uint8Array(0), keySent: null, keyP: null, wq: Promise.resolve(), cq: Promise.resolve() });
+        this.name = PRODUCTS[dev.productId] || dev.productName || 'ANT stick';
+        this.readLoop(gen);
+        await this.resetStick();
+        const caps = await this.cmd(MSG.REQUEST, [0, MSG.CAPS], MSG.CAPS);
+        if (caps && caps.length >= 2 && caps[0] > 0) { this.maxChannels = caps[0]; this.maxNetworks = caps[1]; }
+        this.ready = true;
+      } catch (e) {
+        if (gen === this.gen) { this.gen++; this.dev = null; this.ready = false; }
+        try { await dev.close(); } catch { }
+        throw e;
+      }
+    }
+    // ANT USB1 (0FCF:1004) is a Silicon Labs CP210x USB-UART: enable it and set 115200 baud, 8N1
+    async cp210x(dev, iface) {
+      const ctl = (request, value, data) => dev.controlTransferOut({ requestType: 'vendor', recipient: 'interface', request, value, index: iface }, data);
+      await ctl(0x00, 0x0001); // IFC_ENABLE
+      const baud = new Uint8Array(4); new DataView(baud.buffer).setUint32(0, 115200, true);
+      await ctl(0x1e, 0, baud); // SET_BAUDRATE
+      await ctl(0x03, 0x0800); // SET_LINE_CTL: 8 data bits, no parity, 1 stop bit
+    }
+    async readLoop(gen) {
+      while (gen === this.gen && this.dev) {
+        let r;
+        try { r = await this.dev.transferIn(this.epIn, Math.max(64, this.packet)); }
+        catch (e) { if (gen === this.gen) this.onLost(e); return; }
+        if (gen !== this.gen) return;
+        if (r.status === 'stall') { try { await this.dev.clearHalt('in', this.epIn); } catch { } continue; }
+        if (r.data && r.data.byteLength) this.feed(new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength));
+      }
+    }
+    feed(bytes) {
+      const b = new Uint8Array(this.buf.length + bytes.length); b.set(this.buf); b.set(bytes, this.buf.length);
+      const { msgs, rest } = parse(b);
+      this.buf = rest.length > 256 ? new Uint8Array(0) : rest;
+      for (const m of msgs) { try { this.dispatch(m); } catch (e) { console.warn('ANT dispatch', e); } }
+    }
+    dispatch(m) {
+      for (const w of [...this.waiters]) if (w.pred(m)) { this.waiters.delete(w); clearTimeout(w.t); w.res(m); }
+      const d = m.data;
+      if ((m.id === MSG.BROADCAST || m.id === MSG.ACK || m.id === MSG.BURST) && d.length >= 9) { const c = this.chan(d[0] & 0x1f); if (c) c.onData(d.slice(1, 9), m.id); return; }
+      if (m.id === MSG.EVENT && d.length >= 3) {
+        const c = this.chan(d[0]); if (!c) return;
+        if (d[1] === 1) c.onEvent(d[2]);
+        else if ((d[1] === MSG.ACK) && d[2] !== 0) c.ackDone(false); // e.g. 0x1F transfer in progress
+        return;
+      }
+      if (m.id === MSG.SERIAL_ERROR) console.warn('ANT stick: serial error', Array.from(d));
+    }
+    chan(n) { return this.channels.find(c => c.num === n && !c.dead) || null; }
+    waitFor(pred, ms) {
+      return new Promise(res => { const w = { pred, res }; w.t = setTimeout(() => { this.waiters.delete(w); res(null); }, ms); this.waiters.add(w); });
+    }
+    // writes are serialized: one USB transfer at a time
+    write(id, data) {
+      const f = frame(id, data);
+      const run = async () => {
+        const dev = this.dev; if (!dev) throw new Error('ANT stick is not open');
+        const r = await dev.transferOut(this.epOut, f);
+        if (r && r.status === 'stall') { await dev.clearHalt('out', this.epOut); await dev.transferOut(this.epOut, f); }
+      };
+      const next = this.wq.then(run, run); this.wq = next.catch(() => { }); return next;
+    }
+    // One configuration command at a time, waiting for its answer: the response code (0 = ok) from a 0x40 response, or
+    // the data of the message `expect` (for 0x4D requests). null = no answer in time.
+    cmd(id, data, expect = null, ms = T.cmd) {
+      const run = async () => {
+        if (!this.dev) return null;
+        const p = this.waitFor(m => (expect != null && m.id === expect && (expect !== MSG.CHANNEL_ID || m.data[0] === data[0]))
+          || (m.id === MSG.EVENT && m.data[0] === data[0] && m.data[1] === id), ms);
+        try { await this.write(id, data); } catch { return null; }
+        const m = await p;
+        if (!m) return null;
+        if (m.id === MSG.EVENT) return expect != null ? null : m.data[2];
+        return m.data;
+      };
+      const next = this.cq.then(run, run); this.cq = next.catch(() => { }); return next;
+    }
+    async resetStick() {
+      const p = this.waitFor(m => m.id === MSG.STARTUP, T.reset);
+      await this.write(MSG.RESET, [0]);
+      await p; // some sticks don't report the startup message: carry on after the timeout
+      await sleep(Math.min(150, T.reset));
+      this.keySent = null;
+    }
+    ensureKey() {
+      const key = getKey();
+      if (!key) return Promise.reject(named('NoKeyError', 'No ANT+ network key saved. Add it in Settings › ANT+.'));
+      if (this.keySent === key) return Promise.resolve();
+      if (!this.keyP) this.keyP = (async () => {
+        const r = await this.cmd(MSG.NETKEY, [0, ...keyBytes(key)]);
+        if (r !== 0) throw new Error(`The ANT stick did not accept the network key (${r == null ? 'no answer' : 'code ' + r})`);
+        this.keySent = key;
+      })().finally(() => { this.keyP = null; });
+      return this.keyP;
+    }
+    async addChannel(spec, owner) {
+      await this.ensure();
+      await this.ensureKey();
+      let num = 0; while (num < this.maxChannels && this.channels.some(c => c.num === num)) num++;
+      if (num >= this.maxChannels) throw new Error('All ANT channels of the stick are in use');
+      const ch = new AntChannel(this, num, spec, owner);
+      this.channels.push(ch);
+      try { await ch.setup(); }
+      catch (e) { this.channels = this.channels.filter(c => c !== ch); try { await this.cmd(MSG.UNASSIGN, [num]); } catch { } this.releaseLater(); throw e; }
+      return ch;
+    }
+    release(ch) { this.channels = this.channels.filter(c => c !== ch); this.lostOwners.delete(ch.owner); this.releaseLater(); }
+    // when nothing uses the stick any more, let it go so other programs can use it
+    releaseLater() {
+      if (this.channels.length || !this.dev) return;
+      clearTimeout(this.idleT); this.idleT = setTimeout(() => { if (!this.channels.length && !this.opening) this.close(); }, T.idleClose);
+    }
+    close() {
+      clearTimeout(this.idleT); this.idleT = null;
+      if (!this.dev) return Promise.resolve();
+      if (!this.closing) this.closing = (async () => {
+        const dev = this.dev;
+        try { await Promise.race([this.write(MSG.RESET, [0]), sleep(300)]); } catch { } // stop the radio
+        this.gen++; this.dev = null; this.ready = false; this.keySent = null;
+        this.flushWaiters();
+        try { await dev.releaseInterface(this.iface); } catch { }
+        try { await dev.close(); } catch { }
+      })().finally(() => { this.closing = null; });
+      return this.closing;
+    }
+    flushWaiters() { for (const w of [...this.waiters]) { this.waiters.delete(w); clearTimeout(w.t); w.res(null); } }
+    onLost(e) {
+      if (!this.dev) return;
+      console.warn('ANT stick lost', e);
+      const dev = this.dev; this.gen++; this.dev = null; this.ready = false; this.keySent = null;
+      try { Promise.resolve(dev.close()).catch(() => { }); } catch { }
+      this.flushWaiters();
+      const chans = this.channels; this.channels = [];
+      let wanted = false;
+      for (const c of chans) { c.dead = true; c.ackDone(false); if (c.owner && !c.owner.user) { wanted = true; this.lostOwners.add(c.owner); } }
+      if (wanted) H.toast('ANT+ stick disconnected. Plug it back in to resume.', 6000);
+      for (const c of chans) if (c.owner) c.owner.onStickLost();
+    }
+  }
+
+  /* ---------------- one ANT channel on the stick ---------------- */
+  class AntChannel {
+    constructor(stick, num, spec, owner) {
+      this.stick = stick; this.num = num; this.spec = spec; this.owner = owner;
+      this.devNum = spec.devNum || 0; this.transType = spec.transType || 0; this.ack = null; this.closing = false; this.dead = false;
+    }
+    async setup() {
+      let lpFailed = false;
+      for (const [id, data0] of channelSetup(this.num, { ...this.spec, devNum: this.devNum, transType: this.transType })) {
+        let data = data0;
+        if (id === MSG.SEARCH_TIMEOUT && lpFailed) data = [this.num, this.spec.search || SEARCH];
+        const r = await this.stick.cmd(id, data);
+        if (id === MSG.LP_SEARCH_TIMEOUT) { if (r !== 0) lpFailed = true; continue; }
+        if (r !== 0) throw new Error(`The ANT stick refused command ${hex(id)} (${r == null ? 'no answer' : 'code ' + r})`);
+      }
+    }
+    // after a search timeout closed the channel: reopen it, now locked to the device we were paired with
+    async reopen() {
+      if (this.dead || !this.stick.dev) return false;
+      if (this.devNum) await this.stick.cmd(MSG.CHANNEL_ID, [this.num, ...u16(this.devNum), this.spec.devType, this.transType]);
+      return (await this.stick.cmd(MSG.OPEN, [this.num])) === 0;
+    }
+    // the paired device's number (asks the stick for the channel id)
+    async learnId() {
+      const d = await this.stick.cmd(MSG.REQUEST, [this.num, MSG.CHANNEL_ID], MSG.CHANNEL_ID);
+      if (d && d.length >= 5) { const n = d[1] | (d[2] << 8); if (n) { this.devNum = n; this.transType = d[4]; } return n; }
+      return 0;
+    }
+    // acknowledged message to the device: true once it confirmed reception
+    sendAck(page) {
+      if (this.dead || !this.stick.dev) return Promise.resolve(false);
+      this.ackDone(false);
+      return new Promise(res => {
+        const a = { res }; a.t = setTimeout(() => { if (this.ack === a) this.ackDone(false); }, T.ack); this.ack = a;
+        this.stick.write(MSG.ACK, [this.num, ...page]).catch(() => { if (this.ack === a) this.ackDone(false); });
+      });
+    }
+    ackDone(ok) { const a = this.ack; if (!a) return; this.ack = null; clearTimeout(a.t); a.res(ok); }
+    onData(page, id) { if (!this.dead && this.owner) this.owner.onData(page, id, this); }
+    onEvent(code) {
+      if (code === EV.TX_COMPLETED) return this.ackDone(true);
+      if (code === EV.TX_FAILED) return this.ackDone(false);
+      if (code === EV.CHANNEL_CLOSED) { this.ackDone(false); if (this.closing) return; }
+      if (!this.dead && this.owner) this.owner.onEvent(code);
+    }
+    async remove() {
+      this.closing = true; this.ackDone(false);
+      const s = this.stick;
+      if (!this.dead && s.dev) {
+        const closed = s.waitFor(m => m.id === MSG.EVENT && m.data[0] === this.num && m.data[1] === 1 && m.data[2] === EV.CHANNEL_CLOSED, 1000);
+        const r = await s.cmd(MSG.CLOSE, [this.num]);
+        if (r === 0) await closed;
+        await s.cmd(MSG.UNASSIGN, [this.num]);
+      }
+      this.dead = true; s.release(this);
+    }
+  }
+
+  /* ---------------- devices ---------------- */
+  class AntDevice {
+    constructor(kind) {
+      this.kind = kind; this.prof = PROFILE[kind]; this.protocol = 'ant'; this.status = 'idle'; this.name = this.prof.title;
+      this.ch = null; this.user = false; this.everData = false; this.lastData = 0; this.devNum = 0; this.transType = 0;
+      this.timer = null; this.reopenT = null; this.info = {};
+    }
+    get connected() { return this.status === 'connected'; }
+    get cp() { return false; }
+    get canSim() { return false; }
+    setPower() { } setSim() { } release() { }
+    setStatus(s, msg) { this.status = s; H.ui(msg); }
+    async connect() {
+      if (!supported()) { H.toast(unsupportedMsg(), 8000); return; }
+      if (!getKey()) { H.toast('Add your ANT+ network key in Settings › ANT+ first (the instructions are there).', 7000); H.needKey(); return; }
+      if (this.attaching) return; // already opening (USB chooser / channel setup)
+      H.initAudio();
+      if (this.ch) await this.drop();
+      this.user = false; this.everData = false; this.devNum = 0; this.transType = 0; this.name = this.prof.title;
+      this.setStatus('connecting');
+      try { await this.attach(); }
+      catch (e) {
+        this.stopTimers(); this.ch = null; this.attaching = false;
+        if (this.user) return;
+        if (e && e.name === 'NotFoundError') { this.setStatus('idle'); return; } // chooser cancelled
+        console.error(e); this.setStatus('error', e && e.message);
+        if (e && e.name === 'NoKeyError') H.needKey();
+        H.toast(explain(e), 9000);
+      }
+    }
+    async attach() {
+      this.attaching = true;
+      try {
+        const s = getStick();
+        await s.ensure();
+        if (this.user) return;
+        const ch = await s.addChannel({ devType: this.prof.devType, period: this.prof.period, devNum: this.devNum, transType: this.transType }, this);
+        if (this.user) { ch.remove().catch(() => { }); return; }
+        this.ch = ch; this.lastData = now();
+      } finally { this.attaching = false; }
+      clearInterval(this.timer); this.timer = setInterval(() => this.tick(), T.tick);
+    }
+    resume() {
+      if (this.user || this.ch) return;
+      this.setStatus('reconnecting');
+      this.attach().catch(e => { console.warn(e); if (!this.user) { this.setStatus('error', e && e.message); H.toast(explain(e), 7000); } });
+    }
+    stopTimers() { clearInterval(this.timer); this.timer = null; clearTimeout(this.reopenT); this.reopenT = null; }
+    async drop() { this.stopTimers(); const ch = this.ch; this.ch = null; if (ch) await ch.remove().catch(() => { }); }
+    disconnect() {
+      this.user = true; this.stopTimers();
+      const ch = this.ch; this.ch = null;
+      if (ch) Promise.race([this.beforeClose(ch), sleep(1500)]).catch(() => { }).then(() => ch.remove()).catch(() => { });
+      this.setStatus('idle');
+    }
+    beforeClose() { return Promise.resolve(); }
+    onStickLost() { this.stopTimers(); this.ch = null; if (!this.user) this.setStatus('error', 'ANT stick disconnected'); }
+    tick() {
+      if (this.status === 'connected' && now() - this.lastData > T.lost) this.setStatus('reconnecting');
+      this.onTick();
+    }
+    onTick() { }
+    onData(page, id, ch = this.ch) {
+      if (this.user || (this.ch && this.ch !== ch)) return;
+      this.lastData = now();
+      if (this.status !== 'connected') {
+        const first = !this.everData; this.everData = true;
+        this.setStatus('connected');
+        this.onConnected(first);
+        if (ch && !this.devNum) ch.learnId().then(n => { if (n && (this.ch === ch || !this.ch)) { this.devNum = n; this.transType = ch.transType; this.name = `${this.prof.title} ${n}`; H.ui(); } }).catch(() => { });
+      }
+      this.onPage(page);
+    }
+    onEvent(code) {
+      if (code === EV.RX_FAIL_GO_TO_SEARCH) { if (this.status === 'connected') this.setStatus('reconnecting'); return; }
+      if (code !== EV.CHANNEL_CLOSED || this.user || !this.ch) return;
+      if (!this.everData) { // the first search found nothing
+        this.drop(); this.setStatus('error', 'not found');
+        H.toast(`No ANT+ ${this.prof.what} found. ${this.wakeHint()} Check the ANT+ network key in Settings, and close other apps that use it.`, 9000);
+        return;
+      }
+      if (this.status === 'connected') this.setStatus('reconnecting');
+      clearTimeout(this.reopenT); this.reopenT = setTimeout(() => this.reopen(), T.reopen);
+    }
+    async reopen() {
+      this.reopenT = null;
+      const ch = this.ch; if (this.user || !ch) return;
+      const ok = await ch.reopen().catch(() => false);
+      if (!ok && this.ch === ch && !this.user) this.reopenT = setTimeout(() => this.reopen(), T.retry);
+    }
+    wakeHint() { return 'Make sure it is awake and near the stick.'; }
+    onConnected() { }
+    onPage() { }
+  }
+
+  // Smart trainer, ANT+ FE-C profile (device type 17): ERG via page 49, slope via page 51 (page 48 fallback).
+  class AntFeC extends AntDevice {
+    constructor() {
+      super('fec');
+      this.range = { min: 0, max: 2000, inc: 1 }; this.features = null; this.caps = null; this.hasFTMS = false;
+      this.simUnsupported = false; this.mode = null; this.cmdPage = null; this.dirty = false; this.lastSent = 0;
+      this.acking = false; this.extra = []; this.extraTries = 0; this.pw = null; this.feState = 0; this.trainerStatus = 0; this.targetFlag = 0; this.warned = {};
+    }
+    get cp() { return this.connected && !(this.caps && !this.caps.power && !this.caps.sim && !this.caps.basic); }
+    get canSim() { return !(this.caps && !this.caps.sim && !this.caps.basic); }
+    wakeHint() { return 'Pedal a few strokes to wake the trainer.'; }
+    setPower(w) {
+      w = clamp(Math.round(w), Math.max(0, this.range.min), this.range.max);
+      this.mode = { kind: 'power', w }; this.command(fec.targetPower(w));
+    }
+    setSim(grade) {
+      const g = clamp(Math.round(grade * 100) / 100, -10, 20);
+      this.mode = { kind: 'sim', grade: g };
+      this.command(this.simUnsupported ? fec.basicResistance(fec.gradeToPct(g)) : fec.trackResistance(g));
+    }
+    // leave ERG: flat road, or a light fixed resistance on trainers without simulation
+    release() {
+      if (!this.ch) return;
+      if (this.caps && !this.caps.sim && this.caps.basic) { this.mode = { kind: 'res', pct: 5 }; this.command(fec.basicResistance(5)); }
+      else this.setSim(0);
+    }
+    command(page) { this.cmdPage = page; this.dirty = true; this.pump(); }
+    // send the pending one-shot pages, then the current target; the target is repeated every ~2 s
+    async pump() {
+      if (this.acking || !this.ch || !this.connected) return;
+      const ch = this.ch; this.acking = true;
+      try {
+        while (this.ch === ch && this.connected) {
+          const one = this.extra.length > 0;
+          const page = one ? this.extra[0] : this.cmdPage && (this.dirty || now() - this.lastSent >= T.resend) ? this.cmdPage : null;
+          if (!page) break;
+          const ok = await ch.sendAck(page);
+          if (this.ch !== ch) break;
+          if (one) { if (ok || ++this.extraTries >= 3) { this.extra.shift(); this.extraTries = 0; } if (!ok) break; continue; }
+          if (!ok) break; // retried on the next tick
+          this.lastSent = now(); if (page === this.cmdPage) this.dirty = false;
+        }
+      } finally { this.acking = false; }
+    }
+    onTick() { if (this.connected) this.pump(); }
+    beforeClose(ch) { return this.status === 'connected' ? ch.sendAck(this.caps && !this.caps.sim && this.caps.basic ? fec.basicResistance(0) : fec.trackResistance(0)) : Promise.resolve(); }
+    onConnected(first) {
+      this.pw = null; this.extraTries = 0; this.lastSent = 0;
+      this.extra = [fec.userConfig(H.riderKg()), fec.requestPage(54)];
+      if (this.cmdPage) this.dirty = true; // resend the target after a reconnect
+      if (first) { H.simOff(); H.toast(`${this.name} connected · ERG ready`); }
+      H.applyControl();
+      this.pump();
+    }
+    onPage(p) {
+      const d = fec.parse(p);
+      switch (d.page) {
+        case 16:
+          if (d.speed != null) H.speed(d.speed);
+          if (d.hr) H.hr(d.hr, 'trainer');
+          this.feState = d.state; break;
+        case 25: {
+          const r = accPower(this.pw, d.events, d.acc, d.power); this.pw = r.st;
+          if (r.w != null) H.power(r.w, 'ant');
+          if (d.cadence != null) H.cad(d.cadence);
+          this.trainerStatus = d.trainerStatus; this.targetFlag = d.target; this.feState = d.state;
+          if ((d.trainerStatus & 4) && !this.warned.cfg) { this.warned.cfg = true; this.extra.push(fec.userConfig(H.riderKg())); this.pump(); } // user configuration required
+          break;
+        }
+        case 54:
+          this.caps = { basic: d.basic, power: d.power, sim: d.sim, maxResistance: d.maxResistance };
+          if (!d.sim && d.basic && !this.simUnsupported) { this.simUnsupported = true; if (this.mode && this.mode.kind === 'sim') this.setSim(this.mode.grade); }
+          if (!d.power && !this.warned.erg) { this.warned.erg = true; H.toast('This trainer does not report ERG (target power) over ANT+. Trying anyway.', 6000); }
+          H.ui(); break;
+        case 71:
+          if (d.status === 2 || d.status === 3) {
+            if (d.lastCommand === 0x33 && !this.simUnsupported) { this.simUnsupported = true; if (this.mode && this.mode.kind === 'sim') this.setSim(this.mode.grade); }
+            else if (d.lastCommand === 0x31 && !this.warned.rej) { this.warned.rej = true; H.toast('The trainer rejected the ERG power target over ANT+.', 6000); }
+          }
+          break;
+        case 80: this.info.manufacturer = d.manufacturer; this.info.model = d.model; this.info.hw = d.hw; break;
+        case 81: this.info.sw = d.sw; this.info.serial = d.serial; break;
+      }
+    }
+  }
+
+  // ANT+ heart-rate strap (device type 120): computed heart rate is byte 7 of every page.
+  class AntHr extends AntDevice {
+    constructor() { super('hr'); }
+    wakeHint() { return 'Wet the strap contacts and put it on.'; }
+    onConnected(first) { if (first) H.toast(`${this.name} connected`); }
+    onPage(p) { const d = hr.parse(p); if (d.hr) H.hr(d.hr, 'ant'); }
+  }
+
+  // ANT+ power meter (device type 11), read-only: power and cadence from page 16 (standard power-only).
+  class AntPower extends AntDevice {
+    constructor(src = 'antpower') { super('power'); this.src = src; this.pw = null; }
+    wakeHint() { return 'Spin the cranks to wake the power meter.'; }
+    onConnected(first) { this.pw = null; if (first) H.toast(`${this.name} connected (power data only, no control)`, 4000); }
+    onPage(p) {
+      const d = power.parse(p);
+      if (d.page === 16) {
+        const r = accPower(this.pw, d.events, d.acc, d.power); this.pw = r.st;
+        if (r.w != null) H.power(r.w, this.src);
+        if (d.cadence != null) H.cad(d.cadence);
+      } else if (d.page === 80) { this.info.manufacturer = d.manufacturer; this.info.model = d.model; }
+    }
+  }
+
+  /* ---------------- platform / errors ---------------- */
+  function platform() {
+    const ua = typeof navigator !== 'undefined' ? String(navigator.userAgent || '') + ' ' + String((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '') : '';
+    if (/iPhone|iPad|iPod/i.test(ua) || (/MacIntel/.test(ua) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1)) return 'ios';
+    if (/Android/i.test(ua)) return 'android';
+    if (/Win/i.test(ua)) return 'win';
+    if (/Mac/i.test(ua)) return 'mac';
+    if (/Linux|X11|CrOS/i.test(ua)) return 'linux';
+    return '';
+  }
+  function supported() {
+    return typeof navigator !== 'undefined' && !!navigator.usb && (typeof isSecureContext === 'undefined' || isSecureContext);
+  }
+  function unsupportedMsg() {
+    const p = platform();
+    if (p === 'ios') return 'ANT+ USB sticks can\'t be used on iPhone or iPad (Apple gives web pages no USB access). Use Bluetooth in Bluefy instead.';
+    if (typeof navigator !== 'undefined' && navigator.usb && typeof isSecureContext !== 'undefined' && !isSecureContext) return 'ANT+ needs a secure page: open ERGlab over https:// or localhost.';
+    return 'This browser can\'t use USB devices. For an ANT+ stick use Chrome or Edge (Windows, macOS, Linux, Android).';
+  }
+  function explain(e) {
+    const m = String((e && e.message) || e || ''), n = e && e.name, p = platform();
+    if (n === 'NoKeyError') return m;
+    if (n === 'NotSupportedError') return unsupportedMsg();
+    if (n === 'SecurityError' || /access denied/i.test(m)) {
+      if (p === 'win') return 'Windows blocked access to the ANT+ stick. Install the WinUSB driver for it with Zadig (Settings › ANT+), then unplug and replug the stick.';
+      if (p === 'linux') return 'Linux blocked access to the ANT+ stick. Add the udev rule from Settings › ANT+, then unplug and replug the stick.';
+      return 'The browser was not allowed to open the ANT+ stick: ' + m;
+    }
+    if (/claim|busy|in use/i.test(m) || n === 'NetworkError' || n === 'InvalidStateError')
+      return 'Could not open the ANT+ stick: another program is probably using it (Garmin Express, Zwift, another ERGlab tab). Close it, then unplug and replug the stick.' + (p === 'win' ? ' On Windows the stick also needs the WinUSB driver (Settings › ANT+).' : '');
+    return 'ANT+: ' + m;
+  }
+
+  /* ---------------- Settings card ---------------- */
+  // Static HTML (no user data inside); ANT.bindSettings(root) wires it up. No inline handlers (CSP).
+  function settingsCard() {
+    return `<div class="card pad ant-card" id="antCard">
+  <div class="row"><h3>ANT+ <span class="dim ant-sub">USB stick</span></h3><span class="spacer"></span><span class="badge" data-ant="badge"></span></div>
+  <p class="muted ant-p">Ride with an <b>ANT+ USB stick</b> (Garmin, CooSpo, Anself…) instead of Bluetooth: ANT+ FE-C smart trainers (ERG and slope), heart-rate straps and power meters, all on one stick. Chrome or Edge on Windows, macOS, Linux and Android (with a USB OTG adapter). Not on iPhone or iPad.</p>
+  <div class="field">
+    <label for="antKeyIn">ANT+ network key</label>
+    <div class="ant-keyrow">
+      <input type="password" id="antKeyIn" data-ant="key" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="80" placeholder="16 hex digits (8 bytes)">
+      <button class="btn sm" type="button" data-ant="show">Show</button>
+      <button class="btn sm primary" type="button" data-ant="save">Save</button>
+      <button class="btn sm" type="button" data-ant="clear">Clear</button>
+    </div>
+    <span class="hint" data-ant="msg" role="status" aria-live="polite"></span>
+  </div>
+  <details class="ant-help">
+    <summary>Where do I get the key?</summary>
+    <ol>
+      <li>Register for free as an <b>ANT+ Adopter</b> at <a href="https://www.thisisant.com/register/" target="_blank" rel="noopener noreferrer">thisisant.com</a> and sign in.</li>
+      <li>Open the <a href="https://www.thisisant.com/developer/ant-plus/ant-plus-basics/network-keys" target="_blank" rel="noopener noreferrer">ANT+ network keys</a> page and copy the <b>ANT+ Managed Network</b> key (8 bytes).</li>
+      <li>Paste it above (spaces, commas or 0x are fine) and tap <b>Save</b>.</li>
+    </ol>
+    <p>The key is licensed to ANT+ adopters, so ERGlab can't include it for you. It is stored on <b>this device only</b> and is never synced to your account.</p>
+  </details>
+  <details class="ant-help">
+    <summary>Setting up the USB stick</summary>
+    <ul>
+      <li><b>Windows:</b> Chrome and Edge need the <b>WinUSB</b> driver for the stick. Install it with <a href="https://zadig.akeo.ie/" target="_blank" rel="noopener noreferrer">Zadig</a>: Options › List All Devices, pick the ANT stick (USB ID 0FCF 1008 or 1009, e.g. "ANT USBStick2"), select <b>WinUSB</b>, Replace Driver, then replug the stick. This replaces the Garmin driver, so Garmin Express, Zwift and other ANT+ programs can't use that stick until you roll the driver back (Device Manager › the stick › Uninstall device, tick "delete the driver", replug).</li>
+      <li><b>macOS:</b> works as is.</li>
+      <li><b>Linux:</b> allow the browser to open the stick with a udev rule, e.g. <code>/etc/udev/rules.d/51-ant-usb.rules</code> containing <code>SUBSYSTEM=="usb", ATTRS{idVendor}=="0fcf", MODE="0666"</code>, then run <code>sudo udevadm control --reload-rules</code> and replug the stick.</li>
+      <li><b>Android:</b> Chrome with a USB OTG adapter (USB-C or micro-USB). Allow access when Android asks.</li>
+      <li><b>iPhone / iPad:</b> not possible (no USB access for web pages): use Bluetooth in Bluefy.</li>
+    </ul>
+    <p>Only <b>one program</b> can use the stick at a time: close Garmin Express, Zwift and other ERGlab tabs first. The first time, ERGlab pairs with the first trainer / strap / power meter it hears, so keep other people's devices asleep or away.</p>
+  </details>
+</div>`;
+  }
+  function bindSettings(root = document) {
+    const q = s => root.querySelector(`[data-ant="${s}"]`);
+    const input = q('key'), msg = q('msg'), badge = q('badge'), save = q('save'), clear = q('clear'), show = q('show');
+    if (!input || !save) return;
+    const say = (text, tone) => { if (msg) { msg.textContent = text || ''; msg.className = 'hint' + (tone ? ' ant-' + tone : ''); } };
+    const refresh = () => {
+      const has = !!getKey(), ok = supported();
+      if (badge) {
+        badge.textContent = !ok ? 'not available here' : has ? (stick && stick.open ? 'stick connected' : 'key saved') : 'key needed';
+        badge.className = 'badge ' + (!ok ? 'ant-dim' : has ? 'ant-ok' : 'ant-warn');
+      }
+      input.placeholder = has ? 'Key saved on this device. Paste a new one to replace it' : '16 hex digits (8 bytes)';
+      if (clear) clear.disabled = !has;
+    };
+    save.onclick = () => {
+      const r = setKey(input.value);
+      if (!r.ok) { say(r.error, 'bad'); return; }
+      if (r.cleared) { say('No key entered.', 'warn'); refresh(); return; }
+      input.value = ''; input.type = 'password'; if (show) show.textContent = 'Show';
+      say(r.warn || ('Saved on this device only (never synced).' + (stick && stick.channels.length ? ' Reconnect your ANT+ devices to use it.' : '')), r.warn ? 'warn' : 'ok');
+      refresh();
+    };
+    if (clear) clear.onclick = () => { setKey(''); input.value = ''; say('Key removed from this device.', ''); refresh(); };
+    if (show) show.onclick = () => { const hid = input.type === 'password'; input.type = hid ? 'text' : 'password'; show.textContent = hid ? 'Hide' : 'Show'; };
+    input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); save.click(); } };
+    if (!supported()) say(unsupportedMsg(), 'warn');
+    refresh();
+  }
+
+  return {
+    VENDOR, PRODUCTS, MSG, EV, PROFILE, KEY_STORE, timing: T, hooks: H,
+    supported, platform, unsupportedMsg, explain,
+    getKey, setKey, normKey, hasKey: () => !!getKey(),
+    frame, parse, channelSetup, fec, hr, power, accPower,
+    settingsCard, bindSettings,
+    get stick() { return getStick(); },
+    AntStick, AntChannel, AntFeC, AntHr, AntPower,
+  };
+})();
+const { AntStick, AntFeC, AntHr, AntPower } = ANT;
 
 /* ---- parts/z2-gauges.js ---- */
 /* =====================================================================

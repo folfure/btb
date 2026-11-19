@@ -1,6 +1,6 @@
 # ERGlab: smart-trainer workouts in one HTML file
 
-`index.html` is the whole app: workouts, plans, live dashboard and Bluetooth ERG control for smart trainers that speak the standard FTMS protocol (Wahoo, Tacx, Elite, Saris, JetBlack, Zwift Hub and more). No install, no server code.
+`index.html` is the whole app: workouts, plans, live dashboard, ride analytics and ERG control for smart trainers over Bluetooth or ANT+. No install, no server code.
 
 ## Where it runs
 
@@ -28,6 +28,14 @@ The hosted site (GitHub Pages build) ships a web app manifest and icons, so it c
 - **iPhone / iPad:** in Safari or Chrome, Share › **Add to Home Screen**. Apple does not allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and rides; to **ride**, keep using **Bluefy**. The home-screen app has its own storage: sign in there once with the emailed **code** (tapping the email link opens the browser instead).
 
 The single-file `index.html` in the repo has no manifest and is not installable.
+
+## Trainers
+
+- **Bluetooth** (Chrome/Edge on Windows, macOS, Android, ChromeOS; Bluefy on iPhone/iPad): the protocol is detected after connecting. Standard **FTMS** (almost every current smart trainer), **Tacx FE-C over Bluetooth** (older Tacx firmware) and **Wahoo legacy ERG** (older KICKR firmware) all control ERG and slope; a plain **power meter** connects read-only.
+- **ANT+** (Chrome/Edge on a computer or Android with OTG; not iPhone): plug in an ANT+ USB stick, then pick *ANT+ USB stick* when connecting. Trainers use ANT+ FE-C (ERG and slope), and heart-rate straps work too. Set it up once in **Settings › ANT+**:
+  - paste the **ANT+ network key** (free from thisisant.com after registering as an ANT+ adopter; it may not be published, so it is not in the code and stays only in that browser);
+  - **Windows**: install the WinUSB driver for the stick with Zadig (Garmin Express / Zwift can't use the stick until you switch the driver back); **Linux**: add a udev rule; **macOS**: works as is.
+- Not tested on every trainer model: report what works on yours.
 
 ## Before riding
 - Close Zwift, the trainer maker's app and similar. Most trainers accept only one Bluetooth controller at a time.
