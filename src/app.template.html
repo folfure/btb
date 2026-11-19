@@ -1684,7 +1684,7 @@ function buildGauges() {
   G.wkg = makeGauge($('#gWkg'), { label: 'W/kg', unit: 'W/kg', min: 0, max: maxW, bands: PZ.map(z => ({ from: z.lo * wk, to: Math.min(z.hi, 9) * wk, col: z.col })), ticks: [0, +(wk * 0.75).toFixed(1), +wk.toFixed(1), maxW] });
   G.cad = makeGauge($('#gCad'), { label: t('Cadence'), unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
   const hrMin = 40, mx = S.maxHr;
-  G.hr = makeGauge($('#gHr'), { label: t('Heart rate'), unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
+  G.hr = makeGauge($('#gHr'), { label: t('Heart rate@@gauge'), unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
 }
 function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
@@ -2008,7 +2008,7 @@ function renderPlans() {
     const open = openPlans.has(pl.id);
     return `<div class="card plan" data-plan="${esc(pl.id)}">
       <div class="head" data-ptoggle="${esc(pl.id)}">
-        <div style="flex:1;min-width:240px"><div class="row" style="gap:8px"><h3>${esc(pl.name)}</h3><span class="badge" style="color:${pl.level === 'Beginner' ? '#2fbf71' : pl.level === 'Advanced' ? '#ff3b3b' : '#f5c518'}">${esc(pl.level || '')}</span></div>
+        <div style="flex:1;min-width:240px"><div class="row" style="gap:8px"><h3>${esc(pl.name)}</h3><span class="badge" style="color:${(pl.levelKey || pl.level) === 'Beginner' ? '#2fbf71' : (pl.levelKey || pl.level) === 'Advanced' ? '#ff3b3b' : '#f5c518'}">${esc(pl.level || '')}</span></div>
           <p class="muted" style="margin:4px 0 0;font-size:13.5px">${esc(pl.desc || '')}</p>
           <div class="kv num" style="margin-top:6px"><span>${t(pl.weeks.length === 1 ? '<b>{n}</b> week' : '<b>{n}</b> weeks', { n: pl.weeks.length })}</span><span>${t(total === 1 ? '<b>{n}</b> session' : '<b>{n}</b> sessions', { n: total })}</span><span>${t('Goal')} <b>${esc(pl.goal || '')}</b></span><span>${t('Avg weekly TSS')} <b>${Math.round(tssWeeks.reduce((a, b) => a + b, 0) / pl.weeks.length)}</b></span>${pl.src ? `<span class="dim">${esc(pl.src)}</span>` : ''}</div>
           <div class="bar2"><i style="width:${total ? nDone / total * 100 : 0}%"></i></div>

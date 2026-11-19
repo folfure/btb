@@ -17,7 +17,7 @@
 // Tests: node src/test/ant.test.mjs
 const ANT = (() => {
   // t() is the page's translation helper (i18n.js); the Node tests run this part without it: English, placeholders filled
-  const t = typeof globalThis.t === 'function' ? globalThis.t : (s, v) => v ? s.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m) : s;
+  const t = typeof i18nT === 'function' ? i18nT : (s, v) => v ? s.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m) : s;
   const VENDOR = 0x0fcf;
   const PRODUCTS = { 0x1008: 'ANT USB2 stick', 0x1009: 'ANT USB-m stick', 0x1004: 'ANT USB stick' };
   const KEY_STORE = 'erglab.antKey';

@@ -16,6 +16,8 @@ French, and the English text otherwise. Core: `i18n.js` (inlined at the top of t
 - Values go in `{braces}`: `t('Disconnect {name}?', { name: trainer.name })`, never `${…}` inside the key.
   Keep `esc()` on user values: `t('Delete {n}?', { n: esc(w.name) })`.
 - A sentence with inline tags stays one key, tags included: `t('Ride in <b>Bluefy</b> on iPhone.')`.
+- Same English, different French (e.g. a short gauge title): add a context after `@@`, `t('Heart rate@@gauge')`;
+  English shows the part before `@@`.
 - Plurals: two keys (`'{n} workout'`, `'{n} workouts'`) chosen in code.
 - Static markup in `app.template.html` needs no code: text nodes and `placeholder` / `title` / `aria-label` / `alt`
   are translated when their text is a key. For a sentence with inline tags, add `data-i18n` to the element: its

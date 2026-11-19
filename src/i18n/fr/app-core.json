@@ -100,5 +100,6 @@
   "Ride paused: the app went to the background": "Sortie en pause : l'appli est passée en arrière-plan",
   "Power": "Puissance",
   "Cadence": "Cadence",
-  "Heart rate": "Fréquence cardiaque"
+  "Heart rate": "Fréquence cardiaque",
+  "Heart rate@@gauge": "Cardio"
 }

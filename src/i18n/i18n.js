@@ -1,6 +1,7 @@
 // Interface language: English (the source text) or French. The English text itself is the key, so code reads
 //   t('Connect trainer')                          -> 'Connecter le home trainer' in French
 //   t('Disconnect {name}?', { name: trainer.name }) placeholders in braces, same names in both languages
+//   t('Heart rate@@gauge')                        the same English text with its own French (here a shorter one)
 // The dictionaries (src/i18n/fr/*.json) and the workout / plan translations (src/i18n/fr-data/*.json) are merged by
 // build.mjs into I18N_FR and I18N_FR_DATA right above this code. Static page text is translated by translateDom(),
 // and a MutationObserver translates exact-match text that renders add later (a safety net, not a replacement for t()).
@@ -15,9 +16,12 @@ const I18N_MISS = new Set(); // keys asked for but missing from the French dicti
 function t(s, v) {
   let r = s;
   if (I18N) { r = I18N[s] ?? I18N[norm(s)]; if (r == null) { r = s; if (/[A-Za-z]/.test(s)) I18N_MISS.add(s); } }
+  if (r === s && s.includes('@@')) r = s.slice(0, s.indexOf('@@')); // context keys: 'Heart rate@@gauge' shows 'Heart rate' in English
   if (v) r = r.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m);
   return r;
 }
+// the same t() under a name parts can look up without shadowing it (their own `const t` falls back to English in node tests)
+const i18nT = t;
 // French number formatting for display only (decimal comma); never feed the result back into maths
 const tn = (x, d = 0) => (+x).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
 
@@ -33,6 +37,7 @@ function i18nData(lib, plans) {
   }
   for (const p of plans) {
     const o = (D.p || {})[p.id]; if (!o) continue;
+    p.levelKey = p.level; // the English level drives the badge colour
     for (const k of ['name', 'level', 'goal', 'desc', 'src']) if (o[k]) p[k] = o[k];
     if (Array.isArray(o.focus)) (p.weeks || []).forEach((wk, i) => { if (o.focus[i]) wk.focus = o.focus[i]; });
   }
