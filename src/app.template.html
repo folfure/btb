@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Structured indoor cycling workouts with ERG control for FTMS smart trainers (Elite Direto X and others) over Web Bluetooth.">
+<!--__CSP__-->
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>ERGlab</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d13'/%3E%3Cpath d='M6 44h10l6-20 8 30 8-38 6 28h14' fill='none' stroke='%23ff8a1f' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
@@ -211,6 +213,11 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .hist .mini svg{width:100%;height:100%;display:block}
 kbd{background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:12px}
 
+/* ---------- sign-in gate ---------- */
+.gate{position:fixed;inset:0;z-index:300;background:radial-gradient(circle at 30% 20%,rgba(255,138,31,.10),transparent 50%),var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+.gate .gbox{width:min(400px,100%);padding:22px}
+.gate .brand svg{width:34px;height:34px}
+body.gated{overflow:hidden}
 /* ---------- touch, phones, tablets ---------- */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{overscroll-behavior-y:none}
@@ -428,6 +435,11 @@ body.riding #btBanner{display:none}
         <div class="field"><label>ERG ramp-in on start (s)</label><input type="number" id="sSoftStart" min="0" max="30" step="1"><span class="hint">Ramps the first target in gently after a pause.</span></div>
       </div>
     </div>
+    <div class="card pad hidden" style="margin-top:12px" id="acctCard">
+      <div class="row"><h3>Account</h3><span class="spacer"></span><span class="badge" id="syncBadge" style="color:var(--ok)">cloud sync on</span></div>
+      <p class="muted" style="margin:6px 0 10px;font-size:14px">Signed in as <b id="acctEmail"></b>. Settings, custom workouts, plan progress and rides are saved to your private cloud space (EU) and follow you to any device.</p>
+      <div class="row"><button class="btn sm" id="acctSync">Sync now</button><span class="spacer"></span><button class="btn sm danger" id="acctOut">Sign out</button></div>
+    </div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
       <div class="row"><h3><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
@@ -439,6 +451,7 @@ body.riding #btBanner{display:none}
         </div>
       </div>
       <div id="stvSetup">
+        <div id="stvLocal">
         <ol class="muted" style="font-size:14px;margin:0 0 12px;padding-left:20px;line-height:1.6">
           <li>Open <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> and create an API application (any name/website; category "Training").</li>
           <li>Set <b>Authorization Callback Domain</b> to <code id="stvDomain" style="background:var(--bg2);padding:2px 6px;border-radius:6px;color:var(--text)"></code></li>
@@ -451,6 +464,7 @@ body.riding #btBanner{display:none}
         <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:13px">Sharing the app with others? Use a token relay instead of a secret</summary>
           <div class="field" style="margin-top:8px"><label>Token relay URL</label><input type="text" id="stvRelay" autocomplete="off" placeholder="https://erglab-strava.yourname.workers.dev"><span class="hint">A tiny server (see <code>strava-relay.worker.js</code>) keeps the Client Secret off the page, so riders only need the Client ID. New Strava apps accept 1 athlete; raise it to 10 under "My API Application", more needs Strava's review.</span></div>
         </details>
+        </div>
         <div class="row" style="margin-top:12px"><button class="btn" id="stvConnect" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Connect with Strava</button><span class="dim" id="stvHint" style="font-size:12.5px"></span></div>
       </div>
     </div>
@@ -469,6 +483,24 @@ body.riding #btBanner{display:none}
   </section>
 </main>
 
+<div id="gate" class="gate hidden" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gbox card">
+    <div class="brand" style="justify-content:center;margin-bottom:6px"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#151b28"/><path d="M6 44h10l6-20 8 30 8-38 6 28h14" fill="none" stroke="#ff8a1f" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/></svg><span style="display:inline">ERG<b>lab</b></span></div>
+    <h2 id="gateTitle" style="text-align:center">Sign in</h2>
+    <p class="muted" id="gateMsg" style="text-align:center;font-size:14px;margin:6px 0 14px">Connecting…</p>
+    <form id="gateEmailF" class="hidden" autocomplete="on">
+      <div class="field"><label for="gateEmail">Email</label><input type="email" id="gateEmail" autocomplete="email" required placeholder="you@example.com"></div>
+      <button class="btn primary lg" style="width:100%;margin-top:12px" id="gateSend">Email me a sign-in code</button>
+    </form>
+    <form id="gateCodeF" class="hidden" autocomplete="off">
+      <div class="field"><label for="gateCode">Code from the email</label><input type="text" id="gateCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" maxlength="10" required placeholder="••••••" style="font-size:22px;letter-spacing:.3em;text-align:center"></div>
+      <button class="btn primary lg" style="width:100%;margin-top:12px" id="gateVerify">Sign in</button>
+      <button type="button" class="btn ghost sm" style="width:100%;margin-top:8px" id="gateBack">Use another email</button>
+    </form>
+    <div id="gateOffline" class="hidden" style="margin-top:12px"><button class="btn" style="width:100%" id="gateOfflineBtn">Ride offline (sync later)</button></div>
+    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0">Invite-only. Ask the owner for access.</p>
+  </div>
+</div>
 <div id="modalRoot"></div>
 <div id="countdown" class="countdown hidden"></div>
 
@@ -524,7 +556,7 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
    ===================================================================== */
 const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100 };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
-const saveSettings = () => store('erglab.settings', S);
+const saveSettings = () => { const ok = store('erglab.settings', S); if (typeof cloud !== 'undefined') cloud.schedulePush(); return ok; };
 
 const PZ = [
   { n: 'Z1', name: 'Active recovery', lo: 0, hi: 0.55, col: '#8b95a7' },
@@ -637,7 +669,7 @@ function profileSVG(w, { W = 600, H = 100, axis = false } = {}) {
 let CUSTOM = load('erglab.custom', []);
 function allWorkouts() { return [...LIBRARY, ...CUSTOM.map(w => ({ ...w, custom: true }))]; }
 function findWorkout(id) { return allWorkouts().find(w => w.id === id); }
-function saveCustom() { store('erglab.custom', CUSTOM); statsCache.clear(); }
+function saveCustom() { store('erglab.custom', CUSTOM); statsCache.clear(); if (typeof cloud !== 'undefined') cloud.schedulePush(); }
 
 /* =====================================================================
    PARSERS: text builder, ZWO, ERG/MRC
@@ -695,9 +727,14 @@ function parseText(text, ftp = S.ftp) {
   }
   return steps;
 }
-function validateSeg(s, ctx = '') {
+function validateSeg(s, ctx = '', depth = 0) {
   const bad = p => !(p > 0.05 && p <= 3);
-  if (s.t === 'x') { (s.s || []).forEach(c => validateSeg(c, ctx)); return; }
+  if (!s || typeof s !== 'object') throw new Error(`Bad step in "${ctx}"`);
+  if (s.t === 'x') {
+    if (!(Number.isInteger(+s.n) && +s.n >= 1 && +s.n <= 100) || depth > 2 || !Array.isArray(s.s) || !s.s.length || s.s.length > 200) throw new Error(`Bad repeat block in "${ctx}"`);
+    s.s.forEach(c => validateSeg(c, ctx, depth + 1)); return;
+  }
+  if (!['s', 'r', 'f'].includes(s.t)) throw new Error(`Unknown step type in "${ctx}"`);
   if (!(s.d >= 1 && s.d <= 6 * 3600)) throw new Error(`Duration out of range in "${ctx}"`);
   if ((s.t === 's' && bad(s.p)) || (s.t === 'r' && (bad(s.p0) || bad(s.p1)))) throw new Error(`Power out of range (5-300% FTP) in "${ctx}"`);
 }
@@ -729,7 +766,7 @@ function parseZWO(xml) {
       add({ t: 'r', d, p0: lo, p1: hi, lbl: tag === 'warmup' ? 'Warm-up' : tag === 'cooldown' ? 'Cool-down' : '' });
     } else if (tag === 'steadystate') add({ t: 's', d, p: A(el, 'Power', A(el, 'PowerLow', 0.6)) });
     else if (tag === 'intervalst') {
-      const n = A(el, 'Repeat', 1), on = { t: 's', d: A(el, 'OnDuration', 60), p: A(el, 'OnPower', A(el, 'PowerOnHigh', 1)), lbl: 'On' }, off = { t: 's', d: A(el, 'OffDuration', 60), p: A(el, 'OffPower', A(el, 'PowerOffHigh', 0.5)), lbl: 'Off' };
+      const n = clamp(Math.round(A(el, 'Repeat', 1)) || 1, 1, 100), on = { t: 's', d: A(el, 'OnDuration', 60), p: A(el, 'OnPower', A(el, 'PowerOnHigh', 1)), lbl: 'On' }, off = { t: 's', d: A(el, 'OffDuration', 60), p: A(el, 'OffPower', A(el, 'PowerOffHigh', 0.5)), lbl: 'Off' };
       if (cad) on.c = cad; const cr = A(el, 'CadenceResting', null); if (cr) off.c = cr;
       seg.push({ t: 'x', n, s: [on, off] });
     } else if (tag === 'freeride' || tag === 'maxeffort') add({ t: tag === 'maxeffort' ? 'f' : 's', d, p: 0.6, lbl: tag === 'freeride' ? 'Free ride' : 'Max effort' });
@@ -1331,6 +1368,7 @@ function finishRide(completed) {
   if (R.source && R.source.plan && ride.completed) {
     const d = load('erglab.plandone', {}); (d[R.source.plan] ||= {})[R.source.key] = ride.date;
     if (!store('erglab.plandone', d)) toast('Storage full: plan progress not saved', 5000);
+    cloud.schedulePush();
   }
   summaryModal(ride);
 }
@@ -1339,7 +1377,7 @@ function cleanRide(r) {
   if (!r || typeof r !== 'object' || !/^[\w-]{1,64}$/.test(String(r.id))) return null;
   const n = v => (isFinite(+v) ? +v : 0), arr = a => Array.isArray(a) ? a.map(n) : undefined;
   const d = new Date(r.date); if (isNaN(d)) return null;
-  const out = { id: String(r.id), date: d.toISOString(), name: String(r.name || 'Ride'), wid: String(r.wid || ''), cat: CATS.includes(r.cat) ? r.cat : 'Custom', completed: !!r.completed };
+  const out = { id: String(r.id), date: d.toISOString(), name: String(r.name || 'Ride').slice(0, 200), wid: String(r.wid || '').slice(0, 80), cat: CATS.includes(r.cat) ? r.cat : 'Custom', completed: !!r.completed };
   for (const k of ['dur', 'avgP', 'np', 'maxP', 'kj', 'avgHr', 'maxHr', 'avgC', 'ftp', 'dist', 'IF', 'tss']) out[k] = n(r[k]);
   if (!out.ftp) out.ftp = S.ftp;
   for (const k of ['p', 'hr', 'c', 'dd']) { const a = arr(r[k]); if (a) out[k] = a; }
@@ -1347,6 +1385,8 @@ function cleanRide(r) {
   return out;
 }
 function saveRide(ride) {
+  if (cloud.user) ride.owner = cloud.user.id;
+  cloud.pushRide(ride).then(ok => { if (ok) { const h = load('erglab.history', []); const x = h.find(y => y.id === ride.id); if (x) { x.cloud = true; store('erglab.history', h); } } });
   const h = load('erglab.history', []).filter(x => x.id !== ride.id); h.unshift(ride);
   let stripped = 0, evicted = 0;
   while (!store('erglab.history', h)) {
@@ -1830,7 +1870,7 @@ function renderPlans() {
     </div>`;
   }).join('');
   $$('[data-ptoggle]').forEach(h => h.onclick = () => { const id = h.dataset.ptoggle; openPlans.has(id) ? openPlans.delete(id) : openPlans.add(id); renderPlans(); });
-  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm('Reset progress for this plan?')) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); renderPlans(); });
+  $$('[data-preset]').forEach(b => b.onclick = () => { if (!confirm('Reset progress for this plan?')) return; const d = load('erglab.plandone', {}); delete d[b.dataset.preset]; store('erglab.plandone', d); cloud.schedulePush(); renderPlans(); });
 }
 
 /* ---- builder ---- */
@@ -1865,6 +1905,7 @@ async function importFiles(files) {
       for (const w of list) {
         if (!w.seg || !w.seg.length) continue;
         w.seg.forEach(s => validateSeg(s, f.name));
+        { const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) throw new Error('workout too long'); }
         CUSTOM.push({ id: 'u-' + slug(w.name || f.name) + '-' + (Date.now() + n).toString(36), name: w.name || f.name, cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: w.desc || `Imported from ${f.name}`, src: w.src || f.name, seg: w.seg }); n++;
       }
     } catch (e) { toast(`${f.name}: ${e.message}`, 4000); }
@@ -1874,7 +1915,8 @@ async function importFiles(files) {
 
 /* ---- history ---- */
 function rideSVG(r, W = 600, H = 40) {
-  const n = r.p ? r.p.length : 0; if (!n) return '';
+  const P = r.p || r.pv; const n = P ? P.length : 0; if (!n) return '';
+  r = { ...r, p: P };
   const mx = Math.max(r.ftp * 1.5, ...r.p) * 1.05; const step = Math.max(1, Math.floor(n / 300));
   let d = `M0 ${H}`; for (let i = 0; i < n; i += step) { let a = 0, k = 0; for (let j = i; j < Math.min(n, i + step); j++) { a += r.p[j]; k++; } d += ` L${(i / n * W).toFixed(1)} ${(H - a / k / mx * H).toFixed(1)}`; }
   d += ` L${W} ${H} Z`;
@@ -1888,12 +1930,16 @@ function renderHistory() {
       <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
-        if (!stv.connected || !(r.p || s.upload)) return '';
-        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.p ? `<button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button></div>
+        if (!stv.connected || !(r.p || r.cloud || s.upload)) return '';
+        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.p || r.cloud ? `<button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button></div>
       <div class="mini">${rideSVG(r)}</div></div>`).join('');
-  $$('[data-tcx]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.tcx); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); });
+  $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast('Could not load ride: ' + e.message); } });
   $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = 'Uploading…'; uploadToStrava(r, null).catch(() => { }); });
-  $$('[data-hdel]').forEach(b => b.onclick = () => { if (!confirm('Delete this ride?')) return; store('erglab.history', h.filter(x => x.id !== b.dataset.hdel)); renderHistory(); });
+  $$('[data-hdel]').forEach(b => b.onclick = async () => {
+    if (!confirm(cloud.user ? 'Delete this ride everywhere (this device and your cloud space)?' : 'Delete this ride?')) return;
+    if (cloud.user) { try { await cloud.deleteRide(b.dataset.hdel); } catch (e) { toast('Could not delete from the cloud: ' + e.message, 5000); return; } }
+    store('erglab.history', load('erglab.history', []).filter(x => x.id !== b.dataset.hdel)); renderHistory();
+  });
 }
 function toTCX(r) {
   const t0 = new Date(r.date).getTime(); const pts = [];
@@ -1974,17 +2020,18 @@ function summaryModal(r) {
    Either each rider enters their own API app credentials (kept in this browser),
    or the host sets a token relay URL that adds the secret server-side.
    ===================================================================== */
+const CLOUD = /*__CLOUD__*/{ url: '', key: '' }; // injected at build time from GitHub variables / src/cloud.config.json (publishable key only)
 const STRAVA_APP = { clientId: '', clientSecret: '', relay: '' }; // optional host defaults (a secret here is visible to anyone who opens the page)
 const STV_API = 'https://www.strava.com/api/v3';
 const stv = {
   app() { const a = load('erglab.stravaApp', {}); return { clientId: String(a.clientId || STRAVA_APP.clientId || '').trim(), secret: String(a.secret || STRAVA_APP.clientSecret || '').trim(), relay: String(a.relay || STRAVA_APP.relay || '').trim().replace(/\/+$/, '') }; },
   tok() { return load('erglab.strava', null); },
-  get connected() { const t = this.tok(); return !!(t && t.refresh_token); },
+  get connected() { if (cloud.on) return !!(cloud.stv && cloud.stv.connected); const t = this.tok(); return !!(t && t.refresh_token); },
   redirectUri() { return location.origin + location.pathname; },
   connect() {
     if (rideInProgress()) { toast('Finish or end your ride before connecting Strava'); return; }
-    const a = this.app();
-    if (!/^\d+$/.test(a.clientId)) { toast('Enter your Strava Client ID first'); return; }
+    const a = cloud.on ? { clientId: String((cloud.stv && cloud.stv.client_id) || ''), secret: 'server' } : this.app();
+    if (!/^\d+$/.test(a.clientId)) { toast(cloud.on ? 'Strava is not set up on the server yet (STRAVA_CLIENT_ID missing)' : 'Enter your Strava Client ID first'); return; }
     if (!a.secret && !a.relay) { toast('Enter your Client Secret (or a token relay URL)'); return; }
     if (!/^https?:$/.test(location.protocol)) { toast('Strava login needs the app opened from an http(s) address, not a local file', 6000); return; }
     const state = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
@@ -2029,8 +2076,14 @@ const stv = {
     if (q.get('error')) { toast('Strava connection cancelled'); return true; }
     if (!/activity:write/.test(q.get('scope') || '')) { toast('Strava: tick "Upload your activities" on the Strava permission screen, then connect again.', 8000); return true; }
     try {
-      const j = await this.tokenCall({ code: q.get('code'), grant_type: 'authorization_code' });
-      this.save(j); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+      if (cloud.on) {
+        if (!cloud.user) throw new Error('Sign in first, then connect Strava again');
+        const j = await cloud.fn('/exchange', { method: 'POST', json: { code: q.get('code'), scope: q.get('scope') || '' } });
+        await cloud.stravaStatus(); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+      } else {
+        const j = await this.tokenCall({ code: q.get('code'), grant_type: 'authorization_code' });
+        this.save(j); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+      }
     } catch (e) { toast('Strava: ' + e.message, 7000); }
     renderStrava(); return true;
   },
@@ -2059,6 +2112,7 @@ const stv = {
     return this._refreshing;
   },
   async api(path, opts = {}, retried = false) {
+    if (cloud.on) return cloud.fn(path.replace(/^\/uploads/, '/upload'), opts);
     const tk = await this.token(retried);
     let r;
     try { r = await fetch(STV_API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: 'Bearer ' + tk } }); }
@@ -2115,6 +2169,11 @@ const stv = {
     return res;
   },
   async disconnect() {
+    if (cloud.on) {
+      try { const j = await cloud.fn('/disconnect', { method: 'POST' }); toast(j.revoked ? 'Disconnected: ERGlab access removed from your Strava account' : 'Disconnected. To be sure, also remove ERGlab under Strava › Settings › My Apps.', 6000); }
+      catch (e) { toast('Strava: ' + e.message, 6000); }
+      await cloud.stravaStatus(); renderStrava(); return;
+    }
     let tk = null, ok = false;
     try { if (this._refreshing) await this._refreshing.catch(() => { }); tk = await this.token(); } catch { }
     this.gen++; // any refresh finishing later must not store tokens again
@@ -2141,6 +2200,7 @@ function stvOf(r) { const m = load('erglab.stravaIds', {}); return m[r.id] || r.
 function setRideStrava(id, info) {
   const m = load('erglab.stravaIds', {}); m[id] = info;
   if (!store('erglab.stravaIds', m)) toast('Storage full: could not remember the Strava upload', 5000);
+  cloud.setStrava(id, info);
 }
 const stvLink = id => `https://www.strava.com/activities/${encodeURIComponent(id)}`;
 const stvBusy = new Set();
@@ -2150,6 +2210,7 @@ async function uploadToStrava(ride, statusEl) {
   const say = (html, col) => { if (statusEl && statusEl.isConnected) { statusEl.innerHTML = html; statusEl.style.color = col || ''; } };
   stvBusy.add(ride.id);
   try {
+    ride = await rideFull(ride);
     const res = await stv.upload(ride, msg => say(esc(msg)));
     if (res.pending) { say('Uploaded. Strava is still processing it; it will appear in your feed shortly (History shows the link once it is ready).', 'var(--ok)'); setRideStrava(ride.id, { pending: true, upload: res.upload, at: Date.now() }); }
     else {
@@ -2164,7 +2225,9 @@ async function uploadToStrava(ride, statusEl) {
   } finally { stvBusy.delete(ride.id); renderHistory(); }
 }
 function renderStrava() {
-  const on = stv.connected, t = stv.tok(), a = stv.app();
+  const on = stv.connected, a = stv.app();
+  const t = cloud.on ? { athlete: cloud.stv && cloud.stv.athlete } : stv.tok();
+  $('#stvLocal').classList.toggle('hidden', cloud.on);
   $('#stvOn').classList.toggle('hidden', !on);
   $('#stvSetup').classList.toggle('hidden', on);
   const b = $('#stvBadge'); b.textContent = on ? 'connected' : 'not connected'; b.style.color = on ? '#fc4c02' : 'var(--dim)';
@@ -2176,7 +2239,7 @@ function renderStrava() {
   if (STRAVA_APP.clientId && !load('erglab.stravaApp', {}).clientId) $('#stvId').placeholder = STRAVA_APP.clientId + ' (provided by this site)';
   $('#stvAuto').value = S.stravaAuto === false ? '0' : '1';
   $('#stvSport').value = S.stravaSport || 'VirtualRide';
-  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? 'Needs the app opened from an http(s) address.' : (a.clientId && (a.secret || a.relay)) ? '' : 'Fill in the fields above first.';
+  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? 'Needs the app opened from an http(s) address.' : cloud.on ? (cloud.stv ? '' : 'Checking Strava status…') : (a.clientId && (a.secret || a.relay)) ? '' : 'Fill in the fields above first.';
 }
 function bindStrava() {
   const saveApp = () => {
@@ -2192,6 +2255,227 @@ function bindStrava() {
   $('#stvOff').onclick = () => { if (confirm('Disconnect from Strava? Rides already uploaded stay on Strava.')) stv.disconnect(); };
   $('#stvAuto').onchange = e => { S.stravaAuto = e.target.value === '1'; saveSettings(); };
   $('#stvSport').onchange = e => { S.stravaSport = e.target.value; saveSettings(); };
+}
+
+/* =====================================================================
+   CLOUD (Supabase): invite-only sign-in with emailed codes + private per-rider storage (Row Level Security)
+   ===================================================================== */
+const SUPABASE_JS = { src: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js', sri: 'sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK' };
+const USER_KEYS = ['erglab.settings', 'erglab.custom', 'erglab.history', 'erglab.plandone', 'erglab.stravaIds', 'erglab.inprogress', 'erglab.strava', 'erglab.stravaApp', 'erglab.stvState', 'erglab.btHelpHidden'];
+function applySettings(o) {
+  if (!o || typeof o !== 'object') return;
+  for (const k of Object.keys(DEFAULTS)) { const v = o[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v; }
+  S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
+  if (['VirtualRide', 'Ride'].includes(o.stravaSport)) S.stravaSport = o.stravaSport;
+  if (typeof o.stravaAuto === 'boolean') S.stravaAuto = o.stravaAuto;
+}
+function cleanCustom(list) {
+  return (Array.isArray(list) ? list : []).filter(w => w && typeof w.id === 'string' && Array.isArray(w.seg)).flatMap(w => {
+    try { w.seg.forEach(s => validateSeg(s, String(w.name))); const x = expand(w); if (x.segs.length > 5000 || x.total > 12 * 3600) return []; } catch { return []; }
+    return [{ id: String(w.id).replace(/[^\w-]/g, '').slice(0, 80) || 'u-' + Math.random().toString(36).slice(2), name: String(w.name || 'Workout').slice(0, 120), cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: String(w.desc || '').slice(0, 2000), src: String(w.src || '').slice(0, 200), seg: w.seg }];
+  });
+}
+function cleanPlanDone(o) {
+  const out = {}; if (!o || typeof o !== 'object') return out;
+  for (const [p, days] of Object.entries(o)) if (/^[\w-]{1,80}$/.test(p) && days && typeof days === 'object') { out[p] = {}; for (const [k, v] of Object.entries(days)) if (/^\d+-\d+$/.test(k)) out[p][k] = String(v).slice(0, 40); }
+  return out;
+}
+const preview = (arr, n = 300) => { if (!arr || !arr.length) return null; const step = Math.max(1, Math.ceil(arr.length / n)); const out = []; for (let i = 0; i < arr.length; i += step) { let s = 0, k = 0; for (let j = i; j < Math.min(arr.length, i + step); j++) { s += arr[j]; k++; } out.push(Math.round(s / k)); } return out; };
+async function rideFull(r) {
+  if (!r) throw new Error('Ride not found');
+  if (r.p) return r;
+  if (!cloud.user) throw new Error('Only a summary is stored for this ride');
+  const st = await cloud.fetchStreams(r.id);
+  if (!st || !Array.isArray(st.p)) throw new Error('No per-second data stored for this ride');
+  return { ...r, p: st.p, hr: st.hr || st.p.map(() => 0), c: st.c || st.p.map(() => 0), dd: st.dd };
+}
+function wipeLocal(all = false) {
+  const keys = USER_KEYS.concat('erglab.profileDirty', all ? ['erglab.lastUser'] : []);
+  keys.forEach(k => { try { localStorage.removeItem(k); } catch { } });
+  if (all) { try { Object.keys(localStorage).filter(k => k.startsWith('erglab-auth') || /^sb-.*-auth-token/.test(k)).forEach(k => localStorage.removeItem(k)); } catch { } }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.user && cloud.pushT) { clearTimeout(cloud.pushT); cloud.pushProfile(); } });
+const cloud = {
+  on: !!(CLOUD && CLOUD.url && CLOUD.key), sb: null, user: null, stv: null, pushT: null, offline: false,
+  loadLib() {
+    if (window.supabase && window.supabase.createClient) return Promise.resolve();
+    return new Promise((res, rej) => {
+      const s = document.createElement('script'); s.src = SUPABASE_JS.src; s.integrity = SUPABASE_JS.sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
+      s.onload = () => res(); s.onerror = () => rej(new Error('Could not load the sign-in library (offline?)'));
+      document.head.appendChild(s);
+    });
+  },
+  async start() {
+    if (!this.on) return;
+    gate('loading');
+    try {
+      await this.loadLib();
+      this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'erglab-auth' } });
+      this.sb.auth.onAuthStateChange((ev, session) => {
+        if (ev === 'SIGNED_OUT' && this.user && !this._leaving) { this._leaving = true; wipeLocal(); location.replace(location.pathname); return; }
+        if (session && session.user) this.user = session.user;
+      });
+      const { data } = await this.sb.auth.getSession();
+      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); }
+      else gate('email');
+    } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message || 'Cannot reach the server.'); }
+  },
+  async afterLogin() {
+    // a different account than the one whose data is cached on this device → start clean
+    const last = load('erglab.lastUser', null);
+    const localRides = load('erglab.history', []), unsynced = localRides.filter(r => !r.cloud);
+    if (last && last !== this.user.id) {
+      // another account used this device: keep its not-yet-uploaded rides aside for that account, then start clean
+      if (unsynced.length) store('erglab.pending.' + last, unsynced.filter(r => !r.owner || r.owner === last));
+      wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
+    } else if (!last && (localRides.length || CUSTOM.length) && !confirm(`This device has ${localRides.length} ride(s) and ${CUSTOM.length} custom workout(s) from before you signed in. Add them to ${this.user.email}?`)) {
+      wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
+    }
+    store('erglab.lastUser', this.user.id);
+    gate(null);
+    $('#acctCard').classList.remove('hidden'); $('#acctEmail').textContent = this.user.email || '';
+    try { await this.pull(); } catch (e) { toast('Sync failed: ' + e.message, 5000); }
+    this.stravaStatus().then(renderStrava);
+  },
+  async sendCode(email) {
+    const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    if (error && /rate|seconds|too many/i.test(error.message)) throw new Error('Please wait a minute before asking for a new code.');
+    if (error && !/signups? not allowed|not found|user/i.test(error.message)) throw new Error(error.message);
+    // unknown addresses get the same answer as invited ones (no account enumeration)
+  },
+  async verify(email, code) {
+    const { data, error } = await this.sb.auth.verifyOtp({ email, token: code, type: 'email' });
+    if (error || !data || !data.session) throw new Error(error && /expired|invalid/i.test(error.message) ? 'That code is wrong or expired.' : (error ? error.message : 'Sign-in failed'));
+    this.user = data.session.user; await this.afterLogin();
+  },
+  async signOut() {
+    if (rideInProgress() && !confirm('A ride is in progress. Sign out anyway?')) return;
+    this._leaving = true;
+    if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
+    try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
+    wipeLocal(true); // nothing personal stays on this device
+    location.replace(location.pathname);
+  },
+  async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error('Signed out'); return data.session; },
+  profile() {
+    const settings = {}; for (const k of Object.keys(DEFAULTS)) settings[k] = S[k];
+    if (S.stravaSport) settings.stravaSport = S.stravaSport; if (typeof S.stravaAuto === 'boolean') settings.stravaAuto = S.stravaAuto;
+    return { user_id: this.user.id, settings, custom_workouts: CUSTOM, plan_progress: cleanPlanDone(load('erglab.plandone', {})) };
+  },
+  schedulePush() { if (!this.user) return; store('erglab.profileDirty', true); clearTimeout(this.pushT); this.pushT = setTimeout(() => this.pushProfile(), 1200); },
+  async pushProfile() {
+    this.pushT = null;
+    if (!this.user) return false;
+    const { error } = await this.sb.from('profiles').upsert(this.profile());
+    if (error) { console.warn('profile sync', error); this.pushT = setTimeout(() => this.pushProfile(), 30000); return false; }
+    try { localStorage.removeItem('erglab.profileDirty'); } catch { }
+    return true;
+  },
+  rideRow(r) {
+    const { p, hr, c, dd, cloud: _c, strava: _s, ...sum } = r;
+    sum.pv = preview(p) || r.pv || null;
+    return { user_id: this.user.id, id: r.id, started_at: r.date, name: String(r.name || 'Ride').slice(0, 200) || 'Ride', summary: sum, streams: p ? { p, hr, c, dd } : undefined, strava: stvOf(r) || null };
+  },
+  async pushRide(r) {
+    if (!this.user || !r || !/^[\w-]{1,64}$/.test(r.id)) return false;
+    const row = this.rideRow(r); if (row.streams === undefined) delete row.streams;
+    const { error } = await this.sb.from('rides').upsert(row);
+    if (error) { console.warn('ride sync', error); return false; } return true;
+  },
+  async fetchStreams(id) {
+    const { data, error } = await this.sb.from('rides').select('streams').eq('id', id).maybeSingle();
+    if (error) throw new Error(error.message); return data && data.streams;
+  },
+  async deleteRide(id) { const { error } = await this.sb.from('rides').delete().eq('id', id); if (error) throw new Error(error.message); },
+  async setStrava(id, info) { if (!this.user) return; const { error } = await this.sb.from('rides').update({ strava: info }).eq('id', id); if (error) console.warn('strava marker sync', error); },
+  async pull() {
+    const uid = this.user.id;
+    const { data: prof, error: pe } = await this.sb.from('profiles').select('settings, custom_workouts, plan_progress').eq('user_id', uid).maybeSingle();
+    if (pe) throw new Error(pe.message);
+    if (prof && !load('erglab.profileDirty', false)) { // the cloud copy wins (deletions on other devices stick)
+      applySettings(prof.settings); store('erglab.settings', S);
+      CUSTOM = cleanCustom(prof.custom_workouts); store('erglab.custom', CUSTOM);
+      store('erglab.plandone', cleanPlanDone(prof.plan_progress));
+    } else await this.pushProfile(); // first sign-in, or this device changed something that wasn't sent yet
+    // rides: server list (no streams) merged with this device's cache; unsynced local rides are uploaded
+    const rows = [];
+    for (let from = 0; from < 20000; from += 1000) {
+      const { data, error } = await this.sb.from('rides').select('id, started_at, name, summary, strava').order('started_at', { ascending: false }).range(from, from + 999);
+      if (error) throw new Error(error.message);
+      rows.push(...data); if (data.length < 1000) break;
+    }
+    const pendingMine = load('erglab.pending.' + uid, []);
+    const local = load('erglab.history', []).concat(pendingMine.filter(r => r && !r.cloud)), byId = new Map(local.map(r => [r.id, r]));
+    const marks = load('erglab.stravaIds', {});
+    const merged = [];
+    for (const row of rows || []) {
+      const base = cleanRide({ ...(row.summary || {}), id: row.id, date: row.started_at, name: row.name, p: undefined, hr: undefined, c: undefined, dd: undefined });
+      if (!base) continue;
+      const pv = row.summary && Array.isArray(row.summary.pv) ? row.summary.pv.map(v => +v || 0) : null; if (pv) base.pv = pv;
+      const loc = byId.get(row.id); if (loc && loc.p) Object.assign(base, { p: loc.p, hr: loc.hr, c: loc.c, dd: loc.dd });
+      base.cloud = true;
+      if (row.strava && typeof row.strava === 'object' && !marks[row.id]) { const s = row.strava; if (/^\d+$/.test(String(s.id || '')) || s.pending) marks[row.id] = { id: s.id ? String(s.id) : undefined, pending: !!s.pending && !s.id, upload: s.upload ? String(s.upload).replace(/\D/g, '') : undefined, at: +s.at || 0 }; }
+      merged.push(base); byId.delete(row.id);
+    }
+    // left in byId: rides the server doesn't have. Never-synced ones (of this account) are uploaded;
+    // ones that were already synced were deleted on another device, so they are dropped here too.
+    const unsynced = [...byId.values()].filter(r => !r.cloud && (!r.owner || r.owner === uid));
+    for (const r of unsynced) { r.owner = uid; if (await this.pushRide(r)) r.cloud = true; merged.push(r); }
+    try { localStorage.removeItem('erglab.pending.' + uid); } catch { }
+    merged.sort((a, b) => b.date.localeCompare(a.date));
+    store('erglab.stravaIds', marks);
+    // keep per-second data locally only for the 10 newest rides; older ones load from the cloud on demand
+    merged.forEach((r, i) => { if (i >= 10 && r.cloud && r.p) { r.pv = r.pv || preview(r.p); delete r.p; delete r.hr; delete r.c; delete r.dd; } });
+    store('erglab.history', merged);
+    afterSettings(); renderHistory(); renderPlans(); renderCustom();
+    if (unsynced.length) toast(`Synced ${unsynced.length} ride${unsynced.length > 1 ? 's' : ''} from this device to your cloud space`);
+  },
+  async fn(path, { method = 'GET', json, body } = {}) {
+    const s = await this.session();
+    const headers = { Authorization: 'Bearer ' + s.access_token, apikey: CLOUD.key };
+    if (json !== undefined) { headers['Content-Type'] = 'application/json'; body = JSON.stringify(json); }
+    let r;
+    try { r = await fetch(`${CLOUD.url.replace(/\/+$/, '')}/functions/v1/strava${path}`, { method, headers, body }); }
+    catch { throw new Error('Network error talking to the ERGlab server'); }
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 409) { this.stravaStatus().then(renderStrava); }
+    if (!r.ok) { const e = new Error(j.message || stvErr(j) || `Server error ${r.status}`); e.status = r.status; e.body = j; throw e; }
+    return j;
+  },
+  async stravaStatus() { if (!this.user) return null; try { this.stv = await this.fn('/status'); } catch (e) { console.warn('strava status', e); this.stv = this.stv || null; } return this.stv; },
+};
+let gateEmail = '';
+function gate(mode, msg) {
+  const g = $('#gate');
+  document.body.classList.toggle('gated', !!mode);
+  g.classList.toggle('hidden', !mode);
+  if (!mode) return;
+  $('#gateEmailF').classList.toggle('hidden', mode !== 'email');
+  $('#gateCodeF').classList.toggle('hidden', mode !== 'code');
+  $('#gateOffline').classList.toggle('hidden', mode !== 'offline');
+  $('#gateMsg').textContent = msg || { loading: 'Connecting…', email: 'Enter the email address you were invited with.', code: `If ${gateEmail} is invited, a sign-in code is on its way. Check your inbox (and spam).`, offline: 'Cannot reach the server.' }[mode];
+  $('#gateMsg').style.color = '';
+  setTimeout(() => { const f = mode === 'email' ? $('#gateEmail') : mode === 'code' ? $('#gateCode') : null; try { f && f.focus(); } catch { } }, 50);
+}
+function bindCloud() {
+  const err = m => { $('#gateMsg').textContent = m; $('#gateMsg').style.color = 'var(--bad)'; };
+  $('#gateEmailF').onsubmit = async e => {
+    e.preventDefault(); const em = $('#gateEmail').value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return err('Enter a valid email address.');
+    $('#gateSend').disabled = true;
+    try { await cloud.sendCode(em); gateEmail = em; gate('code'); } catch (x) { err(x.message); } finally { $('#gateSend').disabled = false; }
+  };
+  $('#gateCodeF').onsubmit = async e => {
+    e.preventDefault(); const code = $('#gateCode').value.replace(/\D/g, '');
+    if (code.length < 6) return err('Enter the code from the email.');
+    $('#gateVerify').disabled = true;
+    try { await cloud.verify(gateEmail, code); $('#gateCode').value = ''; } catch (x) { err(x.message); } finally { $('#gateVerify').disabled = false; }
+  };
+  $('#gateBack').onclick = () => gate('email');
+  $('#gateOfflineBtn').onclick = () => { gate(null); toast('Offline: rides are kept on this device and sync after you sign in.', 6000); };
+  $('#acctOut').onclick = () => { if (confirm('Sign out? Data on this device is removed; it stays in your cloud space.')) cloud.signOut(); };
+  $('#acctSync').onclick = async () => { try { await cloud.pull(); toast('Synced'); } catch (e) { toast('Sync failed: ' + e.message, 5000); } };
+  window.addEventListener('online', () => { if (cloud.user) cloud.pull().catch(() => { }); });
 }
 
 /* ---- settings ---- */
@@ -2214,15 +2498,11 @@ function bindSettings() {
   $('#sImport').onchange = async e => {
     try {
       const j = JSON.parse(await e.target.files[0].text());
-      if (j.settings && typeof j.settings === 'object') for (const k of Object.keys(DEFAULTS)) {
-        const v = j.settings[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v;
-      }
-      if (j.settings && ['VirtualRide', 'Ride'].includes(j.settings.stravaSport)) S.stravaSport = j.settings.stravaSport;
-      if (j.settings && typeof j.settings.stravaAuto === 'boolean') S.stravaAuto = j.settings.stravaAuto;
-      if (Array.isArray(j.custom)) CUSTOM = j.custom.filter(w => w && typeof w.id === 'string' && Array.isArray(w.seg)).map(w => { w.seg.forEach(s => validateSeg(s, String(w.name))); return { id: String(w.id).replace(/[^\w-]/g, '').slice(0, 80) || 'u-' + Math.random().toString(36).slice(2), name: String(w.name || 'Workout'), cat: CATS.includes(w.cat) ? w.cat : 'Custom', desc: String(w.desc || ''), src: String(w.src || ''), seg: w.seg }; });
+      applySettings(j.settings);
+      if (Array.isArray(j.custom)) CUSTOM = cleanCustom(j.custom);
       saveSettings(); saveCustom();
-      if (Array.isArray(j.history)) store('erglab.history', j.history.map(cleanRide).filter(Boolean));
-      if (j.plandone && typeof j.plandone === 'object') store('erglab.plandone', j.plandone);
+      if (Array.isArray(j.history)) { const hs = j.history.map(cleanRide).filter(Boolean); store('erglab.history', hs); hs.forEach(r => cloud.pushRide(r)); }
+      if (j.plandone && typeof j.plandone === 'object') { store('erglab.plandone', cleanPlanDone(j.plandone)); cloud.schedulePush(); }
       afterSettings(); renderHistory(); toast('Backup restored');
     } catch (err) { toast('Restore failed: ' + err.message); }
   };
@@ -2325,7 +2605,8 @@ function init() {
   buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false);
   const oauthReturn = /[?&]state=/.test(location.search) && /[?&](code|error)=/.test(location.search);
   const h = (location.hash || '').slice(1); go(oauthReturn ? 'settings' : TABS.some(t => t.id === h) ? h : 'workouts');
-  stv.handleRedirect().then(() => { setTimeout(offerRecovery, 300); });
+  bindCloud();
+  (cloud.on ? cloud.start() : Promise.resolve()).then(() => stv.handleRedirect()).then(() => { setTimeout(offerRecovery, 300); });
   tickTimer = setInterval(tick, 250);
   window.addEventListener('resize', updateConnUI);
 }

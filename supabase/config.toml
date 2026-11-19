@@ -1,0 +1,7 @@
+# Supabase CLI project config (only what ERGlab needs; everything else uses defaults)
+project_id = "erglab"
+
+[functions.strava]
+# The function verifies the caller itself (auth.getUser), which works with both
+# legacy JWT keys and the new publishable/secret keys.
+verify_jwt = false

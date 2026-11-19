@@ -7,3 +7,7 @@ Thumbs.db
 # never commit Strava / API secrets
 .env
 .dev.vars
+src/cloud.config.json
+dist/
+supabase/.temp/
+supabase/.branches/

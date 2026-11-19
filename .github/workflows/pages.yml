@@ -1,0 +1,42 @@
+name: Deploy ERGlab to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      # Supabase project URL + PUBLISHABLE key come from repository variables
+      # (Settings > Secrets and variables > Actions > Variables), never from the code.
+      # The build refuses secret / service-role keys.
+      - name: Build single-file app
+        env:
+          ERGLAB_SUPABASE_URL: ${{ vars.ERGLAB_SUPABASE_URL }}
+          ERGLAB_SUPABASE_KEY: ${{ vars.ERGLAB_SUPABASE_KEY }}
+        run: |
+          mkdir -p dist
+          node src/build.mjs --out dist/index.html
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
