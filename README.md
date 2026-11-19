@@ -21,6 +21,14 @@ Host `index.html` on any https static host and send the link:
 
 Local test: `python -m http.server 8765`, then open http://localhost:8765.
 
+## Install as an app
+
+The hosted site (GitHub Pages build) ships a web app manifest and icons, so it can be installed:
+- **Windows / macOS / Android (Chrome, Edge):** Settings › *Install as an app* › **Install ERGlab**, or the install icon in the address bar. Bluetooth keeps working in the installed app.
+- **iPhone / iPad:** in Safari or Chrome, Share › **Add to Home Screen**. Apple does not allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and rides; to **ride**, keep using **Bluefy**. The home-screen app has its own storage: sign in there once with the emailed **code** (tapping the email link opens the browser instead).
+
+The single-file `index.html` in the repo has no manifest and is not installable.
+
 ## Before riding (Direto X)
 - Close Zwift, the Elite apps and similar. The trainer accepts only one Bluetooth controller at a time.
 - Heart rate comes from a separate Bluetooth strap (the "HR" button). The Direto X doesn't relay HR.
@@ -38,5 +46,5 @@ Rides upload as TCX (gzipped) with power, HR and cadence, automatically after ea
 
 - `src/app.template.html`: app code (HTML/CSS/JS)
 - `src/data/workouts_*.json`, `src/data/plans.json`: workout library and plans (power as a fraction of FTP, durations in seconds)
-- `node src/build.mjs` validates the data and writes `index.html`
+- `node src/build.mjs` validates the data and writes `index.html`; `--out dist/index.html` writes a hosted build plus `manifest.webmanifest` and the icons from `src/assets/`
 - `src/protocol_notes.md`: FTMS / Direto X protocol research the Bluetooth code is based on

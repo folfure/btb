@@ -71,6 +71,8 @@ npx supabase db push
 
 To **block** someone without losing their data: *Ban user*. It takes effect immediately, because the database checks on every request. To **erase** someone and all their rides/HR data: *Delete user*.
 
+**Riders on iPhone:** they ride in **Bluefy** (sign in there with a code). They can also add ERGlab to the home screen (Safari › Share › Add to Home Screen) to browse plans and rides, but Apple gives home-screen apps no Bluetooth, and the icon needs its own sign-in with a code (the email link opens the browser, not the icon).
+
 ## 7. Recommended: give ERGlab its own domain
 Every GitHub Pages site of the `folfure` account shares the origin `https://folfure.github.io`. Pages on one origin can read each other's browser storage, which includes a rider's login session. As long as you publish **no other** Pages sites on this account that's fine. For a clean separation, use a custom domain (e.g. `erglab.yourdomain.be`): repo *Settings › Pages › Custom domain* + *Enforce HTTPS*, then update the Supabase Site/Redirect URLs, `ALLOWED_ORIGINS` and the Strava callback domain to it.
 

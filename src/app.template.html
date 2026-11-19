@@ -8,6 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Structured indoor cycling workouts with ERG control for FTMS smart trainers (Elite Direto X and others) over Web Bluetooth.">
 <!--__CSP__-->
+<!--__PWA__-->
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>ERGlab</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d13'/%3E%3Cpath d='M6 44h10l6-20 8 30 8-38 6 28h14' fill='none' stroke='%23ff8a1f' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -279,6 +280,7 @@ body.riding #btBanner{display:none}
   body.riding .chartbox, body.riding .statsrow{display:none}
   body.riding .controls .btn{min-height:42px}
 }
+/*__PARTS_CSS__*/
 </style>
 </head>
 <body>
@@ -467,6 +469,10 @@ body.riding #btBanner{display:none}
         </div>
         <div class="row" style="margin-top:12px"><button class="btn" id="stvConnect" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Connect with Strava</button><span class="dim" id="stvHint" style="font-size:12.5px"></span></div>
       </div>
+    </div>
+    <div class="card pad hidden" style="margin-top:12px" id="installCard">
+      <div class="row"><h3>Install as an app</h3><span class="spacer"></span><span class="badge hidden" id="installBadge" style="color:var(--ok)">installed</span></div>
+      <div id="installBody" class="muted" style="font-size:14px;margin-top:6px"></div>
     </div>
     <div class="card pad" style="margin-top:12px">
       <h3>Connection notes</h3>
@@ -1163,6 +1169,8 @@ function speedFromPower(P, mass = S.weight + 9) { // m/s, flat road, newton iter
   return v;
 }
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+// Running as an installed app (home-screen icon on iPhone/iPad, installed app in Chrome/Edge)?
+const isStandalone = () => navigator.standalone === true || ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'].some(m => matchMedia(`(display-mode: ${m})`).matches);
 
 /* =====================================================================
    RIDE ENGINE
@@ -2525,6 +2533,35 @@ function updateConnUI(msg) {
   const cb = $('#rideConnect'); if (cb) cb.classList.toggle('hidden', trainer.connected || sim.on);
   $('#pillSim').className = 'pill ' + (sim.on ? 'sim' : '');
 }
+// "Install as an app": hosted builds ship a web app manifest (the single local file has none and can't be installed).
+let installEvt = null;
+function renderInstall() {
+  const card = $('#installCard'); if (!card) return;
+  if (!document.querySelector('link[rel="manifest"]')) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  const on = isStandalone();
+  $('#installBadge').classList.toggle('hidden', !on);
+  const code = 'Sign in there once with the <b>code</b> from the email (don\'t tap the email link: it opens the browser, not the app).';
+  let html;
+  if (on) html = isIOS
+    ? `<p style="margin:0">You're using ERGlab from your home screen.${cloud.on ? ' Workouts, plans, rides and Strava sync with your account.' : ''} Apple doesn't allow Bluetooth here, so to <b>ride</b> open ERGlab in <b>Bluefy</b>.</p>`
+    : `<p style="margin:0">You're using ERGlab as an installed app. Bluetooth works here as in the browser.</p>`;
+  else if (isIOS) html = `<ol style="margin:0;padding-left:20px;line-height:1.6">
+      <li>Open this page in <b>Safari</b> or <b>Chrome</b>, tap <b>Share</b> <span aria-hidden="true">(□↑)</span>, then <b>Add to Home Screen</b> › <b>Add</b>.</li>
+      <li>Open ERGlab from the new icon. ${code}</li></ol>
+      <p style="margin:8px 0 0"><b>Note:</b> Apple doesn't allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and your rides. To <b>ride</b> with the trainer, keep using <b>Bluefy</b>${navigator.bluetooth ? ' (as you are now)' : ''}.</p>`;
+  else if (installEvt) html = `<p style="margin:0 0 10px">Install ERGlab to open it from your desktop, taskbar or home screen in its own window. Bluetooth keeps working.</p><button class="btn sm" id="installBtn">Install ERGlab</button>`;
+  else html = `<p style="margin:0">In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app. ${cloud.on ? code : ''}</p>`;
+  $('#installBody').innerHTML = html;
+  const b = $('#installBtn');
+  if (b) b.onclick = async () => {
+    const e = installEvt; installEvt = null; if (!e) return renderInstall();
+    try { e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') toast('ERGlab installed'); } catch { }
+    renderInstall();
+  };
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; renderInstall(); });
 function showBtHelp(force, why) {
   const iOS = isIOS;
   const b = $('#btBanner');
@@ -2533,6 +2570,8 @@ function showBtHelp(force, why) {
   const msg = why === 'security'
     ? (iOS ? `<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.`
       : `<b>The browser blocked Bluetooth for this page.</b> ${location.protocol === 'file:' ? 'Pages opened as a local file can be refused. ' : ''}Open the app from an <b>https://</b> address (GitHub Pages, Netlify…) or from <b>http://localhost</b>, as a normal tab (not inside an embedded preview).`)
+    : iOS && isStandalone()
+    ? `<b>The home-screen app can't use Bluetooth.</b> On iPhone and iPad, Apple only lets apps like <b>Bluefy – Web BLE Browser</b> talk to trainers, not home-screen web apps. Use this app to browse workouts, follow your plan and look at your rides. To ride, open ERGlab in <b>Bluefy</b> (sign in there once with an email code).`
     : iOS
     ? `<b>Bluetooth isn't available in this browser.</b> On iPhone and iPad, Apple blocks Web Bluetooth in Safari and Chrome. Open this page in the free <b>Bluefy – Web BLE Browser</b> app (App Store) to connect your trainer. You can still browse workouts and try <b>Sim</b> mode here.`
     : !window.isSecureContext
@@ -2540,7 +2579,7 @@ function showBtHelp(force, why) {
       : `<b>Web Bluetooth isn't available in this browser.</b> Use <b>Chrome</b> or <b>Edge</b> on Windows, macOS, Android or ChromeOS. On Linux, enable <i>chrome://flags/#enable-experimental-web-platform-features</i>. You can still use <b>Sim</b> mode.`;
   b.innerHTML = `<button class="x" aria-label="Dismiss" style="float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>${msg}${iOS && !navigator.bluetooth ? ' <button class="btn sm" id="copyLink" style="margin-left:6px">Copy link for Bluefy</button>' : ''}`;
   b.querySelector('.x').onclick = () => { store('erglab.btHelpHidden', 1); b.classList.add('hidden'); };
-  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.href).then(() => toast('Link copied. Paste it into Bluefy.'), () => toast(location.href, 8000));
+  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname).then(() => toast('Link copied. Paste it into Bluefy.'), () => toast(location.href, 8000));
 }
 
 /* =====================================================================
@@ -2607,8 +2646,10 @@ function bind() {
   bindSettings();
 }
 
+/*__PARTS_JS__*/
+
 function init() {
-  buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false);
+  buildTabs(); bind(); bindStrava(); renderSettings(); renderStrava(); renderCats(); renderLib(); renderCustom(); builderPreview(); updateConnUI(); showBtHelp(false); renderInstall();
   const oauthReturn = /[?&]state=/.test(location.search) && /[?&](code|error)=/.test(location.search);
   const h = (location.hash || '').slice(1); go(oauthReturn ? 'settings' : TABS.some(t => t.id === h) ? h : 'workouts');
   bindCloud();

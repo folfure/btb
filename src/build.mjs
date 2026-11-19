@@ -1,13 +1,20 @@
 // Builds the single self-contained ../index.html from app.template.html + data/*.json
 // Usage: node src/build.mjs
-import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync, copyFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, 'data');
-const tpl = readFileSync(join(here, 'app.template.html'), 'utf8');
+// src/parts/*.css and *.js (theme, gauges, analysis, analytics views) are inlined into the template, sorted by
+// file name, so the output stays one self-contained HTML file.
+const partsDir = join(here, 'parts');
+const parts = ext => existsSync(partsDir) ? readdirSync(partsDir).filter(f => f.endsWith(ext)).sort()
+  .map(f => `/* ---- parts/${f} ---- */\n` + readFileSync(join(partsDir, f), 'utf8').replace(/<\/(script|style)/gi, '<\\/$1')).join('\n') : '';
+const tpl = readFileSync(join(here, 'app.template.html'), 'utf8')
+  .replace('/*__PARTS_CSS__*/', () => parts('.css'))
+  .replace('/*__PARTS_JS__*/', () => parts('.js'));
 
 const workouts = [];
 for (const f of readdirSync(dataDir).filter(f => /^workouts.*\.json$/.test(f)).sort()) {
@@ -56,6 +63,16 @@ if (cloud.url || cloud.key) {
   } else if (!/^sb_publishable_/.test(cloud.key)) { console.error('Supabase key must be the publishable key (sb_publishable_…)'); process.exit(1); }
 }
 
+// The committed repo-root index.html is the local-only build. A cloud build goes to dist/ unless --out is given,
+// so the Supabase project settings never end up in a file that gets committed.
+const outArg = process.argv.indexOf('--out');
+const rootIndex = resolve(join(here, '..', 'index.html'));
+const target = resolve(outArg > 0 ? process.argv[outArg + 1] : (cloud.url ? join(here, '..', 'dist', 'index.html') : rootIndex));
+if (cloud.url && target === rootIndex) { console.error('Refusing to write a cloud build over the committed index.html; use --out dist/index.html'); process.exit(1); }
+// Hosted builds (anything but the committed single file) also get a web app manifest + icons, so the page can be
+// installed: "Add to Home Screen" on iPhone/iPad, "Install" in desktop Chrome/Edge.
+const pwa = target !== rootIndex;
+
 const js = v => JSON.stringify(v).replace(/</g, '\\u003c');
 let out = tpl
   .replace('/*__WORKOUTS__*/[]', () => js(workouts))
@@ -73,6 +90,7 @@ const csp = [
   `script-src 'sha256-${hash}'${cloud.url ? ' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js' : ''}`,
   "style-src 'unsafe-inline'",
   "img-src 'self' data: blob:",
+  ...(pwa ? ["manifest-src 'self'"] : []),
   "media-src blob: mediastream:",
   `connect-src ${connect}`,
   "base-uri 'none'",
@@ -80,12 +98,23 @@ const csp = [
   "object-src 'none'",
 ].join('; ');
 out = out.replace('<!--__CSP__-->', `<meta http-equiv="Content-Security-Policy" content="${csp}">`);
+out = out.replace(/<!--__PWA__-->\r?\n?/, pwa ? '<link rel="manifest" href="manifest.webmanifest">\n<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">\n' : '');
 
-// The committed repo-root index.html is the local-only build. A cloud build goes to dist/ unless --out is given,
-// so the Supabase project settings never end up in a file that gets committed.
-const outArg = process.argv.indexOf('--out');
-const target = outArg > 0 ? process.argv[outArg + 1] : (cloud.url ? join(here, '..', 'dist', 'index.html') : join(here, '..', 'index.html'));
-if (cloud.url && resolve(target) === resolve(join(here, '..', 'index.html'))) { console.error('Refusing to write a cloud build over the committed index.html; use --out dist/index.html'); process.exit(1); }
-mkdirSync(dirname(resolve(target)), { recursive: true });
+mkdirSync(dirname(target), { recursive: true });
 writeFileSync(target, out);
+if (pwa) {
+  const dir = dirname(target);
+  for (const f of ['apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png']) copyFileSync(join(here, 'assets', f), join(dir, f));
+  writeFileSync(join(dir, 'manifest.webmanifest'), JSON.stringify({
+    id: './', name: 'ERGlab', short_name: 'ERGlab',
+    description: 'Structured indoor cycling workouts with ERG control for smart trainers.',
+    start_url: './', scope: './', display: 'standalone', orientation: 'any',
+    background_color: '#0a0d13', theme_color: '#0a0d13', lang: 'en', categories: ['sports', 'health', 'fitness'],
+    icons: [
+      { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+  }, null, 1));
+}
 console.log(`${target}: ${workouts.length} workouts, ${plans.length} plans, ${(out.length / 1024).toFixed(0)} KB, cloud ${cloud.url ? 'ON (' + cloud.url + ')' : 'off (local-only)'}`);
