@@ -14,9 +14,13 @@ const TRAINER_PROTO = (() => {
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const u16 = v => [v & 0xff, (v >> 8) & 0xff];
 
+  // Standard 16-bit ids written out as full lowercase 128-bit UUIDs: Bluefy's Web Bluetooth bridge on iPhone is more
+  // reliable with those than with plain numbers (Chrome accepts both).
+  const full = n => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`;
   const UUID = {
-    FTMS: 0x1826, IBD: 0x2ad2, CP: 0x2ad9, STATUS: 0x2ada, FEAT: 0x2acc, PRANGE: 0x2ad8,
-    CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37,
+    FTMS: full(0x1826), IBD: full(0x2ad2), CP: full(0x2ad9), STATUS: full(0x2ada), FEAT: full(0x2acc), PRANGE: full(0x2ad8),
+    CPS: full(0x1818), CPM: full(0x2a63), HRS: full(0x180d), HRM: full(0x2a37), DIS: full(0x180a), BATTERY: full(0x180f),
+    ELITE: '347b0001-7635-408b-8918-8ff3949ce592',    // Elite's own service (Direto, Suito...): only used to find the trainer
     FEC: '6e40fec1-b5a3-f393-e0a9-e50e24dcca9e',      // Tacx FE-C over BLE service
     FEC_NOTIFY: '6e40fec2-b5a3-f393-e0a9-e50e24dcca9e',   // trainer -> app (notify)
     FEC_WRITE: '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',   // app -> trainer (write)

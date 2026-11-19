@@ -998,7 +998,8 @@ function toERG(w) {
    referenced inside methods). Trainer owns the connection, the one-command-in-flight queue, throttling and
    reconnects; a small adapter per protocol turns targets into bytes and notifications into live samples.
    ===================================================================== */
-const UUID = { CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37 };
+const bt128 = n => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`; // full UUIDs: friendlier to Bluefy
+const UUID = { CPS: bt128(0x1818), CPM: bt128(0x2a63), HRS: bt128(0x180d), HRM: bt128(0x2a37), BATTERY: bt128(0x180f) };
 const live = { power: null, cadence: null, hr: null, speed: null, tPower: 0, tCad: 0, tHr: 0, powerHist: [] };
 
 function liveFresh(field, ms = 3500) { return performance.now() - live['t' + field] < ms; }
@@ -1161,13 +1162,13 @@ class Trainer {
   async connect(all = false) {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
-    const U = TRAINER_PROTO.UUID, optionalServices = [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.HRS, 'device_information', 'battery_service'];
+    const U = TRAINER_PROTO.UUID, optionalServices = [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.ELITE, U.HRS, U.DIS, U.BATTERY];
     try {
       // must be the first await in the click handler (user-gesture requirement). Any brand: trainers advertising a
       // trainer service, plus common trainer names (some browsers, e.g. Bluefy on iPhone, miss service-only filters),
       // or, after "Show all Bluetooth devices", every device nearby (the protocol is detected after connecting).
       const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices } : {
-        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }, ...TRAINER_NAMES.map(namePrefix => ({ namePrefix }))],
+        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }, { services: [U.ELITE] }, ...TRAINER_NAMES.map(namePrefix => ({ namePrefix }))],
         optionalServices,
       });
       if (this.dev && this.dev !== dev) this.disconnect();
@@ -1336,7 +1337,7 @@ class HrStrap {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
     try {
-      const optionalServices = [UUID.HRS, 'battery_service'];
+      const optionalServices = [UUID.HRS, UUID.BATTERY];
       const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices }
         : { filters: [{ services: [UUID.HRS] }, ...HR_NAMES.map(namePrefix => ({ namePrefix }))], optionalServices });
       clearTimeout(this.timer); this.timer = null;

@@ -152,7 +152,7 @@ const a = tpl.indexOf('/* ======================================================
 assert.ok(a > 0 && b > a, 'trainer region not found in app.template.html');
 const trainerSrc = tpl.slice(a, b);
 
-const key = u => String(u).toLowerCase();
+const key = u => typeof u === 'number' ? `0000${u.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb` : String(u).toLowerCase(); // 16-bit numbers = their full UUID
 class FakeChar {
   constructor(uuid, o = {}) {
     this.uuid = key(uuid); this.o = o; this.hs = []; this.writes = []; this.value = o.value || [];
@@ -167,7 +167,7 @@ class FakeChar {
   notify(bytes) { const ev = { target: { value: new DataView(Uint8Array.from(bytes).buffer) } }; for (const h of [...this.hs]) h(ev); }
 }
 function fakeDevice(name, services) { // services: { uuid: [FakeChar] }
-  const svcs = Object.fromEntries(Object.entries(services).map(([u, cs]) => [key(u), {
+  const svcs = Object.fromEntries(Object.entries(services).map(([u, cs]) => [key(/^\d+$/.test(u) ? +u : u), { // object keys arrive as decimal strings
     getCharacteristic: async c => { const f = cs.find(x => x.uuid === key(c)); if (!f) throw Object.assign(new Error('no char'), { name: 'NotFoundError' }); return f; },
   }]));
   const dev = {
@@ -202,10 +202,11 @@ test('Trainer: requestDevice lists every protocol, plus trainer names; "show all
   const env = makeEnv(dev);
   await env.trainer.connect();
   const r = env.requests[0], svc = r.filters.filter(f => f.services), names = r.filters.filter(f => f.namePrefix);
-  assert.deepEqual(svc.map(f => f.services[0]), [0x1826, 0x1818, P.UUID.FEC], 'one service filter per protocol');
+  assert.deepEqual(svc.map(f => f.services[0]), [P.UUID.FTMS, P.UUID.CPS, P.UUID.FEC, P.UUID.ELITE], 'one service filter per protocol + Elite');
+  assert.ok(r.filters.every(f => !f.services || f.services.every(u => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(u))), 'full lowercase UUIDs');
   assert.ok(names.length && names.every(f => !f.services && typeof f.namePrefix === 'string'), 'name filters only widen the list');
   assert.ok(r.filters.every(f => f.services || f.namePrefix), 'no empty filter');
-  const opt = [0x1826, 0x1818, P.UUID.FEC, P.UUID.WAHOO_SVC, 0x180d, 'device_information', 'battery_service'];
+  const opt = [P.UUID.FTMS, P.UUID.CPS, P.UUID.FEC, P.UUID.WAHOO_SVC, P.UUID.ELITE, P.UUID.HRS, P.UUID.DIS, P.UUID.BATTERY];
   for (const u of opt) assert.ok(r.optionalServices.includes(u), 'optional ' + u);
   await env.trainer.connect(true);
   const all = env.requests[1];

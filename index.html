@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="BTB">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Structured indoor cycling workouts with ERG control for Bluetooth smart trainers, live gauges, training plans and ride analytics.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6Mek5BSJeZl45jwr9LpC8pw4iV8MAJKYxo2aMoqiXpM=' 'sha256-xL+rfQQSEoK328w7rCga0opAmoCJk5wNl2e93YmZeAI='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src blob: mediastream:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6Mek5BSJeZl45jwr9LpC8pw4iV8MAJKYxo2aMoqiXpM=' 'sha256-qq12Iutetj1ldoTRON5wT4MJoM997Iql9JsLN9uJo5c='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src blob: mediastream:; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'; object-src 'none'">
 <script>/* shows script errors on the page: browsers like Bluefy have no console */(function(){function show(m){var d=document.createElement('pre');d.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99999;margin:0;padding:10px 12px;background:#5a0b1e;color:#fff;font:12px/1.4 monospace;white-space:pre-wrap;max-height:40vh;overflow:auto';d.textContent=m+'  (tap to close)';d.onclick=function(){d.remove()};(document.body||document.documentElement).appendChild(d)}addEventListener('error',function(e){if(e&&e.message)show('Error: '+e.message+(e.lineno?' (line '+e.lineno+')':''))});addEventListener('unhandledrejection',function(e){var r=e&&e.reason;if(r&&r.name==='SyntaxError')show('Error: '+r.message)});document.addEventListener('securitypolicyviolation',function(e){show('Blocked by the page security policy: '+e.violatedDirective+' '+(e.blockedURI||''))})})();</script>
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BTB – Bouge Ton Body</title>
@@ -1790,7 +1790,8 @@ function toERG(w) {
    referenced inside methods). Trainer owns the connection, the one-command-in-flight queue, throttling and
    reconnects; a small adapter per protocol turns targets into bytes and notifications into live samples.
    ===================================================================== */
-const UUID = { CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37 };
+const bt128 = n => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`; // full UUIDs: friendlier to Bluefy
+const UUID = { CPS: bt128(0x1818), CPM: bt128(0x2a63), HRS: bt128(0x180d), HRM: bt128(0x2a37), BATTERY: bt128(0x180f) };
 const live = { power: null, cadence: null, hr: null, speed: null, tPower: 0, tCad: 0, tHr: 0, powerHist: [] };
 
 function liveFresh(field, ms = 3500) { return performance.now() - live['t' + field] < ms; }
@@ -1953,13 +1954,13 @@ class Trainer {
   async connect(all = false) {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
-    const U = TRAINER_PROTO.UUID, optionalServices = [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.HRS, 'device_information', 'battery_service'];
+    const U = TRAINER_PROTO.UUID, optionalServices = [U.FTMS, U.CPS, U.FEC, U.WAHOO_SVC, U.ELITE, U.HRS, U.DIS, U.BATTERY];
     try {
       // must be the first await in the click handler (user-gesture requirement). Any brand: trainers advertising a
       // trainer service, plus common trainer names (some browsers, e.g. Bluefy on iPhone, miss service-only filters),
       // or, after "Show all Bluetooth devices", every device nearby (the protocol is detected after connecting).
       const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices } : {
-        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }, ...TRAINER_NAMES.map(namePrefix => ({ namePrefix }))],
+        filters: [{ services: [U.FTMS] }, { services: [U.CPS] }, { services: [U.FEC] }, { services: [U.ELITE] }, ...TRAINER_NAMES.map(namePrefix => ({ namePrefix }))],
         optionalServices,
       });
       if (this.dev && this.dev !== dev) this.disconnect();
@@ -2128,7 +2129,7 @@ class HrStrap {
     if (!hasBt()) { showBtHelp(true); return; }
     initAudio();
     try {
-      const optionalServices = [UUID.HRS, 'battery_service'];
+      const optionalServices = [UUID.HRS, UUID.BATTERY];
       const dev = await navigator.bluetooth.requestDevice(all === true ? { acceptAllDevices: true, optionalServices }
         : { filters: [{ services: [UUID.HRS] }, ...HR_NAMES.map(namePrefix => ({ namePrefix }))], optionalServices });
       clearTimeout(this.timer); this.timer = null;
@@ -6152,9 +6153,13 @@ const TRAINER_PROTO = (() => {
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const u16 = v => [v & 0xff, (v >> 8) & 0xff];
 
+  // Standard 16-bit ids written out as full lowercase 128-bit UUIDs: Bluefy's Web Bluetooth bridge on iPhone is more
+  // reliable with those than with plain numbers (Chrome accepts both).
+  const full = n => `0000${n.toString(16).padStart(4, '0')}-0000-1000-8000-00805f9b34fb`;
   const UUID = {
-    FTMS: 0x1826, IBD: 0x2ad2, CP: 0x2ad9, STATUS: 0x2ada, FEAT: 0x2acc, PRANGE: 0x2ad8,
-    CPS: 0x1818, CPM: 0x2a63, HRS: 0x180d, HRM: 0x2a37,
+    FTMS: full(0x1826), IBD: full(0x2ad2), CP: full(0x2ad9), STATUS: full(0x2ada), FEAT: full(0x2acc), PRANGE: full(0x2ad8),
+    CPS: full(0x1818), CPM: full(0x2a63), HRS: full(0x180d), HRM: full(0x2a37), DIS: full(0x180a), BATTERY: full(0x180f),
+    ELITE: '347b0001-7635-408b-8918-8ff3949ce592',    // Elite's own service (Direto, Suito...): only used to find the trainer
     FEC: '6e40fec1-b5a3-f393-e0a9-e50e24dcca9e',      // Tacx FE-C over BLE service
     FEC_NOTIFY: '6e40fec2-b5a3-f393-e0a9-e50e24dcca9e',   // trainer -> app (notify)
     FEC_WRITE: '6e40fec3-b5a3-f393-e0a9-e50e24dcca9e',   // app -> trainer (write)
