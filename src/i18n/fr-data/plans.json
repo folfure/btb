@@ -1,0 +1,197 @@
+{
+  "p": {
+    "lean-fit-12wk": {
+      "name": "Affûté & en forme : perte de gras en 12 semaines",
+      "level": "Débutant",
+      "goal": "Perdre du gras, gagner en forme",
+      "desc": "Quatre sorties par semaine (trois les semaines légères) : une courte séance d'intervalles, une sortie Tempo/Sweet Spot et deux sorties faciles en Zone 2, en espaçant les jours durs. Le volume passe d'environ 3 à 5 heures par semaine, avec une semaine plus légère toutes les quatre semaines, et des tests rampe en semaines 1, 5 et 12 gardent les intensités justes à mesure que tu progresses. Le gras (y compris celui du ventre) part sur tout le corps, pas à un endroit précis : associe les sorties à un léger déficit calorique, assez de protéines, moins de boissons sucrées et de grignotage, un bon sommeil et, idéalement, deux courtes séances de renforcement par semaine. Vise environ 0,3-0,5 kg par semaine. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Base à tendance polarisée (surtout Zone 2) + HIIT à faible volume ; cycle charge/récupération 3:1",
+      "focus": [
+        "Trouve ton niveau",
+        "On se lance",
+        "Prendre l'habitude",
+        "Semaine légère",
+        "Re-test et progression",
+        "Plus de moteur",
+        "Week-end plus long",
+        "Semaine légère",
+        "Bloc costaud 1",
+        "Bloc costaud 2",
+        "Semaine pic",
+        "Semaine légère + test final"
+      ]
+    },
+    "ftp-builder-6wk": {
+      "name": "Booster de FTP",
+      "level": "Intermédiaire",
+      "goal": "Augmenter ta FTP en 6 semaines",
+      "desc": "Commence par un test FTP de 20 minutes, puis progresse du Sweet Spot au seuil et aux Over-Under, avec une touche de VO2max vers la fin. La semaine 4 est une semaine de récupération, et le plan se termine par un re-test pour mesurer ton gain. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Progression du Sweet Spot au seuil (Coggan/Allen), cycle charge/récupération 3:1",
+      "focus": [
+        "Test + base",
+        "Progression 1",
+        "Progression 2",
+        "Récupération",
+        "Progression 3",
+        "Affûtage + re-test"
+      ]
+    },
+    "sweet-spot-base-8wk": {
+      "name": "Base Sweet Spot",
+      "level": "Intermédiaire",
+      "goal": "Construire ta base aérobie efficacement",
+      "desc": "Développe ta puissance aérobie avec des intervalles Sweet Spot de plus en plus longs à 88-94 % de ta FTP. Deux blocs de charge de 3 semaines se terminent chacun par une semaine de récupération, et le plan finit par un test rampe pour recaler tes zones. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Base Sweet Spot (Coggan/Allen, popularisée par TrainerRoad)",
+      "focus": [
+        "Semaine de base 1",
+        "Semaine de base 2",
+        "Semaine de base 3",
+        "Récupération",
+        "Semaine de base 5",
+        "Semaine de base 6",
+        "Semaine de base 7",
+        "Récupération + test"
+      ]
+    },
+    "polarized-80-20-8wk": {
+      "name": "Polarisé 80/20",
+      "level": "Intermédiaire",
+      "goal": "Booster VO2max et endurance en même temps",
+      "desc": "L'essentiel de ton volume se fait en Zone 2 facile, avec deux séances d'intervalles dures par semaine : les 4x8 minutes de Seiler et des séries d'intervalles courts comme les 30/15. Très peu de temps dans les zones intermédiaires, et une semaine sur quatre est plus légère. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Entraînement polarisé (Seiler 80/20 ; 30/15 de Rønnestad)",
+      "focus": [
+        "Semaine polarisée 1",
+        "Semaine polarisée 2",
+        "Semaine polarisée 3",
+        "Récupération",
+        "Semaine polarisée 5",
+        "Semaine polarisée 6",
+        "Semaine polarisée 7",
+        "Récupération + test"
+      ]
+    },
+    "climbing-6wk": {
+      "name": "Grimpe & côtes",
+      "level": "Intermédiaire",
+      "goal": "Grimper plus longtemps et plus fort",
+      "desc": "Du travail de force à basse cadence et de longues montées assis développent une force spécifique à la grimpe. Les semaines suivantes ajoutent des répétitions en côte, des bergs belges et des simulations complètes de cols alpins. La semaine 4 est une semaine de récupération. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Base/développement classique axé sur l'endurance musculaire (Friel)",
+      "focus": [
+        "Base de force",
+        "Progression grimpe 1",
+        "Progression grimpe 2",
+        "Récupération",
+        "Progression grimpe 3",
+        "Pic de grimpe"
+      ]
+    },
+    "vo2max-block-3wk": {
+      "name": "Bloc VO2max",
+      "level": "Avancé",
+      "goal": "Un coup de boost VO2max court et intense",
+      "desc": "Périodisation en blocs : la semaine 1 concentre cinq séances à haute intensité en sept jours. Les deux semaines suivantes redescendent à une séance VO2 par semaine avec beaucoup d'endurance, pour que l'adaptation s'installe. Ne commence ce bloc que si tu es bien reposé et que tu as déjà une base solide. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Périodisation en blocs de Rønnestad (Rønnestad et al. 2014, 2020)",
+      "focus": [
+        "Bloc HIT (5 séances)",
+        "Assimiler",
+        "Maintien + test"
+      ]
+    },
+    "beginner-get-fit-4wk": {
+      "name": "En forme : débutant",
+      "level": "Débutant",
+      "goal": "Prendre l'habitude du sport",
+      "desc": "Trois ou quatre séances par semaine pour celles et ceux qui découvrent l'entraînement en intérieur. Un test rampe fixe tes zones, puis tu progresses en douceur, de l'endurance facile et des exercices de cadence jusqu'à tes premiers intervalles Tempo et Sweet Spot. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Base classique (zones de Coggan), volume adapté aux débutants",
+      "focus": [
+        "Trouve ta FTP",
+        "On se lance",
+        "On monte d'un cran",
+        "Semaine légère + contrôle"
+      ]
+    },
+    "time-trial-6wk": {
+      "name": "Seuil contre-la-montre",
+      "level": "Avancé",
+      "goal": "Tenir plus de puissance sur 20-40 min",
+      "desc": "Développe ton endurance au seuil avec des intervalles de plus en plus longs à la FTP, des Over-Under pour encaisser les relances et des simulations de gestion d'effort en CLM. La semaine 4 est une semaine de récupération, et la semaine 6 sert d'affûtage avant un effort CLM complet de 40 minutes. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Développement seuil/endurance musculaire (Friel ; Coggan)",
+      "focus": [
+        "Base seuil",
+        "Progression seuil 1",
+        "Progression seuil 2",
+        "Récupération",
+        "Pic au seuil",
+        "Affûtage + CLM"
+      ]
+    },
+    "gran-fondo-8wk": {
+      "name": "Prépa Gran Fondo",
+      "level": "Intermédiaire",
+      "goal": "Finir fort une longue cyclosportive",
+      "desc": "De longues sorties d'endurance, du Tempo et du Sweet Spot construisent la résistance pour des épreuves de 4 à 6 heures. Les séances de grimpe et les répétitions complètes de gestion d'effort Gran Fondo arrivent dans les dernières semaines. La semaine 4 est une semaine de récupération, et la semaine 8 sert d'affûtage. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Périodisation classique base/développement (Friel), charge 3:1",
+      "focus": [
+        "Semaine de base 1",
+        "Semaine de base 2",
+        "Semaine de base 3",
+        "Récupération",
+        "Progression 1",
+        "Progression 2",
+        "Pic",
+        "Affûtage"
+      ]
+    },
+    "criterium-6wk": {
+      "name": "Critérium & explosivité",
+      "level": "Avancé",
+      "goal": "Des relances répétées et un sprint",
+      "desc": "Des efforts VO2max et anaérobies courts et répétés, des sprints neuromusculaires et des simulations de critérium, pour les courses où ça relance sans arrêt. La semaine 4 est plus légère, et la semaine 6 contrôle ta puissance sur 1 minute avant une dernière simulation de critérium. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Développement spécifique course (Friel développement/pic ; intervalles courts de Rønnestad)",
+      "focus": [
+        "Base explosivité",
+        "Progression explosivité 1",
+        "Progression explosivité 2",
+        "Récupération",
+        "Affûtage course",
+        "Pic + contrôle"
+      ]
+    },
+    "time-crunched-3x-6wk": {
+      "name": "Peu de temps : 3x/semaine",
+      "level": "Intermédiaire",
+      "goal": "Forme max avec ~3 h/semaine",
+      "desc": "Trois séances efficaces par semaine, toutes sous les 90 minutes et la plupart autour d'une heure. Elles mélangent Sweet Spot, seuil et VO2max pour tirer le maximum d'un temps limité. La semaine 4 est plus facile, et le plan se termine par un test rampe. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Entraînement pour emploi du temps chargé (Carmichael), haute intensité et faible volume",
+      "focus": [
+        "Semaine 1",
+        "Semaine 2",
+        "Semaine 3",
+        "Récupération",
+        "Semaine 5",
+        "Semaine 6 + test"
+      ]
+    },
+    "recovery-week": {
+      "name": "Semaine de récupération",
+      "level": "Débutant",
+      "goal": "Assimiler l'entraînement, retrouver de la fraîcheur",
+      "desc": "Une semaine type à glisser dans n'importe quel plan après 2-3 semaines dures. Le volume et l'intensité baissent, avec une courte séance Tempo pour garder les jambes vives. Tu dois la finir avec l'envie de t'entraîner. Fais les séances dans l'ordre et garde un jour de repos ou facile entre deux séances dures.",
+      "src": "Cycles charge/récupération 3:1 / 2:1 (Friel ; récupération active de Coggan)",
+      "focus": [
+        "Semaine de récupération"
+      ]
+    },
+    "ramp-test-ftp-check": {
+      "name": "Contrôle FTP (test rampe)",
+      "level": "Débutant",
+      "goal": "Fixer des zones d'entraînement précises",
+      "desc": "Quelques jours faciles et une séance de déblocage pour arriver frais au test rampe. La semaine suivante vérifie ta nouvelle FTP avec des séances Sweet Spot et seuil. Baisse ta FTP de 3-5 % si le 2x15 au seuil te paraît impossible.",
+      "src": "Protocole du test rampe (MAP x 0,75) ; validation sur le terrain",
+      "focus": [
+        "Fraîcheur + test",
+        "Valider la nouvelle FTP"
+      ]
+    }
+  }
+}
