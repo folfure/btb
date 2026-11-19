@@ -304,7 +304,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 
 <main>
   <div id="btBanner" class="banner hidden"></div>
-  <div id="demoBar" class="banner hidden"><b>Demo data.</b> The simulator is on, so History and Progress add a made-up rider (18 weeks of rides marked DEMO, a weight log and a body profile) to explore every feature, next to your own rides. The demo data is never saved or synced. Turn <b>Sim</b> off to hide it.</div>
+  <div id="demoBar" class="banner hidden" data-i18n><b>Demo data.</b> The simulator is on, so History and Progress add a made-up rider (18 weeks of rides marked DEMO, a weight log and a body profile) to explore every feature, next to your own rides. The demo data is never saved or synced. Turn <b>Sim</b> off to hide it.</div>
 
   <!-- WORKOUTS -->
   <section class="view" id="v-workouts">
@@ -338,7 +338,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 2x( 20m 95% @90rpm "FTP interval", 5m 50% "Recover" )
 30s max "Sprint!"
 8m 60-40% "Cool-down"</textarea>
-        <div class="hint">Durations: <kbd>90s</kbd> <kbd>5m</kbd> <kbd>1h10m</kbd> <kbd>4:30</kbd> · Power: <kbd>95%</kbd> FTP, ramp <kbd>50-75%</kbd>, absolute <kbd>250w</kbd>, all-out <kbd>max</kbd> · Cadence <kbd>@90rpm</kbd> · Repeats <kbd>4x( 4m 115%, 3m 50% )</kbd> · Label <kbd>"text"</kbd> · One step per line or comma separated.</div>
+        <div class="hint" data-i18n>Durations: <kbd>90s</kbd> <kbd>5m</kbd> <kbd>1h10m</kbd> <kbd>4:30</kbd> · Power: <kbd>95%</kbd> FTP, ramp <kbd>50-75%</kbd>, absolute <kbd>250w</kbd>, all-out <kbd>max</kbd> · Cadence <kbd>@90rpm</kbd> · Repeats <kbd>4x( 4m 115%, 3m 50% )</kbd> · Label <kbd>"text"</kbd> · One step per line or comma separated.</div>
       </div>
       <div class="bigprof" id="bProf"></div>
       <div class="row"><span class="kv" id="bStats"></span><span class="spacer"></span><span id="bErr" style="color:var(--bad);font-size:13px"></span></div>
@@ -409,7 +409,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
         <button class="btn danger" id="cEnd">End &amp; save</button>
         <button class="btn primary" id="rideConnect">Connect trainer</button>
       </div>
-      <p class="dim kbdhint" style="font-size:12px;margin:8px 2px">Shortcuts: <kbd>Space</kbd> start/pause · <kbd>N</kbd> next interval · <kbd>↑</kbd>/<kbd>↓</kbd> intensity ±1% (Shift ±5%) · <kbd>E</kbd> ERG/slope toggle</p>
+      <p class="dim kbdhint" style="font-size:12px;margin:8px 2px" data-i18n>Shortcuts: <kbd>Space</kbd> start/pause · <kbd>N</kbd> next interval · <kbd>↑</kbd>/<kbd>↓</kbd> intensity ±1% (Shift ±5%) · <kbd>E</kbd> ERG/slope toggle</p>
     </div>
   </section>
 
@@ -469,7 +469,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     </div>
     <div id="antHost" style="margin-top:12px"></div>
     <div class="card pad" style="margin-top:12px" id="stvCard">
-      <div class="row"><h3><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
+      <div class="row"><h3 data-i18n><span style="color:#fc4c02">Strava</span> upload</h3><span class="spacer"></span><span id="stvBadge" class="badge" style="color:var(--dim)">not connected</span></div>
       <p class="muted" style="margin:6px 0 12px;font-size:14px">Send finished rides to Strava with power, heart rate and cadence, automatically or with one tap.</p>
       <div id="stvOn" class="hidden">
         <div class="row" style="margin-bottom:12px"><span>Connected as <b id="stvWho"></b></span><span class="spacer"></span><button class="btn sm danger" id="stvOff">Disconnect</button></div>
@@ -481,16 +481,16 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <div id="stvSetup">
         <div id="stvLocal">
         <ol class="muted" style="font-size:14px;margin:0 0 12px;padding-left:20px;line-height:1.6">
-          <li>Open <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> and create an API application (any name/website; category "Training").</li>
-          <li>Set <b>Authorization Callback Domain</b> to <code id="stvDomain" style="background:var(--bg2);padding:2px 6px;border-radius:6px;color:var(--text)"></code></li>
-          <li>Copy its <b>Client ID</b> and <b>Client Secret</b> here, then press Connect.</li>
+          <li data-i18n>Open <a href="https://www.strava.com/settings/api" target="_blank" rel="noopener">strava.com/settings/api</a> and create an API application (any name/website; category "Training").</li>
+          <li><span data-i18n>Set <b>Authorization Callback Domain</b> to</span> <code id="stvDomain" style="background:var(--bg2);padding:2px 6px;border-radius:6px;color:var(--text)"></code></li>
+          <li data-i18n>Copy its <b>Client ID</b> and <b>Client Secret</b> here, then press Connect.</li>
         </ol>
         <div class="form">
           <div class="field"><label>Client ID</label><input type="text" id="stvId" inputmode="numeric" autocomplete="off" placeholder="e.g. 123456"></div>
-          <div class="field"><label>Client Secret</label><input type="password" id="stvSecret" autocomplete="off" placeholder="40-character secret"><span class="hint">Stored in this browser (not in backups) and only sent to Strava. Other pages on the same web address can read browser storage: on a shared <i>username</i>.github.io, prefer a token relay or a custom domain.</span></div>
+          <div class="field"><label>Client Secret</label><input type="password" id="stvSecret" autocomplete="off" placeholder="40-character secret"><span class="hint" data-i18n>Stored in this browser (not in backups) and only sent to Strava. Other pages on the same web address can read browser storage: on a shared <i>username</i>.github.io, prefer a token relay or a custom domain.</span></div>
         </div>
         <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;font-size:13px">Sharing the app with others? Use a token relay instead of a secret</summary>
-          <div class="field" style="margin-top:8px"><label>Token relay URL</label><input type="text" id="stvRelay" autocomplete="off" placeholder="https://btb-strava.yourname.workers.dev"><span class="hint">A tiny server (see <code>strava-relay.worker.js</code>) keeps the Client Secret off the page, so riders only need the Client ID. New Strava apps accept 1 athlete; raise it to 10 under "My API Application", more needs Strava's review.</span></div>
+          <div class="field" style="margin-top:8px"><label>Token relay URL</label><input type="text" id="stvRelay" autocomplete="off" placeholder="https://btb-strava.yourname.workers.dev"><span class="hint" data-i18n>A tiny server (see <code>strava-relay.worker.js</code>) keeps the Client Secret off the page, so riders only need the Client ID. New Strava apps accept 1 athlete; raise it to 10 under "My API Application", more needs Strava's review.</span></div>
         </details>
         </div>
         <div class="row" style="margin-top:12px"><button class="btn" id="stvConnect" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Connect with Strava</button><span class="dim" id="stvHint" style="font-size:12.5px"></span></div>
@@ -503,12 +503,12 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
     <div class="card pad" style="margin-top:12px">
       <h3>Connection notes</h3>
       <ul class="muted" style="font-size:14px;margin:8px 0 0;padding-left:18px">
-        <li><b>Connect trainer</b> works with any smart trainer that has ERG over Bluetooth. The app picks the protocol after connecting: the standard <b>FTMS</b> (Fitness Machine Service, used by almost every current trainer), <b>Tacx FE-C over Bluetooth</b> (older Tacx firmware) or the <b>Wahoo</b> trainer protocol (older Wahoo firmware). A power meter or a trainer without control connects read-only: you see your power, but ERG is not available. Updating the trainer firmware usually adds FTMS.</li>
-        <li>Heart rate comes from a separate Bluetooth strap (<b>Connect HR</b>) or, if your trainer relays one, from the trainer itself.</li>
+        <li data-i18n><b>Connect trainer</b> works with any smart trainer that has ERG over Bluetooth. The app picks the protocol after connecting: the standard <b>FTMS</b> (Fitness Machine Service, used by almost every current trainer), <b>Tacx FE-C over Bluetooth</b> (older Tacx firmware) or the <b>Wahoo</b> trainer protocol (older Wahoo firmware). A power meter or a trainer without control connects read-only: you see your power, but ERG is not available. Updating the trainer firmware usually adds FTMS.</li>
+        <li data-i18n>Heart rate comes from a separate Bluetooth strap (<b>Connect HR</b>) or, if your trainer relays one, from the trainer itself.</li>
         <li>Close Zwift, MyWhoosh, the trainer maker's app and similar apps first. The trainer accepts only one Bluetooth controller at a time.</li>
-        <li><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
-        <li><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
-        <li>Bluetooth only works on a secure page: <b>https://</b> or <b>http://localhost</b>. To share the app, host this single file on GitHub Pages, Netlify Drop, Cloudflare Pages or any https web space and send the link.</li>
+        <li data-i18n><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
+        <li data-i18n><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
+        <li data-i18n>Bluetooth only works on a secure page: <b>https://</b> or <b>http://localhost</b>. To share the app, host this single file on GitHub Pages, Netlify Drop, Cloudflare Pages or any https web space and send the link.</li>
         <li>ERG tips: start pedalling before the first target, and use the small chainring with a middle cog so low targets stay reachable. ERG takes a few seconds to settle after big steps.</li>
       </ul>
       <div class="row" style="margin-top:12px"><button class="btn sm" id="sExport">Back up data</button><label class="btn sm"><input type="file" id="sImport" accept=".json" style="display:none">Restore backup</label><button class="btn sm danger" id="sReset">Reset settings</button></div>
@@ -531,7 +531,7 @@ body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
       <button type="button" class="btn ghost sm" style="width:100%;margin-top:8px" id="gateBack">Use another email</button>
     </form>
     <div id="gateOffline" class="hidden" style="margin-top:12px"><button class="btn" style="width:100%" id="gateOfflineBtn">Ride offline (sync later)</button></div>
-    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0">Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
+    <p class="dim" style="text-align:center;font-size:12px;margin:14px 0 0" data-i18n>Invite-only. Just invited? Click <b>Accept invitation</b> in the invitation email first; after that, sign in here with a code.</p>
   </div>
 </div>
 <div id="modalRoot"></div>
