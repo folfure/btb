@@ -2293,11 +2293,11 @@ const stv = {
   get connected() { if (cloud.on) return !!(cloud.stv && cloud.stv.connected); const t = this.tok(); return !!(t && t.refresh_token); },
   redirectUri() { return location.origin + location.pathname; },
   connect() {
-    if (rideInProgress()) { toast('Finish or end your ride before connecting Strava'); return; }
+    if (rideInProgress()) { toast(t('Finish or end your ride before connecting Strava')); return; }
     const a = cloud.on ? { clientId: String((cloud.stv && cloud.stv.client_id) || ''), secret: 'server' } : this.app();
-    if (!/^\d+$/.test(a.clientId)) { toast(cloud.on ? 'Strava is not set up on the server yet (STRAVA_CLIENT_ID missing)' : 'Enter your Strava Client ID first'); return; }
-    if (!a.secret && !a.relay) { toast('Enter your Client Secret (or a token relay URL)'); return; }
-    if (!/^https?:$/.test(location.protocol)) { toast('Strava login needs the app opened from an http(s) address, not a local file', 6000); return; }
+    if (!/^\d+$/.test(a.clientId)) { toast(cloud.on ? t('Strava is not set up on the server yet (STRAVA_CLIENT_ID missing)') : t('Enter your Strava Client ID first')); return; }
+    if (!a.secret && !a.relay) { toast(t('Enter your Client Secret (or a token relay URL)')); return; }
+    if (!/^https?:$/.test(location.protocol)) { toast(t('Strava login needs the app opened from an http(s) address, not a local file'), 6000); return; }
     const state = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
     store('erglab.stvState', { v: state, at: Date.now() });
     const q = new URLSearchParams({ client_id: a.clientId, redirect_uri: this.redirectUri(), response_type: 'code', approval_prompt: 'auto', scope: 'read,activity:write', state });
@@ -2310,16 +2310,16 @@ const stv = {
     if (a.relay) url = a.relay + '/token'; else body.set('client_secret', a.secret);
     let r;
     try { r = await fetch(url, { method: 'POST', body }); }
-    catch { throw new Error(a.relay ? 'Token relay unreachable' : 'Network error talking to Strava'); }
+    catch { throw new Error(a.relay ? t('Token relay unreachable') : t('Network error talking to Strava')); }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) {
       const appErr = Array.isArray(j.errors) && j.errors.some(x => /Application/i.test(x.resource || '') || /client_(id|secret)/i.test(x.field || ''));
       const msg = r.status === 409 && j.message ? j.message
-        : appErr ? (a.relay ? 'Strava rejected the relay\'s app credentials (check the relay setup)' : 'Strava rejected this Client ID / Client Secret. Check Settings › Strava.')
-        : (r.status === 400 || r.status === 401) ? 'Strava rejected the authorization' : (j.message || `Strava token error ${r.status}`);
+        : appErr ? (a.relay ? t('Strava rejected the relay\'s app credentials (check the relay setup)') : t('Strava rejected this Client ID / Client Secret. Check Settings › Strava.'))
+        : (r.status === 400 || r.status === 401) ? t('Strava rejected the authorization') : (j.message || t('Strava token error {status}', { status: r.status }));
       const e = new Error(msg); e.status = r.status; e.body = j; e.appErr = appErr; throw e;
     }
-    if (!j.access_token) throw new Error('Strava returned no access token');
+    if (!j.access_token) throw new Error(t('Strava returned no access token'));
     return j;
   },
   gen: 0,
@@ -2336,29 +2336,29 @@ const stv = {
     const expected = load('erglab.stvState', null);
     try { localStorage.removeItem('erglab.stvState'); } catch { }
     try { history.replaceState(null, '', location.pathname + '#settings'); } catch { }
-    if (!expected || expected.v !== q.get('state') || Date.now() - expected.at > 30 * 60000) { toast('Strava login could not be verified. Please try again.', 6000); return true; }
-    if (q.get('error')) { toast('Strava connection cancelled'); return true; }
-    if (!/activity:write/.test(q.get('scope') || '')) { toast('Strava: tick "Upload your activities" on the Strava permission screen, then connect again.', 8000); return true; }
+    if (!expected || expected.v !== q.get('state') || Date.now() - expected.at > 30 * 60000) { toast(t('Strava login could not be verified. Please try again.'), 6000); return true; }
+    if (q.get('error')) { toast(t('Strava connection cancelled')); return true; }
+    if (!/activity:write/.test(q.get('scope') || '')) { toast(t('Strava: tick "Upload your activities" on the Strava permission screen, then connect again.'), 8000); return true; }
     try {
       if (cloud.on) {
-        if (!cloud.user) throw new Error('Sign in first, then connect Strava again');
+        if (!cloud.user) throw new Error(t('Sign in first, then connect Strava again'));
         const j = await cloud.fn('/exchange', { method: 'POST', json: { code: q.get('code'), scope: q.get('scope') || '' } });
-        await cloud.stravaStatus(); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+        await cloud.stravaStatus(); toast(j.athlete && j.athlete.firstname ? t('Connected to Strava as {name}', { name: j.athlete.firstname }) : t('Connected to Strava'));
       } else {
         const j = await this.tokenCall({ code: q.get('code'), grant_type: 'authorization_code' });
-        this.save(j); toast(`Connected to Strava${j.athlete && j.athlete.firstname ? ' as ' + j.athlete.firstname : ''}`);
+        this.save(j); toast(j.athlete && j.athlete.firstname ? t('Connected to Strava as {name}', { name: j.athlete.firstname }) : t('Connected to Strava'));
       }
-    } catch (e) { toast('Strava: ' + e.message, 7000); }
+    } catch (e) { toast(t('Strava: {msg}', { msg: t(e.message) }), 7000); }
     renderStrava(); return true;
   },
   async token(force) {
-    const t = this.tok(); if (!t || !t.refresh_token) throw new Error('Not connected to Strava');
-    if (!force && t.access_token && t.expires_at * 1000 - Date.now() > 5 * 60000) return t.access_token;
+    const tk = this.tok(); if (!tk || !tk.refresh_token) throw new Error(t('Not connected to Strava'));
+    if (!force && tk.access_token && tk.expires_at * 1000 - Date.now() > 5 * 60000) return tk.access_token;
     // Strava rotates refresh tokens: refresh once at a time (also across tabs) and re-read what another refresh stored
     if (!this._refreshing) {
       const gen = this.gen;
       const doRefresh = async () => {
-        const cur = this.tok(); if (!cur || !cur.refresh_token) throw new Error('Not connected to Strava');
+        const cur = this.tok(); if (!cur || !cur.refresh_token) throw new Error(t('Not connected to Strava'));
         if (!force && cur.expires_at * 1000 - Date.now() > 5 * 60000) return cur.access_token; // another tab already refreshed
         try { const j = await this.tokenCall({ grant_type: 'refresh_token', refresh_token: cur.refresh_token }); this.save(j, gen); return j.access_token; }
         catch (e) {
@@ -2366,7 +2366,7 @@ const stv = {
           if (now && now.refresh_token !== cur.refresh_token && now.access_token) return now.access_token;
           if ((e.status === 400 || e.status === 401) && !e.appErr && now && now.refresh_token === cur.refresh_token) {
             try { localStorage.removeItem('erglab.strava'); } catch { } renderStrava();
-            throw new Error('Strava access expired or was revoked. Reconnect in Settings.');
+            throw new Error(t('Strava access expired or was revoked. Reconnect in Settings.'));
           }
           throw e;
         }
@@ -2380,18 +2380,18 @@ const stv = {
     const tk = await this.token(retried);
     let r;
     try { r = await fetch(STV_API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: 'Bearer ' + tk } }); }
-    catch { throw new Error('Network error talking to Strava'); }
+    catch { throw new Error(t('Network error talking to Strava')); }
     if (r.status === 401 && !retried) return this.api(path, opts, true);
-    if (r.status === 429) throw new Error('Strava rate limit reached. Try again in 15 minutes.');
+    if (r.status === 429) throw new Error(t('Strava rate limit reached. Try again in 15 minutes.'));
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) { const e = new Error(stvErr(j) || `Strava error ${r.status}`); e.status = r.status; e.body = j; throw e; }
+    if (!r.ok) { const e = new Error(stvErr(j) || t('Strava error {status}', { status: r.status })); e.status = r.status; e.body = j; throw e; }
     return j;
   },
   async poll(id, onStatus) {
     const waits = [1, 1.5, 2, 3, 4, 5, 6, 8, 10, 13];
     let up = null;
     for (const w of waits) {
-      onStatus('Strava is processing…');
+      onStatus(t('Strava is processing…'));
       await new Promise(r => setTimeout(r, w * 1000));
       try { up = await this.api('/uploads/' + id); }
       catch (e) { if (e.status === 404) return { gone: true }; return { pending: true, upload: id }; }
@@ -2407,8 +2407,8 @@ const stv = {
       const res = await this.poll(prev.upload, onStatus);
       if (res.activity_id || res.pending) return res;
     }
-    if (!ride.p || !ride.p.length) throw new Error('Only a summary is stored for this ride (no per-second data)');
-    onStatus('Uploading to Strava…');
+    if (!ride.p || !ride.p.length) throw new Error(t('Only a summary is stored for this ride (no per-second data)'));
+    onStatus(t('Uploading to Strava…'));
     let blob = new Blob([toTCX(ride)], { type: 'application/xml' }), type = 'tcx';
     const base = `erglab-${ride.id}.tcx`;
     if (window.CompressionStream) { try { blob = await new Response(blob.stream().pipeThrough(new CompressionStream('gzip'))).blob(); type = 'tcx.gz'; } catch { } }
@@ -2434,8 +2434,8 @@ const stv = {
   },
   async disconnect() {
     if (cloud.on) {
-      try { const j = await cloud.fn('/disconnect', { method: 'POST' }); toast(j.revoked ? 'Disconnected: BTB access removed from your Strava account' : 'Disconnected. To be sure, also remove the app under Strava › Settings › My Apps.', 6000); }
-      catch (e) { toast('Strava: ' + e.message, 6000); }
+      try { const j = await cloud.fn('/disconnect', { method: 'POST' }); toast(j.revoked ? t('Disconnected: BTB access removed from your Strava account') : t('Disconnected. To be sure, also remove the app under Strava › Settings › My Apps.'), 6000); }
+      catch (e) { toast(t('Strava: {msg}', { msg: t(e.message) }), 6000); }
       await cloud.stravaStatus(); renderStrava(); return;
     }
     let tk = null, ok = false;
@@ -2444,7 +2444,7 @@ const stv = {
     if (tk) { try { const r = await fetch('https://www.strava.com/oauth/deauthorize', { method: 'POST', body: new URLSearchParams({ access_token: tk }) }); ok = r.ok; } catch { } }
     try { localStorage.removeItem('erglab.strava'); } catch { }
     renderStrava();
-    toast(ok ? 'Disconnected: BTB access removed from your Strava account' : 'Disconnected here. To fully revoke, remove the app under Strava › Settings › My Apps.', 6000);
+    toast(ok ? t('Disconnected: BTB access removed from your Strava account') : t('Disconnected here. To fully revoke, remove the app under Strava › Settings › My Apps.'), 6000);
   },
 };
 function stvErr(j) {
@@ -2454,16 +2454,16 @@ function stvErr(j) {
 }
 function dupId(msg) { const m = /duplicate of (?:<a[^>]*>)?activity (\d+)/i.exec(String(msg || '')) || /duplicate of .*?activities\/(\d+)/i.exec(String(msg || '')); return m ? m[1] : null; }
 function rideDescription(r) {
-  const parts = [`${r.name}${r.completed ? '' : ' (partial)'}`, `NP ${r.np} W · avg ${r.avgP} W · IF ${r.IF} · TSS ${r.tss} · ${r.kj} kJ`];
-  if (r.avgHr) parts.push(`HR avg ${r.avgHr}${r.maxHr ? ' / max ' + r.maxHr : ''} bpm`);
-  if (r.avgC) parts.push(`Cadence avg ${r.avgC} rpm`);
-  parts.push(`FTP ${r.ftp} W · ridden in ERG mode with BTB`);
+  const parts = [`${r.name}${r.completed ? '' : ' ' + t('(partial)')}`, t('NP {np} W · avg {avg} W · IF {if} · TSS {tss} · {kj} kJ', { np: r.np, avg: r.avgP, if: r.IF, tss: r.tss, kj: r.kj })];
+  if (r.avgHr) parts.push(r.maxHr ? t('HR avg {avg} / max {max} bpm', { avg: r.avgHr, max: r.maxHr }) : t('HR avg {avg} bpm', { avg: r.avgHr }));
+  if (r.avgC) parts.push(t('Cadence avg {avg} rpm', { avg: r.avgC }));
+  parts.push(t('FTP {ftp} W · ridden in ERG mode with BTB', { ftp: r.ftp }));
   return parts.join('\n');
 }
 function stvOf(r) { const m = load('erglab.stravaIds', {}); return m[r.id] || r.strava || null; }
 function setRideStrava(id, info) {
   const m = load('erglab.stravaIds', {}); m[id] = info;
-  if (!store('erglab.stravaIds', m)) toast('Storage full: could not remember the Strava upload', 5000);
+  if (!store('erglab.stravaIds', m)) toast(t('Storage full: could not remember the Strava upload'), 5000);
   cloud.setStrava(id, info);
 }
 const stvLink = id => `https://www.strava.com/activities/${encodeURIComponent(id)}`;
@@ -2476,47 +2476,47 @@ async function uploadToStrava(ride, statusEl) {
   try {
     ride = await rideFull(ride);
     const res = await stv.upload(ride, msg => say(esc(msg)));
-    if (res.pending) { say('Uploaded. Strava is still processing it; it will appear in your feed shortly (History shows the link once it is ready).', 'var(--ok)'); setRideStrava(ride.id, { pending: true, upload: res.upload, at: Date.now() }); }
+    if (res.pending) { say(t('Uploaded. Strava is still processing it; it will appear in your feed shortly (History shows the link once it is ready).'), 'var(--ok)'); setRideStrava(ride.id, { pending: true, upload: res.upload, at: Date.now() }); }
     else {
       setRideStrava(ride.id, { id: res.activity_id, at: Date.now() });
-      say(`${res.duplicate ? 'Already on Strava' : 'Uploaded to Strava'}: <a href="${stvLink(res.activity_id)}" target="_blank" rel="noopener" style="color:#fc4c02;font-weight:700">View activity →</a>`, 'var(--ok)');
-      if (!statusEl || !statusEl.isConnected) toast(res.duplicate ? 'Ride was already on Strava' : 'Ride uploaded to Strava');
+      say(`${res.duplicate ? t('Already on Strava') : t('Uploaded to Strava')}: <a href="${stvLink(res.activity_id)}" target="_blank" rel="noopener" style="color:#fc4c02;font-weight:700">${t('View activity →')}</a>`, 'var(--ok)');
+      if (!statusEl || !statusEl.isConnected) toast(res.duplicate ? t('Ride was already on Strava') : t('Ride uploaded to Strava'));
     }
   } catch (e) {
-    say('Strava upload failed: ' + esc(e.message), 'var(--bad)');
-    if (!statusEl || !statusEl.isConnected) toast('Strava upload failed: ' + e.message, 6000);
+    say(t('Strava upload failed: {msg}', { msg: esc(t(e.message)) }), 'var(--bad)');
+    if (!statusEl || !statusEl.isConnected) toast(t('Strava upload failed: {msg}', { msg: t(e.message) }), 6000);
     throw e;
   } finally { stvBusy.delete(ride.id); renderHistory(); }
 }
 function renderStrava() {
   const on = stv.connected, a = stv.app();
-  const t = cloud.on ? { athlete: cloud.stv && cloud.stv.athlete } : stv.tok();
+  const tt = cloud.on ? { athlete: cloud.stv && cloud.stv.athlete } : stv.tok();
   $('#stvLocal').classList.toggle('hidden', cloud.on);
   $('#stvOn').classList.toggle('hidden', !on);
   $('#stvSetup').classList.toggle('hidden', on);
-  const b = $('#stvBadge'); b.textContent = on ? 'connected' : 'not connected'; b.style.color = on ? '#fc4c02' : 'var(--dim)';
-  if (on) $('#stvWho').textContent = t.athlete ? `${t.athlete.firstname || ''} ${t.athlete.lastname || ''}`.trim() || 'athlete ' + t.athlete.id : 'your Strava account';
-  $('#stvDomain').textContent = /^https?:$/.test(location.protocol) ? location.hostname : '(open the app from its web address first)';
+  const b = $('#stvBadge'); b.textContent = on ? t('connected') : t('not connected'); b.style.color = on ? '#fc4c02' : 'var(--dim)';
+  if (on) $('#stvWho').textContent = tt.athlete ? `${tt.athlete.firstname || ''} ${tt.athlete.lastname || ''}`.trim() || t('athlete {id}', { id: tt.athlete.id }) : t('your Strava account');
+  $('#stvDomain').textContent = /^https?:$/.test(location.protocol) ? location.hostname : t('(open the app from its web address first)');
   if (document.activeElement !== $('#stvId')) $('#stvId').value = load('erglab.stravaApp', {}).clientId || '';
   if (document.activeElement !== $('#stvRelay')) $('#stvRelay').value = load('erglab.stravaApp', {}).relay || '';
-  $('#stvSecret').placeholder = load('erglab.stravaApp', {}).secret ? '•••••••• (saved)' : (STRAVA_APP.clientSecret ? 'provided by this site' : '40-character secret');
-  if (STRAVA_APP.clientId && !load('erglab.stravaApp', {}).clientId) $('#stvId').placeholder = STRAVA_APP.clientId + ' (provided by this site)';
+  $('#stvSecret').placeholder = load('erglab.stravaApp', {}).secret ? t('•••••••• (saved)') : (STRAVA_APP.clientSecret ? t('provided by this site') : t('40-character secret'));
+  if (STRAVA_APP.clientId && !load('erglab.stravaApp', {}).clientId) $('#stvId').placeholder = t('{id} (provided by this site)', { id: STRAVA_APP.clientId });
   $('#stvAuto').value = S.stravaAuto === false ? '0' : '1';
   $('#stvSport').value = S.stravaSport || 'VirtualRide';
-  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? 'Needs the app opened from an http(s) address.' : cloud.on ? (cloud.stv ? '' : 'Checking Strava status…') : (a.clientId && (a.secret || a.relay)) ? '' : 'Fill in the fields above first.';
+  $('#stvHint').textContent = !/^https?:$/.test(location.protocol) ? t('Needs the app opened from an http(s) address.') : cloud.on ? (cloud.stv ? '' : t('Checking Strava status…')) : (a.clientId && (a.secret || a.relay)) ? '' : t('Fill in the fields above first.');
 }
 function bindStrava() {
   const saveApp = () => {
     const cur = load('erglab.stravaApp', {});
     const id = $('#stvId').value.trim(), sec = $('#stvSecret').value.trim(), relay = $('#stvRelay').value.trim();
-    if (relay && !/^https:\/\//i.test(relay) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\b/i.test(relay)) { toast('The relay URL must start with https://'); return false; }
+    if (relay && !/^https:\/\//i.test(relay) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\b/i.test(relay)) { toast(t('The relay URL must start with https://')); return false; }
     store('erglab.stravaApp', { clientId: id, secret: sec || cur.secret || '', relay });
     if (sec) $('#stvSecret').value = '';
     renderStrava(); return true;
   };
   ['#stvId', '#stvSecret', '#stvRelay'].forEach(s => $(s).addEventListener('change', saveApp));
   $('#stvConnect').onclick = () => { if (saveApp() !== false) stv.connect(); };
-  $('#stvOff').onclick = () => { if (confirm('Disconnect from Strava? Rides already uploaded stay on Strava.')) stv.disconnect(); };
+  $('#stvOff').onclick = () => { if (confirm(t('Disconnect from Strava? Rides already uploaded stay on Strava.'))) stv.disconnect(); };
   $('#stvAuto').onchange = e => { S.stravaAuto = e.target.value === '1'; saveSettings(); };
   $('#stvSport').onchange = e => { S.stravaSport = e.target.value; saveSettings(); };
 }
@@ -2568,7 +2568,7 @@ const cloud = {
     if (window.supabase && window.supabase.createClient) return Promise.resolve();
     return new Promise((res, rej) => {
       const s = document.createElement('script'); s.src = SUPABASE_JS.src; s.integrity = SUPABASE_JS.sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
-      s.onload = () => res(); s.onerror = () => rej(new Error('Could not load the sign-in library (offline?)'));
+      s.onload = () => res(); s.onerror = () => rej(new Error(t('Could not load the sign-in library (offline?)')));
       document.head.appendChild(s);
     });
   },
@@ -2593,9 +2593,9 @@ const cloud = {
       });
       const { data } = await this.sb.auth.getSession();
       if (fromLink) { try { history.replaceState(null, '', location.pathname + location.search + '#workouts'); } catch { } }
-      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast('Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.', 6000); }
-      else gate('email', linkErr ? 'That link has expired or was already used. Enter your email to get a sign-in code instead.' : undefined);
-    } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message || 'Cannot reach the server.'); }
+      if (data && data.session) { this.user = data.session.user; await this.afterLogin(); if (fromLink && !linkErr) toast(t('Welcome to BTB, Bouge Ton Body! Next time, sign in with a code sent to your email.'), 6000); }
+      else gate('email', linkErr ? t('That link has expired or was already used. Enter your email to get a sign-in code instead.') : undefined);
+    } catch (e) { console.warn(e); this.offline = true; gate('offline', e.message ? t(e.message) : t('Cannot reach the server.')); }
   },
   async afterLogin() {
     // a different account than the one whose data is cached on this device → start clean
@@ -2604,37 +2604,37 @@ const cloud = {
     if (last && last !== this.user.id) {
       // another account used this device: keep its not-yet-uploaded rides aside for that account, then start clean
       const keep = unsynced.filter(r => !r.owner || r.owner === last);
-      if (keep.length && !store('erglab.pending.' + last, keep.concat(load('erglab.pending.' + last, []).filter(x => !keep.some(k => k.id === x.id))))) toast('Storage full: some rides of the previous account could not be kept', 6000);
+      if (keep.length && !store('erglab.pending.' + last, keep.concat(load('erglab.pending.' + last, []).filter(x => !keep.some(k => k.id === x.id))))) toast(t('Storage full: some rides of the previous account could not be kept'), 6000);
       wipeLocal(false, pendingIds()); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
-    } else if (!last && (localRides.length || CUSTOM.length) && !confirm(`This device has ${localRides.length} ride(s) and ${CUSTOM.length} custom workout(s) from before you signed in. Add them to ${this.user.email}?`)) {
+    } else if (!last && (localRides.length || CUSTOM.length) && !confirm(t('This device has {rides} ride(s) and {workouts} custom workout(s) from before you signed in. Add them to {email}?', { rides: localRides.length, workouts: CUSTOM.length, email: this.user.email }))) {
       wipeLocal(); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
     }
     store('erglab.lastUser', this.user.id);
     gate(null);
     $('#acctCard').classList.remove('hidden'); $('#acctEmail').textContent = this.user.email || '';
-    try { await this.pull(); } catch (e) { toast('Sync failed: ' + e.message, 5000); }
+    try { await this.pull(); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); }
     this.stravaStatus().then(renderStrava);
   },
   async sendCode(email) {
     const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-    if (error && /rate|seconds|too many/i.test(error.message)) throw new Error('Please wait a minute before asking for a new code.');
+    if (error && /rate|seconds|too many/i.test(error.message)) throw new Error(t('Please wait a minute before asking for a new code.'));
     if (error && !/signups? not allowed|not found|user/i.test(error.message)) throw new Error(error.message);
     // unknown addresses get the same answer as invited ones (no account enumeration)
   },
   async verify(email, code) {
     const { data, error } = await this.sb.auth.verifyOtp({ email, token: code, type: 'email' });
-    if (error || !data || !data.session) throw new Error(error && /expired|invalid/i.test(error.message) ? 'That code is wrong or expired.' : (error ? error.message : 'Sign-in failed'));
+    if (error || !data || !data.session) throw new Error(error && /expired|invalid/i.test(error.message) ? t('That code is wrong or expired.') : (error ? error.message : t('Sign-in failed')));
     this.user = data.session.user; await this.afterLogin();
   },
   async signOut() {
-    if (rideInProgress() && !confirm('A ride is in progress. Sign out anyway?')) return;
+    if (rideInProgress() && !confirm(t('A ride is in progress. Sign out anyway?'))) return;
     this._leaving = true;
     if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
     try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
     await wipeLocal(true); // nothing personal stays on this device
     location.replace(location.pathname);
   },
-  async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error('Signed out'); return data.session; },
+  async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error(t('Signed out')); return data.session; },
   profile() {
     const settings = {}; for (const k of Object.keys(DEFAULTS)) settings[k] = S[k]; settings.wlog = S.wlog;
     if (S.stravaSport) settings.stravaSport = S.stravaSport; if (typeof S.stravaAuto === 'boolean') settings.stravaAuto = S.stravaAuto;
@@ -2718,7 +2718,7 @@ const cloud = {
     storeHistory(merged);
     setTimeout(storageJobs, 300);
     afterSettings(); renderHistory(); renderPlans(); renderCustom();
-    if (unsynced.length) toast(`Synced ${unsynced.length} ride${unsynced.length > 1 ? 's' : ''} from this device to your cloud space`);
+    if (unsynced.length) toast(unsynced.length > 1 ? t('Synced {n} rides from this device to your cloud space', { n: unsynced.length }) : t('Synced {n} ride from this device to your cloud space', { n: unsynced.length }));
   },
   async fn(path, { method = 'GET', json, body } = {}) {
     const s = await this.session();
@@ -2726,10 +2726,10 @@ const cloud = {
     if (json !== undefined) { headers['Content-Type'] = 'application/json'; body = JSON.stringify(json); }
     let r;
     try { r = await fetch(`${CLOUD.url.replace(/\/+$/, '')}/functions/v1/strava${path}`, { method, headers, body }); }
-    catch { throw new Error('Network error talking to the BTB server'); }
+    catch { throw new Error(t('Network error talking to the BTB server')); }
     const j = await r.json().catch(() => ({}));
     if (r.status === 409) { this.stravaStatus().then(renderStrava); }
-    if (!r.ok) { const e = new Error(j.message || stvErr(j) || `Server error ${r.status}`); e.status = r.status; e.body = j; throw e; }
+    if (!r.ok) { const e = new Error(j.message || stvErr(j) || t('Server error {status}', { status: r.status })); e.status = r.status; e.body = j; throw e; }
     return j;
   },
   async stravaStatus() { if (!this.user) return null; try { this.stv = await this.fn('/status'); } catch (e) { console.warn('strava status', e); this.stv = this.stv || null; } return this.stv; },
@@ -2743,7 +2743,7 @@ function gate(mode, msg) {
   $('#gateEmailF').classList.toggle('hidden', mode !== 'email');
   $('#gateCodeF').classList.toggle('hidden', mode !== 'code');
   $('#gateOffline').classList.toggle('hidden', mode !== 'offline');
-  $('#gateMsg').textContent = msg || { loading: 'Connecting…', email: 'Enter the email address you were invited with.', code: `If ${gateEmail} is invited, a sign-in code is on its way. Check your inbox (and spam).`, offline: 'Cannot reach the server.' }[mode];
+  $('#gateMsg').textContent = msg || { loading: t('Connecting…'), email: t('Enter the email address you were invited with.'), code: t('If {email} is invited, a sign-in code is on its way. Check your inbox (and spam).', { email: gateEmail }), offline: t('Cannot reach the server.') }[mode];
   $('#gateMsg').style.color = '';
   setTimeout(() => { const f = mode === 'email' ? $('#gateEmail') : mode === 'code' ? $('#gateCode') : null; try { f && f.focus(); } catch { } }, 50);
 }
@@ -2751,20 +2751,20 @@ function bindCloud() {
   const err = m => { $('#gateMsg').textContent = m; $('#gateMsg').style.color = 'var(--bad)'; };
   $('#gateEmailF').onsubmit = async e => {
     e.preventDefault(); const em = $('#gateEmail').value.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return err('Enter a valid email address.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return err(t('Enter a valid email address.'));
     $('#gateSend').disabled = true;
-    try { await cloud.sendCode(em); gateEmail = em; gate('code'); } catch (x) { err(x.message); } finally { $('#gateSend').disabled = false; }
+    try { await cloud.sendCode(em); gateEmail = em; gate('code'); } catch (x) { err(t(x.message)); } finally { $('#gateSend').disabled = false; }
   };
   $('#gateCodeF').onsubmit = async e => {
     e.preventDefault(); const code = $('#gateCode').value.replace(/\D/g, '');
-    if (code.length < 6) return err('Enter the code from the email.');
+    if (code.length < 6) return err(t('Enter the code from the email.'));
     $('#gateVerify').disabled = true;
-    try { await cloud.verify(gateEmail, code); $('#gateCode').value = ''; } catch (x) { err(x.message); } finally { $('#gateVerify').disabled = false; }
+    try { await cloud.verify(gateEmail, code); $('#gateCode').value = ''; } catch (x) { err(t(x.message)); } finally { $('#gateVerify').disabled = false; }
   };
   $('#gateBack').onclick = () => gate('email');
-  $('#gateOfflineBtn').onclick = () => { gate(null); toast('Offline: rides are kept on this device and sync after you sign in.', 6000); };
-  $('#acctOut').onclick = () => { if (confirm('Sign out? Data on this device is removed; it stays in your cloud space.')) cloud.signOut(); };
-  $('#acctSync').onclick = async () => { try { await cloud.pull(); toast('Synced'); } catch (e) { toast('Sync failed: ' + e.message, 5000); } };
+  $('#gateOfflineBtn').onclick = () => { gate(null); toast(t('Offline: rides are kept on this device and sync after you sign in.'), 6000); };
+  $('#acctOut').onclick = () => { if (confirm(t('Sign out? Data on this device is removed; it stays in your cloud space.'))) cloud.signOut(); };
+  $('#acctSync').onclick = async () => { try { await cloud.pull(); toast(t('Synced')); } catch (e) { toast(t('Sync failed: {msg}', { msg: t(e.message) }), 5000); } };
   window.addEventListener('online', () => { if (cloud.user) cloud.pull().catch(() => { }); });
 }
 
@@ -2780,11 +2780,11 @@ function renderSettings() {
   $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme; $('#sLang').value = S.lang;
   $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
   const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
-  $('#sAgeHint').textContent = age ? `Age ${age}` : '';
-  $('#sMaxHrHint').textContent = age ? `Used for heart-rate zones. Age-based estimate: ${Math.round(208 - 0.7 * age)} bpm (Tanaka); a measured max is better.` : 'Used for heart-rate zones.';
+  $('#sAgeHint').textContent = age ? t('Age {n}', { n: age }) : '';
+  $('#sMaxHrHint').textContent = age ? t('Used for heart-rate zones. Age-based estimate: {bpm} bpm (Tanaka); a measured max is better.', { bpm: Math.round(208 - 0.7 * age) }) : t('Used for heart-rate zones.');
   $('#sSmooth').value = S.smooth; $('#sAutoPause').value = S.autoPause ? '1' : '0'; $('#sSound').value = S.sound ? '1' : '0';
   $('#sSprintGrade').value = S.sprintGrade; $('#sSoftStart').value = S.softStart;
-  $('#sWkgHint').textContent = `FTP = ${(S.ftp / S.weight).toFixed(2)} W/kg`;
+  $('#sWkgHint').textContent = `FTP = ${tn(S.ftp / S.weight, 2)} W/kg`;
   $('#zoneTable').innerHTML = PZ.map(z => `<div style="background:${z.col}">${z.n}<span>${z.hi > 5 ? `> ${Math.round(z.lo * S.ftp)}` : `${Math.round(z.lo * S.ftp)}–${Math.round(z.hi * S.ftp)}`} W</span></div>`).join('');
 }
 function bindSettings() {
@@ -2803,7 +2803,7 @@ function bindSettings() {
   $('#sSmooth').onchange = e => { S.smooth = +e.target.value; saveSettings(); };
   $('#sAutoPause').onchange = e => { S.autoPause = e.target.value === '1'; saveSettings(); };
   $('#sSound').onchange = e => { S.sound = e.target.value === '1'; saveSettings(); };
-  $('#sReset').onclick = () => { if (confirm('Reset rider settings to defaults? (Your weight log is kept.)')) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
+  $('#sReset').onclick = () => { if (confirm(t('Reset rider settings to defaults? (Your weight log is kept.)'))) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
   $('#sExport').onclick = async () => {
     const history = [];
     for (const r of load('erglab.history', [])) { const st = r.p ? null : await sdb.get(r.id); const { hs, noData, ...x } = r; history.push(st ? { ...x, ...st } : x); }
@@ -2824,8 +2824,8 @@ function bindSettings() {
         Promise.all(ups).then(ids => { const ok = new Set(ids.filter(Boolean)); if (ok.size) { const h = load('erglab.history', []); h.forEach(x => { if (ok.has(x.id)) x.cloud = true; }); storeHistory(h); } setTimeout(storageJobs, 300); });
       }
       if (j.plandone && typeof j.plandone === 'object') { store('erglab.plandone', cleanPlanDone(j.plandone)); cloud.schedulePush(); }
-      afterSettings(); renderHistory(); toast('Backup restored');
-    } catch (err) { toast('Restore failed: ' + err.message); }
+      afterSettings(); renderHistory(); toast(t('Backup restored'));
+    } catch (err) { toast(t('Restore failed: {msg}', { msg: t(err.message) })); }
   };
 }
 function setTheme() { if (typeof applyTheme === 'function') applyTheme(S.theme === 'classic' ? 'classic' : 'neon'); }
@@ -2840,11 +2840,11 @@ function afterSettings() { langCheck(); setTheme(); renderSettings(); refreshLib
 /* ---- connection UI ---- */
 function updateConnUI(msg) {
   const pt = $('#pillTrainer'); pt.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[trainer.status] || '');
-  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · power data only'} (tap to disconnect)` : `Connect your smart trainer (Bluetooth${antUsable() ? ' or ANT+' : ''})`;
+  pt.title = trainer.connected ? `${trainer.name} · ${trainer.protocol === 'ant' ? 'ANT+ FE-C' : trainer.protocol}${trainer.cp ? ' · ERG' : ' · ' + t('power data only')} ${t('(tap to disconnect)')}` : antUsable() ? t('Connect your smart trainer (Bluetooth or ANT+)') : t('Connect your smart trainer (Bluetooth)');
   const small = matchMedia('(max-width:860px)').matches;
-  $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? 'Trainer' : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? 'Connecting…' : trainer.status === 'reconnecting' ? 'Reconnecting…' : small ? 'Trainer' : 'Connect trainer';
+  $('#lblTrainer').textContent = trainer.status === 'connected' ? (small ? t('Trainer') : trainer.name + (trainer.cp ? ' · ERG' : '')) : trainer.status === 'connecting' ? t('Connecting…') : trainer.status === 'reconnecting' ? t('Reconnecting…') : small ? t('Trainer') : t('Connect trainer');
   const ph = $('#pillHr'); ph.className = 'pill ' + ({ connected: 'ok', connecting: 'busy', reconnecting: 'busy', error: 'err' }[hrm.status] || '');
-  $('#lblHr').textContent = hrm.status === 'connected' ? (small ? 'HR' : hrm.name) : hrm.status === 'idle' || hrm.status === 'error' ? (small ? 'HR' : 'Connect HR') : 'HR…';
+  $('#lblHr').textContent = hrm.status === 'connected' ? (small ? t('HR') : hrm.name) : hrm.status === 'idle' || hrm.status === 'error' ? (small ? t('HR') : t('Connect HR')) : t('HR…');
   const cb = $('#rideConnect'); if (cb) cb.classList.toggle('hidden', trainer.connected || sim.on);
   $('#pillSim').className = 'pill ' + (sim.on ? 'sim' : '');
 }
@@ -2856,22 +2856,22 @@ function renderInstall() {
   card.classList.remove('hidden');
   const on = isStandalone();
   $('#installBadge').classList.toggle('hidden', !on);
-  const code = 'Sign in there once with the <b>code</b> from the email (don\'t tap the email link: it opens the browser, not the app).';
+  const code = t('Sign in there once with the <b>code</b> from the email (don\'t tap the email link: it opens the browser, not the app).');
   let html;
   if (on) html = isIOS
-    ? `<p style="margin:0">You're using BTB from your home screen.${cloud.on ? ' Workouts, plans, rides and Strava sync with your account.' : ''} Apple doesn't allow Bluetooth here, so to <b>ride</b> open BTB in <b>Bluefy</b>.</p>`
-    : `<p style="margin:0">You're using BTB as an installed app. Bluetooth works here as in the browser.</p>`;
+    ? `<p style="margin:0">${t('You\'re using BTB from your home screen.')}${cloud.on ? ' ' + t('Workouts, plans, rides and Strava sync with your account.') : ''} ${t('Apple doesn\'t allow Bluetooth here, so to <b>ride</b> open BTB in <b>Bluefy</b>.')}</p>`
+    : `<p style="margin:0">${t('You\'re using BTB as an installed app. Bluetooth works here as in the browser.')}</p>`;
   else if (isIOS) html = `<ol style="margin:0;padding-left:20px;line-height:1.6">
-      <li>Open this page in <b>Safari</b> or <b>Chrome</b>, tap <b>Share</b> <span aria-hidden="true">(□↑)</span>, then <b>Add to Home Screen</b> › <b>Add</b>.</li>
-      <li>Open BTB from the new icon. ${code}</li></ol>
-      <p style="margin:8px 0 0"><b>Note:</b> Apple doesn't allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and your rides. To <b>ride</b> with the trainer, keep using <b>Bluefy</b>${navigator.bluetooth ? ' (as you are now)' : ''}.</p>`;
-  else if (installEvt) html = `<p style="margin:0 0 10px">Install BTB to open it from your desktop, taskbar or home screen in its own window. Bluetooth keeps working.</p><button class="btn sm" id="installBtn">Install BTB</button>`;
-  else html = `<p style="margin:0">In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app. ${cloud.on ? code : ''}</p>`;
+      <li>${t('Open this page in <b>Safari</b> or <b>Chrome</b>, tap <b>Share</b> <span aria-hidden="true">(□↑)</span>, then <b>Add to Home Screen</b> › <b>Add</b>.')}</li>
+      <li>${t('Open BTB from the new icon.')} ${code}</li></ol>
+      <p style="margin:8px 0 0">${t('<b>Note:</b> Apple doesn\'t allow Bluetooth in home-screen web apps, so the icon is for browsing workouts, plans and your rides. To <b>ride</b> with the trainer, keep using <b>Bluefy</b>{now}.', { now: navigator.bluetooth ? ' ' + t('(as you are now)') : '' })}</p>`;
+  else if (installEvt) html = `<p style="margin:0 0 10px">${t('Install BTB to open it from your desktop, taskbar or home screen in its own window. Bluetooth keeps working.')}</p><button class="btn sm" id="installBtn">${t('Install BTB')}</button>`;
+  else html = `<p style="margin:0">${t('In <b>Chrome</b> or <b>Edge</b>, click the install icon in the address bar, or open the menu › <b>Cast, save and share</b> › <b>Install page as app</b> (Edge: <b>Apps</b> › <b>Install this site as an app</b>). On Android: menu › <b>Add to home screen</b>. Bluetooth keeps working in the installed app.')} ${cloud.on ? code : ''}</p>`;
   $('#installBody').innerHTML = html;
   const b = $('#installBtn');
   if (b) b.onclick = async () => {
     const e = installEvt; installEvt = null; if (!e) return renderInstall();
-    try { e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') toast('BTB installed'); } catch { }
+    try { e.prompt(); const r = await e.userChoice; if (r && r.outcome === 'accepted') toast(t('BTB installed')); } catch { }
     renderInstall();
   };
 }
@@ -2883,18 +2883,18 @@ function showBtHelp(force, why) {
   if ((navigator.bluetooth && !force) || (!force && load('erglab.btHelpHidden', 0))) { b.classList.add('hidden'); return; }
   b.classList.remove('hidden');
   const msg = why === 'security'
-    ? (iOS ? `<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.`
-      : `<b>The browser blocked Bluetooth for this page.</b> ${location.protocol === 'file:' ? 'Pages opened as a local file can be refused. ' : ''}Open the app from an <b>https://</b> address (GitHub Pages, Netlify…) or from <b>http://localhost</b>, as a normal tab (not inside an embedded preview).`)
+    ? (iOS ? t('<b>Bluetooth was refused.</b> Allow Bluetooth for this browser in iOS Settings › Privacy & Security › Bluetooth, then reload.')
+      : `${t('<b>The browser blocked Bluetooth for this page.</b>')} ${location.protocol === 'file:' ? t('Pages opened as a local file can be refused.') + ' ' : ''}${t('Open the app from an <b>https://</b> address (GitHub Pages, Netlify…) or from <b>http://localhost</b>, as a normal tab (not inside an embedded preview).')}`)
     : iOS && isStandalone()
-    ? `<b>The home-screen app can't use Bluetooth.</b> On iPhone and iPad, Apple only lets apps like <b>Bluefy – Web BLE Browser</b> talk to trainers, not home-screen web apps. Use this app to browse workouts, follow your plan and look at your rides. To ride, open BTB in <b>Bluefy</b> (sign in there once with an email code).`
+    ? t('<b>The home-screen app can\'t use Bluetooth.</b> On iPhone and iPad, Apple only lets apps like <b>Bluefy – Web BLE Browser</b> talk to trainers, not home-screen web apps. Use this app to browse workouts, follow your plan and look at your rides. To ride, open BTB in <b>Bluefy</b> (sign in there once with an email code).')
     : iOS
-    ? `<b>Bluetooth isn't available in this browser.</b> On iPhone and iPad, Apple blocks Web Bluetooth in Safari and Chrome. Open this page in the free <b>Bluefy – Web BLE Browser</b> app (App Store) to connect your trainer. You can still browse workouts and try <b>Sim</b> mode here.`
+    ? t('<b>Bluetooth isn\'t available in this browser.</b> On iPhone and iPad, Apple blocks Web Bluetooth in Safari and Chrome. Open this page in the free <b>Bluefy – Web BLE Browser</b> app (App Store) to connect your trainer. You can still browse workouts and try <b>Sim</b> mode here.')
     : !window.isSecureContext
-      ? `<b>Bluetooth needs a secure page.</b> Open this file over <b>https://</b> or <b>localhost</b> (or from a local file in Chrome/Edge).`
-      : `<b>Web Bluetooth isn't available in this browser.</b> Use <b>Chrome</b> or <b>Edge</b> on Windows, macOS, Android or ChromeOS. On Linux, enable <i>chrome://flags/#enable-experimental-web-platform-features</i>. You can still use <b>Sim</b> mode.`;
-  b.innerHTML = `<button class="x" aria-label="Dismiss" style="float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>${msg}${iOS && !navigator.bluetooth ? ' <button class="btn sm" id="copyLink" style="margin-left:6px">Copy link for Bluefy</button>' : ''}`;
+      ? t('<b>Bluetooth needs a secure page.</b> Open this file over <b>https://</b> or <b>localhost</b> (or from a local file in Chrome/Edge).')
+      : t('<b>Web Bluetooth isn\'t available in this browser.</b> Use <b>Chrome</b> or <b>Edge</b> on Windows, macOS, Android or ChromeOS. On Linux, enable <i>chrome://flags/#enable-experimental-web-platform-features</i>. You can still use <b>Sim</b> mode.');
+  b.innerHTML = `<button class="x" aria-label="${t('Dismiss')}" style="float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">×</button>${msg}${iOS && !navigator.bluetooth ? ` <button class="btn sm" id="copyLink" style="margin-left:6px">${t('Copy link for Bluefy')}</button>` : ''}`;
   b.querySelector('.x').onclick = () => { store('erglab.btHelpHidden', 1); b.classList.add('hidden'); };
-  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname).then(() => toast('Link copied. Paste it into Bluefy.'), () => toast(location.href, 8000));
+  const cl = b.querySelector('#copyLink'); if (cl) cl.onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname).then(() => toast(t('Link copied. Paste it into Bluefy.')), () => toast(location.href, 8000));
 }
 
 /* =====================================================================
@@ -2930,7 +2930,7 @@ function bind() {
     R.softFrom = R.elapsed; renderRide(true); applyControl();
   };
   $('#cErg').onclick = () => setMode(true); $('#cSlope').onclick = () => setMode(false);
-  $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm('End the ride and save it?')) finishRide(false); };
+  $('#cEnd').onclick = () => { if (R.state === 'done' || R.state === 'ready') { R.w = null; R.state = 'idle'; trainer.release(); showRide(); return; } if (confirm(t('End the ride and save it?'))) finishRide(false); };
   $('#rideConnect').onclick = () => chooseLink('trainer');
   const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
   $('#cFull').classList.toggle('hidden', !fsOK);
@@ -2946,9 +2946,9 @@ function bind() {
     else if (e.key === 'e' || e.key === 'E') setMode(!(R.freeRide ? R.freeMode === 'erg' : R.ergOn));
   });
   // builder
-  $('#bCat').innerHTML = CATS.map(c => `<option ${c === 'Custom' ? 'selected' : ''}>${c}</option>`).join('');
+  $('#bCat').innerHTML = CATS.map(c => `<option value="${c}" ${c === 'Custom' ? 'selected' : ''}>${t(c)}</option>`).join('');
   $('#bText').addEventListener('input', builderPreview); $('#bName').addEventListener('input', builderPreview);
-  $('#bSave').onclick = () => { const w = builderWorkout(); if (w) { addCustom(w); toast('Saved to library'); } };
+  $('#bSave').onclick = () => { const w = builderWorkout(); if (w) { addCustom(w); toast(t('Saved to library')); } };
   $('#bRide').onclick = () => { const w = builderWorkout(); if (w) loadWorkout(w); };
   $('#bFile').onchange = e => { importFiles(e.target.files); e.target.value = ''; };
   // drag & drop import anywhere
