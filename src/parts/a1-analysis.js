@@ -2,7 +2,8 @@
 // Uses the template's PZ / HZ zone tables when present (falls back to the same fractions otherwise).
 // Never throws on odd input: bad samples (NaN, null, negative) count as 0, impossible results are null.
 const AN = (() => {
-  const MMP_DUR = [1, 2, 3, 5, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 420, 600, 900, 1200, 1800, 2700, 3600, 5400, 7200];
+  const VER = 2; // bump whenever the stored analysis layout changes (2: MMP_DUR gained 480 s)
+  const MMP_DUR = [1, 2, 3, 5, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 420, 480, 600, 900, 1200, 1800, 2700, 3600, 5400, 7200];
   const PZ_HI = [0.55, 0.75, 0.90, 1.05, 1.20, 1.50, 9];
   const HZ_HI = [0.60, 0.70, 0.80, 0.90, 9];
   const pHi = () => (typeof PZ !== 'undefined' && Array.isArray(PZ) && PZ.length === 7) ? PZ.map(z => +z.hi) : PZ_HI;
@@ -249,7 +250,7 @@ const AN = (() => {
     try { ints = detectIntervals(P, H, C, T, D, n, ftp, hasT); } catch (e) { ints = []; }
 
     return {
-      v: 1, mmp: mmpCurve(P), tiz, coast, thz, np: npv, avgP,
+      v: VER, mmp: mmpCurve(P), tiz, coast, thz, np: npv, avgP,
       vi: avgP > 0 && npv > 0 ? r2(npv / avgP) : null,
       ef: avgHr > 0 && npv > 0 ? r2(npv / avgHr) : null,
       dec, wbalMin, ints,
@@ -363,5 +364,5 @@ const AN = (() => {
     return { tiz, thz, n };
   }
 
-  return { MMP_DUR, mmpCurve, np, analyzeRide, wbalSeries, rangeStats, cpFit, bestCurve, fitnessSeries, weekTotals, zoneTotals, dayKey };
+  return { VER, MMP_DUR, mmpCurve, np, analyzeRide, wbalSeries, rangeStats, cpFit, bestCurve, fitnessSeries, weekTotals, zoneTotals, dayKey };
 })();

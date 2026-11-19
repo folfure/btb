@@ -1,6 +1,6 @@
 # ERGlab: smart-trainer workouts in one HTML file
 
-`index.html` is the whole app: workouts, plans, live dashboard and Bluetooth ERG control for FTMS trainers (Elite Direto X and others). No install, no server code.
+`index.html` is the whole app: workouts, plans, live dashboard and Bluetooth ERG control for smart trainers that speak the standard FTMS protocol (Wahoo, Tacx, Elite, Saris, JetBlack, Zwift Hub and more). No install, no server code.
 
 ## Where it runs
 
@@ -29,9 +29,9 @@ The hosted site (GitHub Pages build) ships a web app manifest and icons, so it c
 
 The single-file `index.html` in the repo has no manifest and is not installable.
 
-## Before riding (Direto X)
-- Close Zwift, the Elite apps and similar. The trainer accepts only one Bluetooth controller at a time.
-- Heart rate comes from a separate Bluetooth strap (the "HR" button). The Direto X doesn't relay HR.
+## Before riding
+- Close Zwift, the trainer maker's app and similar. Most trainers accept only one Bluetooth controller at a time.
+- Heart rate comes from a separate Bluetooth strap (the "HR" button).
 - In ERG: small chainring, middle cog, and start pedalling before the first interval.
 
 ## Strava upload
@@ -47,4 +47,7 @@ Rides upload as TCX (gzipped) with power, HR and cadence, automatically after ea
 - `src/app.template.html`: app code (HTML/CSS/JS)
 - `src/data/workouts_*.json`, `src/data/plans.json`: workout library and plans (power as a fraction of FTP, durations in seconds)
 - `node src/build.mjs` validates the data and writes `index.html`; `--out dist/index.html` writes a hosted build plus `manifest.webmanifest` and the icons from `src/assets/`
-- `src/protocol_notes.md`: FTMS / Direto X protocol research the Bluetooth code is based on
+- `src/protocol_notes.md`: FTMS smart-trainer protocol research the Bluetooth code is based on
+- `src/parts/`: inlined into the page by the build: analysis maths (`a1-analysis.js`), Progress / ride analysis views (`a2-*`), body & energy maths (`a3-body.js`), demo rider for Sim mode (`b1-demo.js`), Neon Miami theme and gauges (`z1-theme.css`, `z2-gauges.js`)
+- `src/theme/`: source art for the theme; regenerate with `cd src/theme && node gen-art.mjs theme.src.css ../parts/z1-theme.css art`
+- Tests: `node src/test/analysis.test.mjs`, `node src/test/body.test.mjs`, `node src/test/build.test.mjs`

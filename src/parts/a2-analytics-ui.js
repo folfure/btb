@@ -1,19 +1,22 @@
 // ERGlab analytics UI (intervals.icu-style): the Progress tab (renderProgress) and the per-ride analysis overlay
 // (openRideAnalysis). Hand-written canvas charts (devicePixelRatio aware, pointer events, tooltips), no libraries.
 // Needs AN (a1-analysis.js) and the app helpers: esc, fmtTime, load, store, toast, S, PZ, HZ, rideStreams,
-// saveSettings/afterSettings. Globals: renderProgress, openRideAnalysis, ANUI (everything else lives inside ANUI).
+// saveSettings/afterSettings. Optional: BODY (a3-body.js) and addWeightLog/removeWeightLog for the Body & energy section.
+// Globals: renderProgress, openRideAnalysis, ANUI (everything else lives inside ANUI).
 
 function renderProgress() { ANUI.renderProgress(); }
-async function openRideAnalysis(rideId) { return ANUI.openRide(rideId); }
+async function openRideAnalysis(rideId, ride) { return ANUI.openRide(rideId, ride); }
 
 const ANUI = (() => {
+  const VS = () => (typeof viewS === 'function' ? viewS() : S); // demo rider while the simulator is on
+  const HIST = () => (typeof viewHistory === 'function' ? viewHistory() : load('erglab.history', []));
   const DAY = 864e5;
-  const KEY_DUR = [5, 15, 30, 60, 300, 600, 1200, 3600]; // AN.MMP_DUR has no 8 min (480 s): 10 min instead
+  const KEY_DUR = [5, 15, 30, 60, 300, 480, 1200, 3600];
   const CURVE_TICKS = [1, 5, 15, 30, 60, 120, 300, 600, 1200, 1800, 3600, 7200];
-  const prefs = Object.assign({ fit: 90, wk: 12, per: 90, zper: 42, unit: 'w', sm: 3 }, load('erglab.anui', {}));
+  const prefs = Object.assign({ fit: 90, wk: 12, per: 90, zper: 42, unit: 'w', sm: 3, wr: 90, btr: 'eftp' }, load('erglab.anui', {}));
   prefs.ser = Object.assign({ p: true, t: true, hr: true, c: true, wb: false }, prefs.ser || {});
   const savePrefs = () => store('erglab.anui', prefs);
-  const wprimeOf = () => (typeof S !== 'undefined' && S.wprime > 0 ? +S.wprime : 20000);
+  const wprimeOf = () => (typeof S !== 'undefined' && VS().wprime > 0 ? +VS().wprime : 20000);
 
   /* ---------- formatting ---------- */
   const clampN = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -69,6 +72,7 @@ const ANUI = (() => {
       ctl: g('--an-ctl', '#4cc2ff'), atl: g('--an-atl', '#d65cff'), wbal: g('--an-wbal', '#8f7bff'), cmp: g('--an-cmp', '#8c96ab'),
       text: g('--text', '#e9edf5'), muted: g('--muted', '#8c96ab'), dim: g('--dim', '#5d667a'), line: g('--line', '#242d40'), line2: g('--line2', '#2f3a52'),
       panel: g('--panel', '#121823'), accent: g('--accent', '#4cc2ff'), ok: g('--ok', '#2fbf71'), warn: g('--warn', '#f5c518'), bad: g('--bad', '#ff4d4d'),
+      wt: g('--an-wt', '#4cc2ff'), goal: g('--an-goal', '#2fbf71'), kcal: g('--an-kcal', '#ff8a1f'), vo2: g('--an-vo2', '#d65cff'),
       f: FORM.map(f => g(f.v, '#888')),
       pz: PZ.map(z => resolveCol(z.col, node)), hz: HZ.map(z => resolveCol(z.col, node)),
       font: cs.fontFamily || 'system-ui, sans-serif',
@@ -242,8 +246,8 @@ const ANUI = (() => {
       root.addEventListener('click', e => { const t = e.target.closest('[data-ride]'); if (t && t.dataset.ride && root.contains(t)) openRideAnalysis(t.dataset.ride); });
     }
     if (typeof AN === 'undefined') { root.innerHTML = '<div class="card pad anx-empty"><h3>Analytics unavailable</h3><p class="muted">The analysis module did not load.</p></div>'; return; }
-    const rides = load('erglab.history', []).filter(r => r && r.date && !isNaN(new Date(r.date)));
-    if (!rides.length) { root.innerHTML = emptyHTML(); return; }
+    const rides = HIST().filter(r => r && r.date && !isNaN(new Date(r.date)));
+    if (!rides.length) { PG = { root, rides: [], withAn: [], byId: {}, all: [] }; root.innerHTML = emptyHTML() + bodyShell(); renderBody(); return; }
     const withAn = rides.filter(r => r.an && Array.isArray(r.an.mmp) && r.an.mmp.length);
     const byId = {}; rides.forEach(r => byId[r.id] = r);
     const all = AN.fitnessSeries(rides, null) || [];
@@ -254,6 +258,7 @@ const ANUI = (() => {
         ${seg('fit', [[42, '6w'], [90, '3m'], [182, '6m'], [365, '1y'], [0, 'All']], prefs.fit)}</div>
         <div class="anx-legend"><span><i style="background:var(--an-ctl)"></i>Fitness</span><span><i style="background:var(--an-atl)"></i>Fatigue</span><span><i class="dot" style="background:var(--muted)"></i>Daily TSS</span><span><i style="background:var(--an-f4)"></i>Form</span></div>
         <div class="anx-chart" id="anxFit"></div></section>
+      ${bodyShell()}
       <section class="card anx-card"><div class="anx-ch"><div><h3>Weekly load</h3><p>TSS per week, split by time in power zones. Labels: hours ridden.</p></div>
         ${seg('wk', [[12, '12w'], [26, '26w'], [52, '52w']], prefs.wk)}</div>
         <div class="anx-chart" id="anxWk"></div></section>
@@ -267,7 +272,7 @@ const ANUI = (() => {
         <section class="card anx-card"><div class="anx-ch"><div><h3>Records</h3><p>Best efforts: last 90 days and all time. Tap one to open the ride.</p></div></div>
           <div id="anxRec"></div></section>
       </div>`;
-    renderKpis(); renderFit(); renderWeeks(); renderCurve(); renderZones(); renderRecords();
+    renderKpis(); renderFit(); renderBody(); renderWeeks(); renderCurve(); renderZones(); renderRecords();
     bindSeg(root, 'fit', v => { prefs.fit = +v; savePrefs(); renderFit(); });
     bindSeg(root, 'wk', v => { prefs.wk = +v; savePrefs(); renderWeeks(); });
     bindSeg(root, 'per', v => { prefs.per = +v; savePrefs(); renderCurve(); });
@@ -303,7 +308,7 @@ const ANUI = (() => {
       const pts = s.map((e, i) => `${(i / (s.length - 1) * 100).toFixed(1)},${(28 - (e[key] - mn) / (mx - mn) * 24).toFixed(1)}`);
       return `<svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L${pts.join(' L')} L100,30 Z" class="sf"/><path d="M${pts.join(' L')}" class="sl"/></svg>`;
     };
-    const diff = fit ? fit.eftp - S.ftp : 0;
+    const diff = fit ? fit.eftp - VS().ftp : 0;
     const pctWk = lw.tss ? Math.min(100, tw.tss / lw.tss * 100) : (tw.tss ? 100 : 0);
     el.innerHTML = `
       <div class="card anx-kpi" style="--k:var(--an-ctl)"><div class="k">Fitness <span>CTL</span></div><div class="v num">${fx(last.ctl, 0)}</div>
@@ -313,7 +318,7 @@ const ANUI = (() => {
       <div class="card anx-kpi" style="--k:var(${fz.v})"><div class="k">Form <span>TSB</span></div><div class="v num">${sgn(last.tsb, 0)}</div>
         <div class="s"><span class="anx-pill" style="color:var(${fz.v})">${fz.name}</span></div>${spark('tsb')}</div>
       <div class="card anx-kpi" style="--k:var(--an-curve)"><div class="k">eFTP <span>90 d</span></div>
-        ${fit ? `<div class="v num">${fit.eftp}<small>W</small></div><div class="s num">${(fit.eftp / S.weight).toFixed(2)} W/kg · <span class="${diff > 0 ? 'up' : diff < 0 ? 'down' : 'dim'}">${sgn(diff, 0)} W</span> <span class="dim">vs FTP ${S.ftp}</span></div>
+        ${fit ? `<div class="v num">${fit.eftp}<small>W</small></div><div class="s num">${(fit.eftp / VS().weight).toFixed(2)} W/kg · <span class="${diff > 0 ? 'up' : diff < 0 ? 'down' : 'dim'}">${sgn(diff, 0)} W</span> <span class="dim">vs FTP ${VS().ftp}</span></div>
           ${Math.abs(diff) >= 2 ? `<button class="btn sm anx-useftp" data-v="${fit.eftp}">Use as FTP</button>` : '<div class="s dim">matches your FTP</div>'}`
         : `<div class="v num dim">–</div><div class="s dim">Needs hard 2–20 min efforts in the last 90 days.</div>`}</div>
       <div class="card anx-kpi" style="--k:var(--an-wbal)"><div class="k">W′ <span>anaerobic</span></div>
@@ -324,6 +329,7 @@ const ANUI = (() => {
     const b = el.querySelector('.anx-useftp');
     if (b) b.addEventListener('click', () => {
       const v = +b.dataset.v; if (!(v > 0)) return;
+      if (typeof DEMO !== 'undefined' && DEMO.active) { toast('Demo data: turn Sim off to change your own FTP'); return; }
       S.ftp = v; saveSettings(); if (typeof afterSettings === 'function') afterSettings();
       toast(`FTP set to ${v} W (eFTP from your 90-day power curve)`);
       renderProgressImpl();
@@ -343,7 +349,7 @@ const ANUI = (() => {
   }
   function drawFitness(ch, ser, byDay) {
     const { ctx, w, h, P } = ch, n = ser.length;
-    const L = 30, R = ch.mob ? 28 : 36, T = 10, B = 20, gap = 16;
+    const L = 30, R = ch.mob ? 28 : 36, T = 20, B = 20, gap = 16;
     const pw = w - L - R, avail = h - T - B - gap, th = Math.round(avail * 0.66), bt = T + th + gap, bh = avail - th;
     const X = i => L + i / (n - 1) * pw;
     let mx = 10, mt = 60, tlo = 0, thi = 0;
@@ -361,7 +367,7 @@ const ANUI = (() => {
       text(ctx, fx(v, 0), L - 6, y, P.dim, 'right');
       text(ctx, fx(ta.step * k, 0), L + pw + 5, y, rgba(P.muted, .75), 'left');
     }
-    text(ctx, 'TSS', L + pw + 5, T - 2 + 0, rgba(P.muted, .6), 'left', 'top');
+    ctx.font = ch.font(9.5, 700); text(ctx, 'TSS', L + pw + 5, 7, rgba(P.muted, .6), 'left'); text(ctx, 'CTL · ATL', L - 26, 7, rgba(P.muted, .6), 'left'); ctx.font = ch.font(10);
     // x ticks
     const dx = pw / (n - 1), ticks = [];
     if (n <= 120) {
@@ -542,7 +548,7 @@ const ANUI = (() => {
     const from = per ? isoAgo(per) : null;
     const cur = AN.bestCurve(withAn, from, null);
     const prev = per ? AN.bestCurve(withAn, isoAgo(per * 2), from) : null;
-    const kg = id => (byId[id] && +byId[id].wt) || S.weight;
+    const kg = id => (byId[id] && +byId[id].wt) || VS().weight;
     const conv = b => b.w.map((v, i) => v == null ? null : unit === 'wkg' ? v / kg(b.id[i]) : v);
     const fit = AN.cpFit(cur.w);
     const host = root.querySelector('#anxPc'), foot = root.querySelector('#anxPcFoot'), leg = root.querySelector('#anxPcLeg');
@@ -556,20 +562,20 @@ const ANUI = (() => {
     leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>${esc(perName)}</span>${series[1] ? `<span><i class="dash" style="color:var(--an-cmp)"></i>${esc(series[1].name)}</span>` : ''}${fit ? '<span><i class="dot2"></i>CP model</span>' : ''}`;
     const u = unit === 'wkg' ? 'W/kg' : 'W', fmtV = v => unit === 'wkg' ? fx(v, 2) : fx(v, 0);
     curveChart(host, {
-      series, unit, fit, fitScale: unit === 'wkg' ? S.weight : 1,
+      series, unit, fit, fitScale: unit === 'wkg' ? VS().weight : 1,
       tip(i, ch) {
         const P = ch.P, t = AN.MMP_DUR[i], id = cur.id[i], r = id && byId[id], w = cur.w[i];
         let s = `<div class="t">${durLbl(t)} best</div>`;
         if (w != null) s += trow(P.curve, unit === 'wkg' ? 'W/kg' : 'Power', `${fmtV(series[0].v[i])} ${u}`, `<em>${unit === 'wkg' ? Math.round(w) + ' W' : (w / kg(id)).toFixed(2) + ' W/kg'}</em>`);
         if (series[1] && series[1].v[i] != null) { const d = w != null ? series[0].v[i] - series[1].v[i] : null; s += trow(P.cmp, 'Previous', `${fmtV(series[1].v[i])} ${u}`, d != null ? `<em class="${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : '−'}${fmtV(Math.abs(d))}</em>` : ''); }
-        if (fit && t >= 60) s += trow(null, 'CP model', `${fmtV((fit.cp + fit.wprime / t) / (unit === 'wkg' ? S.weight : 1))} ${u}`);
+        if (fit && t >= 60) s += trow(null, 'CP model', `${fmtV((fit.cp + fit.wprime / t) / (unit === 'wkg' ? VS().weight : 1))} ${u}`);
         if (r) s += `<div class="n">${esc(r.name)} <span>${fDay(r.date)}</span></div><div class="h">${ch.ptype === 'mouse' ? 'Click' : 'Tap again'} to open the ride</div>`;
         return s;
       },
       pick(i) { const id = cur.id[i]; if (id) openRideAnalysis(id); },
     });
     foot.innerHTML = fit
-      ? `<span>CP <b class="num">${fit.cp} W</b></span><span>W′ <b class="num">${(fit.wprime / 1000).toFixed(1)} kJ</b></span><span>eFTP <b class="num">${fit.eftp} W</b> <span class="dim">(${(fit.eftp / S.weight).toFixed(2)} W/kg)</span></span><span class="dim">2-parameter fit of the ${fit.pts} best efforts between 2 and 20 min</span>`
+      ? `<span>CP <b class="num">${fit.cp} W</b></span><span>W′ <b class="num">${(fit.wprime / 1000).toFixed(1)} kJ</b></span><span>eFTP <b class="num">${fit.eftp} W</b> <span class="dim">(${(fit.eftp / VS().weight).toFixed(2)} W/kg)</span></span><span class="dim">2-parameter fit of the ${fit.pts} best efforts between 2 and 20 min</span>`
       : '<span class="dim">Critical Power fit needs best efforts between 2 and 20 minutes in this period.</span>';
   }
 
@@ -579,8 +585,8 @@ const ANUI = (() => {
     const zt = AN.zoneTotals(withAn, per ? isoAgo(per) : null);
     const tp = zt.tiz.reduce((a, b) => a + b, 0), th = zt.thz.reduce((a, b) => a + b, 0);
     root.querySelector('#anxZSub').textContent = zt.n ? `${zt.n} ride${zt.n === 1 ? '' : 's'} · ${hm(tp)} pedalling${th ? ` · ${hm(th)} with heart rate` : ''}` : 'No analysed rides in this period.';
-    root.querySelector('#anxZones').innerHTML = `<div class="anx-zh">Power zones <span class="dim">· FTP ${S.ftp} W</span></div>${zoneBars(zt.tiz, PZ, 'p', S.ftp)}${polarization(zt.tiz)}
-      <div class="anx-zh" style="margin-top:16px">Heart-rate zones <span class="dim">· max ${S.maxHr} bpm</span></div>${zoneBars(zt.thz, HZ, 'hr', S.maxHr)}`;
+    root.querySelector('#anxZones').innerHTML = `<div class="anx-zh">Power zones <span class="dim">· FTP ${VS().ftp} W</span></div>${zoneBars(zt.tiz, PZ, 'p', VS().ftp)}${polarization(zt.tiz)}
+      <div class="anx-zh" style="margin-top:16px">Heart-rate zones <span class="dim">· max ${VS().maxHr} bpm</span></div>${zoneBars(zt.thz, HZ, 'hr', VS().maxHr)}`;
   }
 
   /* ---- records ---- */
@@ -590,7 +596,7 @@ const ANUI = (() => {
     const b90 = AN.bestCurve(withAn, isoAgo(90), null), ball = AN.bestCurve(withAn, null, null);
     const cell = (b, i, star) => {
       const v = b.w[i]; if (v == null) return '<td class="nil">–</td>';
-      const r = byId[b.id[i]], kg = (r && +r.wt) || S.weight;
+      const r = byId[b.id[i]], kg = (r && +r.wt) || VS().weight;
       return `<td data-ride="${esc(b.id[i] || '')}" tabindex="0"><b class="num">${Math.round(v)}</b><span class="u">W</span>${star ? '<span class="pb" title="All-time best">PB</span>' : ''}<div class="sub num">${(v / kg).toFixed(2)} W/kg · ${b.date[i] ? fDay(b.date[i]) : ''}</div></td>`;
     };
     el.innerHTML = `<table class="anx-tbl anx-rec"><thead><tr><th>Duration</th><th>Last 90 days</th><th>All time</th></tr></thead><tbody>${KEY_DUR.map(d => {
@@ -598,6 +604,426 @@ const ANUI = (() => {
       return `<tr><td class="d">${durLbl(d)}</td>${cell(b90, i, b90.w[i] != null && b90.id[i] === ball.id[i])}${cell(ball, i, false)}</tr>`;
     }).join('')}</tbody></table>`;
     el.querySelectorAll('td[data-ride]').forEach(td => td.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRideAnalysis(td.dataset.ride); } }));
+  }
+
+  /* ======================================================================
+     BODY & ENERGY (needs BODY from a3-body.js; the section is left out without it)
+     ====================================================================== */
+  const bc = (fn, ...a) => { try { return typeof BODY !== 'undefined' && BODY && typeof BODY[fn] === 'function' ? BODY[fn](...a) : null; } catch (e) { console.warn('BODY.' + fn, e); return null; } };
+  const hasBody = () => typeof BODY !== 'undefined' && !!BODY;
+  const kcF = v => v == null || !isFinite(v) ? '–' : Math.round(v).toLocaleString();
+  const kgF = v => fx(v, 1);
+  const todayKey = () => AN.dayKey(new Date());
+  const dayT = k => keyDate(k).getTime();
+  const fWd = k => fD(keyDate(k), { weekday: 'short', day: 'numeric', month: 'short' });
+  const numIn = s => { s = String(s == null ? '' : s).trim().replace(',', '.'); if (!/^\d+(\.\d*)?$/.test(s)) return null; const v = +s; return isFinite(v) ? v : null; };
+  const wlogOf = () => (typeof S !== 'undefined' && Array.isArray(VS().wlog) ? VS().wlog : [])
+    .filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.d) && +e.kg > 0).slice().sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+  let BD = null, justSaved = null; // body-section state; the last saved day (flashed in the list)
+
+  const bodyShell = () => hasBody() ? `<section class="anx-body" id="anxBody" aria-labelledby="anxBodyH"><div class="anx-sh"><h3 id="anxBodyH">Body &amp; energy</h3>
+      <p>Weight trend, energy use and long-term fitness markers. All numbers are estimates.</p></div><div id="anxBodyIn"></div></section>` : '';
+
+  // "nice" axis over [lo, hi] (does not start at 0)
+  function niceRange(lo, hi, n) {
+    if (!(hi > lo)) { const c = isFinite(lo) ? lo : 0; lo = c - 1; hi = c + 1; }
+    const raw = (hi - lo) / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+    const a = Math.floor(lo / step + 1e-9) * step, b = Math.ceil(hi / step - 1e-9) * step;
+    return { lo: a, hi: b > a ? b : a + step, step };
+  }
+  const stepDec = s => Math.abs(s - Math.round(s)) < 1e-9 ? 0 : Math.abs(s * 10 - Math.round(s * 10)) < 1e-9 ? 1 : 2;
+  // date ticks for a time axis: Mondays for short spans, month starts (every 1/3/6 months) for long ones
+  function timeTicks(t0, t1, pw, minPx) {
+    const days = (t1 - t0) / DAY, c = [], d0 = new Date(t0);
+    if (days <= 75) {
+      const d = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate()); d.setDate(d.getDate() + (8 - d.getDay()) % 7);
+      for (; d.getTime() <= t1; d.setDate(d.getDate() + 7)) if (d.getTime() >= t0) c.push([d.getTime(), fD(d)]);
+    } else {
+      const every = days > 1100 ? 6 : days > 500 ? 3 : 1;
+      for (let d = new Date(d0.getFullYear(), d0.getMonth() + 1, 1); d.getTime() <= t1; d = new Date(d.getFullYear(), d.getMonth() + 1, 1))
+        if (d.getMonth() % every === 0) c.push([d.getTime(), d.getMonth() ? fD(d, { month: 'short' }) : fD(d, { month: 'short', year: '2-digit' })]);
+    }
+    if (c.length < 2) return c;
+    const px = (c[1][0] - c[0][0]) / (t1 - t0) * pw, k = Math.max(1, Math.ceil(minPx / px));
+    return c.filter((x, i) => i % k === 0);
+  }
+
+  // time-series chart. T: { t0, t1, lines: [{ pts: [[t, v] | null], col, lw, dash, dots, alpha, noLine, area }], refs: [{ v, col, label, dash }],
+  //   marks: [{ t, col, label }], notes: [{ s, col, bottom }], include: [v], pad, dec, hits: [{ t, ys: [[v, col, r]] }], tip(hit, ch) }
+  function tsChart(host, T, height) {
+    return mkChart(host, {
+      height: height || (w => w < 560 ? 200 : 236),
+      draw: ch => drawTs(ch, T),
+      hover(ch, x) {
+        const g = ch.g; if (!g || !T.hits || !T.hits.length || x < g.L - 8 || x > g.L + g.pw + 8) return null;
+        const t = g.t0 + (x - g.L) / g.pw * (g.t1 - g.t0); let bi = -1, bd = Infinity;
+        T.hits.forEach((h, i) => { const d = Math.abs(h.t - t); if (d < bd) { bd = d; bi = i; } });
+        if (bi < 0) return null;
+        const h = T.hits[bi], xx = g.X(h.t), P = ch.P;
+        vline(ch.octx, xx, g.T, g.T + g.ph, rgba(P.text, .35));
+        h.ys.forEach(([v, col, r]) => { if (v != null && isFinite(v)) dot(ch.octx, xx, g.Y(v), P[col] || col, P.panel, r || 4); });
+        return T.tip(h, ch);
+      },
+    });
+  }
+  function drawTs(ch, T) {
+    const { ctx, w, h, P } = ch;
+    let lo = Infinity, hi = -Infinity;
+    const acc = v => { if (v != null && isFinite(v)) { if (v < lo) lo = v; if (v > hi) hi = v; } };
+    T.lines.forEach(l => l.pts.forEach(p => { if (p) acc(p[1]); })); (T.include || []).forEach(acc);
+    if (!isFinite(lo)) { lo = 0; hi = 1; }
+    const pad = Math.max(T.pad || 0, (hi - lo) * 0.08), ya = niceRange(lo - pad, hi + pad, ch.mob ? 4 : 5);
+    const dec = T.dec != null ? T.dec : stepDec(ya.step), ticks = [];
+    for (let k = 0; ya.lo + k * ya.step <= ya.hi + ya.step * 1e-6; k++) ticks.push(ya.lo + k * ya.step);
+    ctx.font = ch.font(10);
+    const lw = Math.max(...ticks.map(v => ctx.measureText(fx(v, dec)).width));
+    const L = Math.ceil(lw) + 12, R = 10, Tp = 14, B = 20, pw = w - L - R, ph = h - Tp - B;
+    const span = Math.max(1, T.t1 - T.t0), X = t => L + (t - T.t0) / span * pw, Y = v => Tp + ph - (v - ya.lo) / (ya.hi - ya.lo) * ph;
+    ch.g = { L, T: Tp, pw, ph, X, Y, t0: T.t0, t1: T.t1 };
+    ticks.forEach((v, k) => { hline(ctx, L, L + pw, Y(v), k ? P.line : P.line2); text(ctx, fx(v, dec), L - 6, Y(v), P.dim, 'right'); });
+    timeTicks(T.t0, T.t1, pw, ch.mob ? 46 : 58).forEach(([t, s]) => {
+      const x = X(t); vline(ctx, x, Tp, Tp + ph, rgba(P.line, .55));
+      const hw = ctx.measureText(s).width / 2; text(ctx, s, clampN(x, L + hw, L + pw - hw), h - B / 2 + 1, P.dim, 'center');
+    });
+    const colOf = c => P[c] || c;
+    (T.marks || []).forEach(m => {
+      const x = X(m.t), col = colOf(m.col); if (x < L - 1 || x > L + pw + 1) return;
+      vline(ctx, x, Tp, Tp + ph, rgba(col, .75), [3, 3]);
+      if (m.label) { ctx.font = ch.font(9.5, 750); const tw = ctx.measureText(m.label).width, lx = x - tw - 6 < L ? x + 4 : x - tw - 4;
+        ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(lx - 3, Tp + 1, tw + 6, 13); text(ctx, m.label, lx, Tp + 7.5, col, 'left'); ctx.font = ch.font(10); }
+    });
+    (T.refs || []).forEach(r => hline(ctx, L, L + pw, Y(r.v), rgba(colOf(r.col), .9), r.dash || [6, 4]));
+    ctx.save(); ctx.beginPath(); ctx.rect(L - 6, Tp - 6, pw + 12, ph + 12); ctx.clip();
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    T.lines.forEach(l => {
+      const col = colOf(l.col), segs = []; let cur = null;
+      l.pts.forEach(p => { if (!p || p[1] == null || !isFinite(p[1])) { cur = null; return; } if (!cur) segs.push(cur = []); cur.push([X(p[0]), Y(p[1])]); });
+      if (!l.noLine) {
+        if (l.area) segs.forEach(s => {
+          if (s.length < 2) return;
+          const g = ctx.createLinearGradient(0, Tp, 0, Tp + ph); g.addColorStop(0, rgba(col, .22)); g.addColorStop(1, rgba(col, .01));
+          ctx.beginPath(); ctx.moveTo(s[0][0], Tp + ph); s.forEach(q => ctx.lineTo(q[0], q[1])); ctx.lineTo(s[s.length - 1][0], Tp + ph); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+        });
+        ctx.save(); if (l.dash) ctx.setLineDash(l.dash); ctx.strokeStyle = l.alpha ? rgba(col, l.alpha) : col; ctx.lineWidth = l.lw || 2;
+        segs.forEach(s => { if (s.length < 2) return; ctx.beginPath(); s.forEach((q, k) => k ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.stroke(); });
+        ctx.restore();
+      }
+      if (l.dots) { ctx.fillStyle = l.noLine && l.alpha ? rgba(col, l.alpha) : col; segs.forEach(s => s.forEach(q => { if (!l.noLine && s.length > 1 && !l.allDots) return; ctx.beginPath(); ctx.arc(q[0], q[1], l.dots, 0, 7); ctx.fill(); })); }
+    });
+    ctx.restore();
+    ctx.font = ch.font(9.5, 750);
+    (T.refs || []).forEach(r => {
+      if (!r.label) return; const col = colOf(r.col), y = Y(r.v), tw = ctx.measureText(r.label).width, ly = y - 9 < Tp + 2 ? y + 9 : y - 9;
+      ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(L + pw - tw - 9, ly - 6.5, tw + 6, 13); text(ctx, r.label, L + pw - 6, ly, col, 'right');
+    });
+    (T.notes || []).forEach(nt => {
+      const tw = ctx.measureText(nt.s).width, y = nt.bottom ? Tp + ph - 9 : Tp + 7;
+      ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(L + pw - tw - 9, y - 6.5, tw + 6, 13); text(ctx, nt.s, L + pw - 6, y, colOf(nt.col), 'right');
+    });
+    ctx.font = ch.font(10);
+  }
+
+  function renderBody(quiet) {
+    const root = PG && PG.root, host = root && root.querySelector('#anxBodyIn'); if (!host) return;
+    const sec = host.parentNode; sec.classList.toggle('quiet', !!quiet);
+    const wlog = wlogOf(), today = todayKey(), rides = PG.rides || [];
+    const tAll = wlog.length ? bc('weightTrend', wlog, { days: Math.min(3660, Math.round((dayT(today) - dayT(wlog[0].d)) / DAY) + 1) }) : null;
+    const tr = tAll && tAll.last ? tAll : null;
+    const cur = tr ? (tr.avg7 != null ? +tr.avg7 : +tr.last.kg) : null;
+    const tgt = +VS().targetWeight > 0 ? +VS().targetWeight : null, tdKey = /^\d{4}-\d{2}-\d{2}$/.test(VS().targetDate || '') ? VS().targetDate : null;
+    const plan = tgt && tr ? bc('targetPlan', { trend: tr, targetWeight: tgt, targetDate: tdKey || '' }) : null;
+    const dir = plan ? -Math.sign(plan.remaining) : 0; // +1 = needs to gain, -1 = needs to lose
+    BD = { wlog, tr, cur, tgt, tdKey, plan, dir, today };
+    const miss = [!(VS().sex === 'f' || VS().sex === 'm') && 'sex', !(+VS().birthYear > 1900) && 'birth year', !(+VS().height > 0) && 'height'].filter(Boolean);
+    const hint = miss.length ? `<div class="anx-bhint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v6M12 7.2v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span>Add your ${miss.length > 1 ? miss.slice(0, -1).join(', ') + ' and ' + miss[miss.length - 1] : miss[0]} in Settings for BMR, daily energy and heart-rate calorie estimates.</span>
+        <button class="btn sm" type="button" data-goto="settings">Open Settings</button></div>` : '';
+    const trend = trendsData();
+    host.innerHTML = `${hint}${weightCardHTML()}
+      <div class="anx-grid2${trend ? '' : ' one'}">${energyCardHTML()}${trend ? trendsCardHTML(trend) : ''}</div>`;
+    bindSeg(host, 'wr', v => { prefs.wr = +v; savePrefs(); renderWeightChart(); });
+    bindWeightForm(host, sec);
+    renderWeightChart(); renderKcalChart();
+    if (trend) bindTrends(host, trend);
+  }
+
+  /* ---- weight ---- */
+  function weightCardHTML() {
+    const { wlog, tr, cur, tgt, tdKey, plan, dir, today } = BD;
+    const rate = tr && tr.ratePerWeek != null ? +tr.ratePerWeek : null;
+    const rateCls = rate == null || !dir || Math.abs(rate) < 0.02 ? '' : Math.sign(rate) === dir ? 'good' : 'bad';
+    const st = (k, v, u, s, cls) => `<div class="anx-ws${cls ? ' ' + cls : ''}"><span class="k">${k}</span><b class="v num">${v}${u ? `<small>${u}</small>` : ''}</b>${s ? `<span class="s">${s}</span>` : ''}</div>`;
+    const rem = plan ? +plan.remaining : tgt ? (cur != null ? cur : +VS().weight || 0) - tgt : 0, reached = !!tgt && Math.abs(rem) < 0.1;
+    const stats = [
+      tr ? st('Current', kgF(cur), 'kg', `7-day avg · last ${kgF(tr.last.kg)} ${tr.last.d === today ? 'today' : fD(keyDate(tr.last.d))}`) : st('Current', kgF(VS().weight), 'kg', 'from Settings'),
+      st('Per week', rate != null ? sgn(rate, 2) : '–', rate != null ? 'kg' : '', plan && plan.requiredPerWeek != null && !reached ? `need ${sgn(plan.requiredPerWeek, 2)} kg/wk` : rate != null ? 'trend, last 4 weeks' : 'needs weigh-ins over 5+ days', rateCls),
+      tgt ? st('To target', reached ? '0' : kgF(Math.abs(rem)), 'kg', reached ? `target ${kgF(tgt)} kg reached` : `${rem < 0 ? 'to gain' : 'to lose'} · target ${kgF(tgt)} kg`, reached ? 'good' : '')
+        : st('To target', '–', '', 'no target weight set'),
+      tgt ? st('ETA', plan && plan.etaDate ? (reached ? 'Now' : fD(keyDate(plan.etaDate), { day: 'numeric', month: 'short', year: '2-digit' })) : '–', '',
+        plan && plan.onTrack != null ? `<span class="anx-pill ${plan.onTrack ? 'good' : 'bad'}">${plan.onTrack ? 'on track' : 'behind'}</span>${tdKey ? ` <span class="dim">goal ${fD(keyDate(tdKey))}</span>` : ''}`
+          : tdKey ? `goal ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })}` : rate != null ? 'not trending toward target' : 'needs more weigh-ins')
+        : st('ETA', '–', '', 'set a target in Settings'),
+    ].join('');
+    const f0 = tr && (tr.first || wlog[0]);
+    const prog = plan && plan.pct != null && f0 ? `<div class="anx-wprog"><div class="l"><span>Progress to target</span><b class="num">${Math.round(plan.pct)}%</b></div>
+        <div class="anx-wbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(plan.pct)}" aria-label="Progress to target weight"><i style="width:${clampN(plan.pct, 0, 100).toFixed(1)}%"></i></div>
+        <div class="s num">${kgF(f0.kg)} kg on ${fD(keyDate(f0.d), { day: 'numeric', month: 'short', year: '2-digit' })} → ${kgF(tgt)} kg${tdKey ? ` by ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })}` : ''}</div></div>` : '';
+    const ex = wlog.find(e => e.d === today);
+    const recent = wlog.slice(-7).reverse();
+    const prevOf = d => { const i = wlog.findIndex(e => e.d === d); return i > 0 ? wlog[i - 1] : null; };
+    const flash = justSaved && Date.now() - justSaved.at < 4000 ? justSaved.d : null;
+    const list = recent.length ? `<div class="anx-wlh"><span>Recent weigh-ins</span><span class="dim">${wlog.length} total</span></div><ul class="anx-wlist">${recent.map(e => {
+      const p = prevOf(e.d), dd = p ? e.kg - p.kg : null, cls = dd == null || Math.abs(dd) < 0.05 ? 'dim' : dir ? (Math.sign(dd) === dir ? 'good' : 'bad') : 'dim';
+      return `<li class="${e.d === flash ? 'new' : ''}"><span class="d">${e.d === today ? 'Today' : fWd(e.d)}</span><b class="num">${kgF(e.kg)}<small>kg</small></b>
+        <span class="dd num ${cls}">${dd == null ? '' : sgn(dd, 1)}</span><span class="hr num">${+e.rhr > 0 ? `${Math.round(e.rhr)}<small>bpm</small>` : ''}</span>
+        <button type="button" class="anx-wdel" data-d="${esc(e.d)}" aria-label="Remove weigh-in of ${esc(fWd(e.d))}">×</button></li>`;
+    }).join('')}</ul>` : '<div class="anx-wlh"><span>Recent weigh-ins</span></div><p class="anx-wnone">Nothing logged yet. Weigh yourself in the morning, before eating, for the steadiest trend.</p>';
+    const canLog = typeof addWeightLog === 'function';
+    const form = canLog ? `<form class="anx-wform" novalidate><div class="anx-wft">Log weight</div>
+        <div class="anx-wfg">
+          <label class="fl"><span>Weight</span><span class="inp"><input type="text" inputmode="decimal" name="kg" autocomplete="off" value="${esc(kgF(ex ? ex.kg : VS().weight))}" aria-describedby="anxWfErr"><em>kg</em></span></label>
+          <label class="fl"><span>Resting HR <i>optional</i></span><span class="inp"><input type="text" inputmode="numeric" name="rhr" autocomplete="off" placeholder="morning" value="${ex && +ex.rhr > 0 ? Math.round(ex.rhr) : ''}"><em>bpm</em></span></label>
+          <label class="fl"><span>Date</span><input type="date" name="d" value="${today}" max="${today}"></label>
+          <button class="btn primary" type="submit">${ex ? 'Update' : 'Save'}</button>
+        </div><div class="anx-wferr" id="anxWfErr" role="alert"></div></form>` : '';
+    return `<section class="card anx-card anx-wcard"><div class="anx-ch"><div><h3>Weight</h3><p>Weigh-ins, the 7-day average${tgt ? ' and your target' : ''}.</p></div>
+        ${seg('wr', [[30, '30d'], [90, '90d'], [365, '1y'], [0, 'All']], prefs.wr)}</div>
+      <div class="anx-wgrid"><div class="anx-wmain"><div class="anx-wstats">${stats}</div>${prog}
+          <div class="anx-legend" id="anxWtLeg"></div><div class="anx-chart" id="anxWt"></div></div>
+        <div class="anx-wside">${form}<div class="anx-wlog">${list}</div></div></div></section>`;
+  }
+
+  function renderWeightChart() {
+    const root = PG && PG.root, host = root && root.querySelector('#anxWt'), leg = root && root.querySelector('#anxWtLeg'); if (!host || !BD) return;
+    const { wlog, tgt, tdKey, cur, today } = BD;
+    if (!wlog.length) { host.innerHTML = '<div class="anx-none">No weigh-ins yet: log your first one to start the trend.</div>'; leg.innerHTML = ''; return; }
+    const todayT = dayT(today), firstT = dayT(wlog[0].d);
+    const days = prefs.wr || Math.min(3660, Math.max(14, Math.round((todayT - firstT) / DAY) + 1));
+    const tr = bc('weightTrend', wlog, { days });
+    const pts = tr && Array.isArray(tr.pts) ? tr.pts.filter(p => p && /^\d{4}-\d{2}-\d{2}$/.test(p.d) && isFinite(+p.kg)) : [];
+    if (!pts.length) { host.innerHTML = `<div class="anx-none">No weigh-ins in the last ${days} days.</div>`; leg.innerHTML = ''; return; }
+    let t0 = todayT - (days - 1) * DAY, t1 = todayT;
+    if (!prefs.wr) t0 = Math.min(t0, firstT);
+    const tdT = tdKey ? dayT(tdKey) : null, marks = [], notes = [], lines = [];
+    let path = null;
+    if (tdT != null && tdT > todayT) {
+      if (tdT - todayT <= Math.max(21 * DAY, 0.75 * (t1 - t0))) {
+        t1 = tdT; marks.push({ t: tdT, col: 'goal', label: fD(keyDate(tdKey)) });
+        if (tgt && cur != null && Math.abs(cur - tgt) >= 0.1) path = [[todayT, cur], [tdT, tgt]];
+      } else notes.push({ s: `target date ${fD(keyDate(tdKey), { day: 'numeric', month: 'short', year: '2-digit' })} →`, col: 'goal', bottom: false });
+    } else if (tdT != null && tdT >= t0) marks.push({ t: tdT, col: 'goal', label: fD(keyDate(tdKey)) });
+    let lo = Infinity, hi = -Infinity; pts.forEach(p => { for (const v of [+p.kg, +p.avg7]) if (isFinite(v) && v > 0) { lo = Math.min(lo, v); hi = Math.max(hi, v); } });
+    const reach = Math.max(3, (hi - lo) * 1.5), incT = tgt != null && tgt >= lo - reach && tgt <= hi + reach;
+    if (tgt != null && !incT) notes.push({ s: `target ${kgF(tgt)} kg ${tgt < lo ? '↓' : '↑'}`, col: 'goal', bottom: tgt < lo });
+    const tp = p => dayT(p.d);
+    lines.push({ pts: pts.map(p => [tp(p), +p.kg]), col: 'wt', noLine: true, dots: pts.length > 120 ? 1.8 : 2.6, alpha: .55 });
+    lines.push({ pts: pts.map(p => p.avg7 != null && +p.avg7 > 0 ? [tp(p), +p.avg7] : null), col: 'wt', lw: 2.4, area: true, dots: 3 });
+    if (path && incT) lines.push({ pts: path, col: 'goal', lw: 1.6, dash: [2, 5], alpha: .9 });
+    const rmap = {}; wlog.forEach(e => { if (+e.rhr > 0) rmap[e.d] = Math.round(e.rhr); });
+    leg.innerHTML = `<span><i class="dot" style="background:var(--an-wt);opacity:.6"></i>Weigh-in</span><span><i style="background:var(--an-wt)"></i>7-day average</span>${tgt != null ? '<span><i class="dash" style="color:var(--an-goal)"></i>Target</span>' : ''}${path && incT ? '<span><i class="dot2" style="border-color:var(--an-goal);opacity:1"></i>Needed pace</span>' : ''}`;
+    tsChart(host, {
+      t0: t0 - 0.6 * DAY, t1: t1 + 0.6 * DAY, pad: 0.3, lines, marks, notes,
+      refs: tgt != null && incT ? [{ v: tgt, col: 'goal', label: `Target ${kgF(tgt)} kg`, dash: [6, 4] }] : [],
+      include: tgt != null && incT ? [tgt] : [],
+      hits: pts.map(p => ({ t: tp(p), p, ys: [[+p.kg, 'wt', 3], [p.avg7 != null ? +p.avg7 : null, 'wt', 4]] })),
+      tip(hh, ch) {
+        const P = ch.P, p = hh.p, a = p.avg7 != null ? +p.avg7 : null;
+        return `<div class="t">${fD(keyDate(p.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          ${trow(rgba(P.wt, .55), 'Weigh-in', `${kgF(p.kg)} kg`)}${a != null ? trow(P.wt, '7-day avg', `${kgF(a)} kg`) : ''}
+          ${rmap[p.d] ? trow(P.hr, 'Resting HR', `${rmap[p.d]} bpm`) : ''}${tgt != null && a != null ? trow(null, 'To target', Math.abs(a - tgt) < 0.1 ? 'reached' : `${kgF(Math.abs(a - tgt))} kg`) : ''}`;
+      },
+    }, w => w < 560 ? 210 : 250);
+  }
+
+  function bindWeightForm(host, sec) {
+    const refresh = () => { if (sec.isConnected && PG && PG.root.contains(sec)) renderBody(true); }; // unless the app already re-rendered the page
+    const f = host.querySelector('.anx-wform');
+    if (f) {
+      const kg = f.elements.namedItem('kg'), rhr = f.elements.namedItem('rhr'), d = f.elements.namedItem('d'), btn = f.querySelector('button[type=submit]'), err = f.querySelector('.anx-wferr');
+      const bad = (el, msg) => { [kg, rhr, d].forEach(x => x.removeAttribute('aria-invalid')); if (el) { el.setAttribute('aria-invalid', 'true'); try { el.focus(); } catch (e) { } } err.textContent = msg || ''; };
+      kg.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+        e.preventDefault(); const v = numIn(kg.value) || +VS().weight || 70; kg.value = (Math.round((v + (e.key === 'ArrowUp' ? 0.1 : -0.1)) * 10) / 10).toFixed(1);
+      });
+      d.addEventListener('change', () => {
+        const e = BD && BD.wlog.find(x => x.d === d.value);
+        if (e) { kg.value = kgF(e.kg); rhr.value = +e.rhr > 0 ? Math.round(e.rhr) : ''; }
+        btn.textContent = e ? 'Update' : 'Save'; bad(null);
+      });
+      f.addEventListener('submit', e => {
+        e.preventDefault();
+        const v = numIn(kg.value), hrS = String(rhr.value || '').trim(), h = hrS ? numIn(hrS) : null, day = d.value, today = todayKey();
+        if (v == null || v < 25 || v > 250) return bad(kg, 'Enter a weight between 25 and 250 kg.');
+        if (hrS && (h == null || h < 25 || h > 120)) return bad(rhr, 'Resting HR should be between 25 and 120 bpm, or leave it empty.');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || AN.dayKey(day) !== day || day > today) return bad(d, 'Pick a date that is not in the future.');
+        bad(null);
+        justSaved = { d: day, at: Date.now() };
+        try { if (h != null) addWeightLog(day, Math.round(v * 10) / 10, Math.round(h)); else addWeightLog(day, Math.round(v * 10) / 10); }
+        catch (er) { console.error(er); return bad(null, 'Could not save: ' + (er && er.message ? er.message : 'unknown error')); }
+        refresh();
+      });
+    }
+    const ul = host.querySelector('.anx-wlist');
+    if (ul) ul.addEventListener('click', e => {
+      const b = e.target.closest('.anx-wdel'); if (!b) return;
+      if (!b.classList.contains('arm')) { // two-step remove: first tap arms the button for 3 s
+        ul.querySelectorAll('.anx-wdel.arm').forEach(x => { x.classList.remove('arm'); x.textContent = '×'; });
+        b.classList.add('arm'); b.textContent = 'Remove'; clearTimeout(b._t);
+        b._t = setTimeout(() => { b.classList.remove('arm'); b.textContent = '×'; }, 3000); return;
+      }
+      clearTimeout(b._t);
+      if (typeof removeWeightLog === 'function') { try { removeWeightLog(b.dataset.d); } catch (er) { console.error(er); } refresh(); }
+    });
+  }
+
+  /* ---- energy ---- */
+  function energyCardHTML() {
+    const E = bc('energy', PG.rides || [], VS(), { days: 28 }) || {};
+    const bmr = E.bmr != null && +E.bmr > 0 ? +E.bmr : null, rest = bmr ? Math.round(bmr * 1.2) : null;
+    const now = new Date(), mon = AN.dayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (now.getDay() + 6) % 7));
+    const W = (Array.isArray(E.weeks) ? E.weeks : []).filter(x => x && x.wk).slice().sort((a, b) => a.wk < b.wk ? -1 : 1).slice(-5);
+    BD.kcalWeeks = W; BD.mon = mon;
+    const tw = W.find(x => x.wk === mon) || { ride: 0, n: 0 }, fat = bc('fatKg', tw.ride);
+    const et = (k, v, u, s, col) => `<div class="anx-et" style="--k:${col}"><span class="k">${k}</span><b class="num">${v}${u ? `<small>${u}</small>` : ''}</b>${s ? `<span class="s">${s}</span>` : ''}</div>`;
+    const needProfile = 'needs height &amp; birth year';
+    return `<section class="card anx-card anx-ecard"><div class="anx-ch"><div><h3>Energy</h3><p>Estimated daily energy use and calories burned on the bike.</p></div></div>
+      <div class="anx-etiles">
+        ${et('BMR', kcF(bmr), bmr ? 'kcal/day' : '', bmr ? 'at complete rest' : needProfile, 'var(--muted)')}
+        ${et('Rest day', kcF(rest), rest ? 'kcal' : '', rest ? 'BMR × 1.2, light activity' : needProfile, 'var(--an-wt)')}
+        ${et('Average day', kcF(E.avgNeed), E.avgNeed != null ? 'kcal' : '', E.avgNeed != null ? `incl. ${kcF(E.avgRidePerDay)} kcal/day riding (28 d)` : needProfile, 'var(--an-goal)')}
+        ${et('Rides this week', kcF(tw.ride), 'kcal', tw.ride > 0 && fat != null ? `≈ ${fat.toFixed(2)} kg of fat-equivalent` : `${tw.n} ride${tw.n === 1 ? '' : 's'} so far`, 'var(--an-kcal)')}
+      </div>
+      <div class="anx-zh" style="margin-top:12px">Ride calories per week <span class="dim">· this week and the 4 before</span></div>
+      <div class="anx-chart" id="anxKcal"></div>
+      <p class="anx-note">Estimates, not medical advice. Ride calories come from the work on the pedals and assume ~24&nbsp;% gross efficiency (heart-rate based, Keytel et&nbsp;al. 2005, when a ride has no power). BMR: Mifflin-St&nbsp;Jeor. Average day = BMR × 1.2 + riding. 1&nbsp;kg of body fat ≈ 7,700&nbsp;kcal.</p></section>`;
+  }
+  function renderKcalChart() {
+    const host = PG && PG.root && PG.root.querySelector('#anxKcal'); if (!host || !BD) return;
+    const W = BD.kcalWeeks || [];
+    if (!W.some(x => x.ride > 0)) { host.innerHTML = '<div class="anx-none">No rides in the last 5 weeks.</div>'; return; }
+    mkChart(host, {
+      height: w => w < 560 ? 160 : 180,
+      draw(ch) {
+        const { ctx, w, h, P } = ch, n = W.length;
+        let mx = 400; W.forEach(x => mx = Math.max(mx, +x.ride || 0));
+        const ya = niceAuto(mx * 1.12, 5);
+        ctx.font = ch.font(10);
+        const lab = v => v >= 10000 ? Math.round(v / 1000) + 'k' : String(Math.round(v));
+        const L = Math.ceil(ctx.measureText(lab(ya.top)).width) + 12, R = 6, T = 18, B = 20, pw = w - L - R, ph = h - T - B, slot = pw / n, bw = Math.max(8, Math.min(44, slot * 0.56));
+        const Y = v => T + ph - v / ya.top * ph;
+        ch.g = { L, T, ph, pw, slot, n };
+        for (let k = 0; k <= ya.n; k++) { const v = ya.step * k; hline(ctx, L, L + pw, Y(v), k ? P.line : P.line2); text(ctx, lab(v), L - 6, Y(v), P.dim, 'right'); }
+        const done = W.slice(0, -1).filter(x => x.n), avg = done.length ? done.reduce((a, x) => a + x.ride, 0) / done.length : 0;
+        W.forEach((x, i) => {
+          const cx = L + i * slot + slot / 2, x0 = cx - bw / 2, cur = x.wk === BD.mon;
+          text(ctx, cur ? 'This wk' : fD(keyDate(x.wk)), cx, h - B / 2 + 1, cur ? P.muted : P.dim, 'center');
+          if (!(x.ride > 0)) return;
+          const top = Y(x.ride), g = ctx.createLinearGradient(0, top, 0, T + ph); g.addColorStop(0, rgba(P.kcal, cur ? .62 : .95)); g.addColorStop(1, rgba(P.kcal, cur ? .25 : .45));
+          topRounded(ctx, x0, top, bw, Y(0) - top, Math.min(5, bw / 3)); ctx.fillStyle = g; ctx.fill();
+          if (cur) { ctx.save(); ctx.setLineDash([3, 3]); ctx.strokeStyle = rgba(P.text, .5); topRounded(ctx, x0 + .5, top + .5, bw - 1, Y(0) - top - 1, Math.min(5, bw / 3)); ctx.stroke(); ctx.restore(); }
+          ctx.font = ch.font(9.5, 700); text(ctx, kcF(x.ride), cx, top - 7, P.muted, 'center'); ctx.font = ch.font(10);
+        });
+        if (avg > 0) {
+          const y = Y(avg); hline(ctx, L, L + pw, y, rgba(P.text, .4), [4, 4]);
+          ctx.font = ch.font(9.5, 700); const s = `avg ${kcF(avg)}`, tw = ctx.measureText(s).width;
+          ctx.fillStyle = rgba(P.panel, .85); ctx.fillRect(L + 2, y - 15, tw + 8, 13); text(ctx, s, L + 6, y - 8.5, P.muted, 'left'); ctx.font = ch.font(10);
+        }
+      },
+      hover(ch, x) {
+        const g = ch.g; if (!g) return null;
+        const i = clampN(Math.floor((x - g.L) / g.slot), 0, g.n - 1), wk = W[i], P = ch.P;
+        ch.octx.fillStyle = rgba(P.text, .06); ch.octx.fillRect(g.L + i * g.slot, g.T - 14, g.slot, g.ph + 14);
+        const fat = bc('fatKg', wk.ride), end = new Date(keyDate(wk.wk).getTime() + 6 * DAY);
+        return `<div class="t">${fD(keyDate(wk.wk))} – ${fD(end)}${wk.wk === BD.mon ? ' <span>this week</span>' : ''}</div>
+          ${trow(P.kcal, 'Ride calories', `${kcF(wk.ride)} kcal`)}${trow(null, 'Rides', wk.n)}${wk.ride > 0 && fat != null ? trow(null, 'Fat-equivalent', `≈ ${fat.toFixed(2)} kg`) : ''}<div class="h">Estimate</div>`;
+      },
+    });
+  }
+
+  /* ---- trends: eFTP, VO2max, resting HR ---- */
+  function trendsData() {
+    const withAn = PG.withAn || [], wlog = BD.wlog;
+    const ef = withAn.length ? (bc('eftpSeries', withAn, 26) || []) : [], vo = withAn.length ? (bc('vo2Series', withAn, 26) || []) : [];
+    const rh = (bc('rhrSeries', wlog, 182) || []).filter(e => e && e.d && +e.rhr > 0);
+    const hasEf = ef.some(p => p && p.eftp != null), hasVo = vo.some(p => p && p.vo2 != null);
+    const i5 = AN.MMP_DUR.indexOf(300), p5 = withAn.length && i5 >= 0 ? AN.bestCurve(withAn, isoAgo(90), null).w[i5] : null;
+    const vNow = p5 ? bc('vo2max', p5, BD.cur || VS().weight) : null;
+    if (!withAn.length && !rh.length) return null;
+    const tabs = [];
+    if (withAn.length) tabs.push('eftp', 'vo2');
+    if (rh.length) tabs.push('rhr');
+    if (!tabs.includes(prefs.btr)) prefs.btr = tabs[0];
+    return { ef, vo, rh, hasEf, hasVo, p5, vNow, tabs };
+  }
+  function trendsCardHTML(D) {
+    const lastOf = (a, k) => { for (let i = a.length - 1; i >= 0; i--) if (a[i] && a[i][k] != null) return a[i]; return null; };
+    const firstOf = (a, k) => a.find(p => p && p[k] != null) || null;
+    const tile = (id, k, v, u, s, col) => `<button type="button" class="anx-bt${prefs.btr === id ? ' on' : ''}" data-t="${id}" aria-pressed="${prefs.btr === id}" style="--k:${col}">
+      <span class="k">${k}</span><b class="num">${v}${u ? `<small>${u}</small>` : ''}</b><span class="s">${s}</span></button>`;
+    const out = [];
+    if (D.tabs.includes('eftp')) {
+      const l = lastOf(D.ef, 'eftp'), f = firstOf(D.ef, 'eftp'), d = l && f && l !== f ? l.eftp - f.eftp : null;
+      out.push(tile('eftp', 'eFTP', l ? l.eftp : '–', l ? 'W' : '', l ? `${d != null ? `<span class="${d > 0 ? 'good' : d < 0 ? 'bad' : ''}">${sgn(d, 0)} W</span> since ${fD(keyDate(f.wk))}` : '90-day CP fit'}` : 'needs 2–20 min efforts', 'var(--an-curve)'));
+      out.push(tile('vo2', 'VO₂max', D.vNow != null ? fx(D.vNow, 1) : '–', D.vNow != null ? 'ml/kg/min' : '', D.vNow != null ? 'ACSM estimate from best 5-min power' : 'needs a 5-min effort (90 d)', 'var(--an-vo2)'));
+    }
+    if (D.tabs.includes('rhr')) {
+      const l = D.rh[D.rh.length - 1], old = D.rh.filter(e => dayT(e.d) <= dayT(l.d) - 21 * DAY).slice(-7);
+      const ref = old.length ? old.reduce((a, e) => a + e.rhr, 0) / old.length : null, d = ref != null ? l.rhr - ref : null;
+      out.push(tile('rhr', 'Resting HR', Math.round(l.rhr), 'bpm', d != null ? `<span class="${d < -0.5 ? 'good' : d > 2 ? 'bad' : ''}">${sgn(d, 0)}</span> vs 3–4 wk ago` : `logged ${l.d === BD.today ? 'today' : fD(keyDate(l.d))}`, 'var(--an-hr)'));
+    }
+    return `<section class="card anx-card anx-tcard"><div class="anx-ch"><div><h3>Trends</h3><p>Long-term markers, one point per week (rolling 90-day bests)${D.rh.length ? ', resting HR from your log' : ''}.</p></div></div>
+      <div class="anx-bts n${out.length}" role="group" aria-label="Trend to chart">${out.join('')}</div>
+      <div class="anx-legend" id="anxTrLeg"></div><div class="anx-chart" id="anxTr"></div><div class="anx-foot" id="anxTrFoot"></div></section>`;
+  }
+  function bindTrends(host, D) {
+    host.querySelectorAll('.anx-bt').forEach(b => b.addEventListener('click', () => {
+      prefs.btr = b.dataset.t; savePrefs();
+      host.querySelectorAll('.anx-bt').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+      renderTrend(host, D);
+    }));
+    renderTrend(host, D);
+  }
+  function renderTrend(host, D) {
+    const el = host.querySelector('#anxTr'), leg = host.querySelector('#anxTrLeg'), foot = host.querySelector('#anxTrFoot'); if (!el) return;
+    const k = prefs.btr, wkT = p => dayT(p.wk);
+    const range = (a, key) => { const t = a.filter(p => p[key] != null).map(wkT); return [Math.min(...t) - 3 * DAY, Math.max(...t) + 3 * DAY]; }; // from the first week with a value
+    const ftp = +VS().ftp > 0 ? +VS().ftp : null;
+    if (k === 'eftp') {
+      leg.innerHTML = `<span><i style="background:var(--an-curve)"></i>eFTP</span>${ftp ? '<span><i class="dash" style="color:var(--muted)"></i>FTP setting</span>' : ''}`;
+      foot.innerHTML = '<span class="dim">eFTP = 96 % of Critical Power, fitted to your best 2–20 min efforts of the 90 days up to each week.</span>';
+      if (!D.hasEf || !D.ef.length) { el.innerHTML = '<div class="anx-none">No eFTP yet: it needs hard 2–20 minute efforts.</div>'; return; }
+      const [t0, t1] = range(D.ef, 'eftp');
+      tsChart(el, {
+        t0, t1, pad: 5,
+        lines: [{ pts: D.ef.map(p => p.eftp != null ? [wkT(p), p.eftp] : null), col: 'curve', lw: 2.4, area: true, dots: 3 }],
+        refs: ftp ? [{ v: ftp, col: 'muted', label: `FTP ${ftp} W`, dash: [5, 4] }] : [], include: ftp ? [ftp] : [],
+        hits: D.ef.filter(p => p.eftp != null).map(p => ({ t: wkT(p), p, ys: [[p.eftp, 'curve', 4]] })),
+        tip: (hh, ch) => { const p = hh.p; return `<div class="t">Week of ${fD(keyDate(p.wk), { day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.curve, 'eFTP', `${p.eftp} W`, VS().weight > 0 ? `<em>${(p.eftp / VS().weight).toFixed(2)} W/kg</em>` : '')}${p.cp ? trow(null, 'CP', `${p.cp} W`) : ''}${p.wprime ? trow(null, 'W′', `${(p.wprime / 1000).toFixed(1)} kJ`) : ''}${ftp ? trow(null, 'vs FTP', `${sgn(p.eftp - ftp, 0)} W`) : ''}`; },
+      });
+    } else if (k === 'vo2') {
+      leg.innerHTML = '<span><i style="background:var(--an-vo2)"></i>VO₂max estimate</span>';
+      foot.innerHTML = `<span class="dim">ACSM cycling equation on the best 5-min power: 10.8 × W ÷ kg + 7 (ml/kg/min). A rough estimate that tracks your 5-min form, not a lab value.</span>${D.p5 ? `<span>Best 5 min (90 d) <b class="num">${Math.round(D.p5)} W</b></span>` : ''}`;
+      if (!D.hasVo) { el.innerHTML = '<div class="anx-none">No estimate yet: it needs a hard 5-minute effort and your weight on the ride.</div>'; return; }
+      const [t0, t1] = range(D.vo, 'vo2');
+      tsChart(el, {
+        t0, t1, pad: 1,
+        lines: [{ pts: D.vo.map(p => p.vo2 != null ? [wkT(p), p.vo2] : null), col: 'vo2', lw: 2.4, area: true, dots: 3 }],
+        hits: D.vo.filter(p => p.vo2 != null).map(p => ({ t: wkT(p), p, ys: [[p.vo2, 'vo2', 4]] })),
+        tip: (hh, ch) => `<div class="t">Week of ${fD(keyDate(hh.p.wk), { day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.vo2, 'VO₂max', `${fx(hh.p.vo2, 1)}`, '<em>ml/kg/min</em>')}<div class="h">Estimate from 90-day best 5-min power</div>`,
+      });
+    } else {
+      leg.innerHTML = '<span><i class="dot" style="background:var(--an-hr)"></i>Morning resting HR</span>';
+      foot.innerHTML = '<span class="dim">A resting HR well above your normal can mean fatigue, illness or poor sleep: consider an easy day.</span>';
+      const pts = D.rh.map(e => [dayT(e.d), +e.rhr]), t1 = dayT(BD.today), t0 = Math.min(pts[0][0], t1 - 27 * DAY);
+      tsChart(el, {
+        t0: t0 - 0.6 * DAY, t1: t1 + 0.6 * DAY, pad: 2,
+        lines: [{ pts, col: 'hr', lw: 1.8, dots: 2.6, allDots: true }],
+        refs: +VS().restHr > 0 ? [{ v: +VS().restHr, col: 'muted', label: `Settings ${Math.round(VS().restHr)} bpm`, dash: [5, 4] }] : [], include: +VS().restHr > 0 ? [+VS().restHr] : [],
+        hits: D.rh.map(e => ({ t: dayT(e.d), p: e, ys: [[+e.rhr, 'hr', 4]] })),
+        tip: (hh, ch) => `<div class="t">${fD(keyDate(hh.p.d), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>${trow(ch.P.hr, 'Resting HR', `${Math.round(hh.p.rhr)} bpm`)}`,
+      });
+    }
   }
 
   /* ======================================================================
@@ -614,9 +1040,9 @@ const ANUI = (() => {
     if (closeRide.focus && closeRide.focus.focus) { try { closeRide.focus.focus({ preventScroll: true }); } catch (e) { } }
   }
 
-  async function openRide(id) {
-    const hist = load('erglab.history', []);
-    const r = hist.find(x => x.id === id);
+  async function openRide(id, fallback) {
+    const hist = HIST();
+    const r = hist.find(x => x.id === id) || (fallback && fallback.id === id ? fallback : null); // a just-finished ride may still be saving
     if (!r) { toast('Ride not found'); return; }
     if (ov) closeRide();
     closeRide.focus = document.activeElement;
@@ -646,10 +1072,11 @@ const ANUI = (() => {
   }
 
   function renderRidePage(body, r, raw, err, hist) {
-    const ftp = +r.ftp || S.ftp, kg = +r.wt || S.weight, wp = wprimeOf();
+    const ftp = +r.ftp || VS().ftp, kg = +r.wt || VS().weight, wp = wprimeOf();
     const st = raw && Array.isArray(raw.p) && raw.p.length > 1 ? prepStreams(raw) : null;
     let an = r.an && Array.isArray(r.an.mmp) && r.an.mmp.length ? r.an : null;
-    if (!an && st) { try { an = AN.analyzeRide(st, { ftp, maxHr: S.maxHr, weight: kg, wprime: wp }); } catch (e) { console.warn('analysis', e); } }
+    // no analysis yet, an older layout, or its interval list was dropped to save space: recompute from the streams
+    if (st && (!an || an.v !== AN.VER || !Array.isArray(an.ints))) { try { an = AN.analyzeRide(st, { ftp, maxHr: VS().maxHr, weight: kg, wprime: wp }); } catch (e) { console.warn('analysis', e); } }
     const mmp = an ? an.mmp : [];
     const peak = d => { const i = AN.MMP_DUR.indexOf(d); return i >= 0 && mmp[i] != null ? mmp[i] : null; };
     const tile = (k, v, u, sub, cls) => `<div class="card anx-tile${cls ? ' ' + cls : ''}"><div class="k">${k}</div><div class="v num">${v}${u ? `<small>${u}</small>` : ''}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div>`;
@@ -664,7 +1091,8 @@ const ANUI = (() => {
       tile('Norm. power', fx(np), 'W', `${fx(np / kg, 2)} W/kg`),
       tile('Max power', fx(r.maxP), 'W'),
       tile('Intensity', fx(IF, 2), 'IF', `FTP ${ftp} W`),
-      tile('Load', fx(r.tss), 'TSS', `${fx(r.kj)} kJ ≈ kcal`),
+      tile('Load', fx(r.tss), 'TSS', `${fx(r.kj)} kJ work`),
+      kcalTile(r),
       tile('Variability', an && an.vi != null ? fx(an.vi, 2) : '–', 'VI', an && an.vi ? (an.vi <= 1.05 ? 'steady' : an.vi <= 1.15 ? 'variable' : 'very variable') : ''),
       tile('Efficiency', an && an.ef != null ? fx(an.ef, 2) : '–', 'EF', 'NP ÷ avg HR'),
       tile('Pw:HR drift', dec != null ? fx(dec, 1) : '–', dec != null ? '%' : '', dec == null ? 'needs 20 min with HR' : dec < 5 ? 'well coupled' : dec < 10 ? 'some drift' : 'strong drift', dec == null ? '' : dec < 5 ? 'good' : dec < 10 ? 'meh' : 'bad'),
@@ -687,7 +1115,7 @@ const ANUI = (() => {
     }
     if (an && an.ints && an.ints.length) html += `<section class="card anx-card"><div class="anx-ch"><div><h3>Intervals</h3><p>${st ? 'Tap a row to select it on the chart.' : 'Detected from the recording.'}</p></div></div><div class="anx-tblw" id="anxInts"></div></section>`;
     if (an) html += `<div class="anx-grid2"><section class="card anx-card"><div class="anx-ch"><div><h3>Power zones</h3><p>Time pedalling in each zone · FTP ${ftp} W</p></div></div>${zoneBars(an.tiz || [], PZ, 'p', ftp, true)}</section>
-      <section class="card anx-card"><div class="anx-ch"><div><h3>Heart-rate zones</h3><p>Max HR ${S.maxHr} bpm</p></div></div>${zoneBars(an.thz || [], HZ, 'hr', S.maxHr, true)}</section></div>
+      <section class="card anx-card"><div class="anx-ch"><div><h3>Heart-rate zones</h3><p>Max HR ${VS().maxHr} bpm</p></div></div>${zoneBars(an.thz || [], HZ, 'hr', VS().maxHr, true)}</section></div>
       <section class="card anx-card"><div class="anx-ch"><div><h3>Power curve</h3><p>This ride vs your best of the 90 days before it.</p></div></div>
         <div class="anx-legend"><span><i style="background:var(--an-curve)"></i>This ride</span><span><i class="dash" style="color:var(--an-cmp)"></i>90-day best before</span><span><i class="ring" style="color:var(--warn)"></i>All-time PB</span><span><i class="ring" style="color:var(--an-ctl)"></i>90-day PB</span></div>
         <div class="anx-chart" id="anxRc"></div><div class="anx-pbs" id="anxPbs"></div></section>`;
@@ -769,6 +1197,16 @@ const ANUI = (() => {
     D.onSel = () => renderSel(selEl, D);
     renderSel(selEl, D);
     if (D.ints.length) renderIntsTable(body, an, ftp, D);
+  }
+
+  // ride calories (BODY.rideKcal): power-based first, heart-rate based as the secondary estimate
+  function kcalTile(r) {
+    if (!hasBody()) return '';
+    const k = bc('rideKcal', r, VS()) || {};
+    const main = k.power != null ? k.power : k.hr, hrOnly = k.power == null && k.hr != null;
+    const sub = main == null ? 'needs power or heart rate' : hrOnly ? 'est. from heart rate' : k.hr != null ? `est. · HR ${kcF(k.hr)}` : 'est. from power';
+    const why = 'Estimate. Power: work on the pedals ÷ ~24 % gross efficiency. Heart rate: Keytel et al. 2005 (uses weight, age and sex from Settings).';
+    return `<div class="card anx-tile anx-kc" title="${esc(why)}"><div class="k">Calories <span>est.</span></div><div class="v num">${main != null ? kcF(main) : '–'}${main != null ? '<small>kcal</small>' : ''}</div><div class="s">${sub}</div></div>`;
   }
 
   function pvSVG(pv, ftp) {
@@ -924,7 +1362,7 @@ const ANUI = (() => {
           try { ch.oc.setPointerCapture(e.pointerId); } catch (er) { }
         } else {
           drag = { x0: x, y0: y, t0, sel: false, mouse: false };
-          drag.lp = setTimeout(() => { if (!drag) return; drag.sel = true; D.sel = [t0, t0 + 1]; D.selInt = -1; ch.wrap.classList.add('selecting'); if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { try { navigator.vibrate(12); } catch (er) { } } ch.redrawOv(); }, 420);
+          drag.lp = setTimeout(() => { if (!drag) return; drag.sel = true; D.sel = [t0, t0 + 1]; D.selInt = -1; ch.wrap.classList.add('selecting'); ch.redrawOv(); }, 420);
         }
       },
       move(ch, x, y) {
@@ -993,5 +1431,6 @@ const ANUI = (() => {
   // touch selection: stop the page from scrolling while a long-press drag selects a range
   document.addEventListener('touchmove', e => { const w = e.target && e.target.closest && e.target.closest('.anx-cv.selecting'); if (w) e.preventDefault(); }, { passive: false });
 
-  return { renderProgress: renderProgressImpl, openRide, closeRide, mkChart, durLbl };
+  // renderBody: re-render only the Body & energy section (e.g. after addWeightLog / a settings change), no entrance animation
+  return { renderProgress: renderProgressImpl, renderBody: () => renderBody(true), openRide, closeRide, mkChart, durLbl };
 })();

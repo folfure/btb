@@ -1,6 +1,7 @@
 /* =====================================================================
    THEMES + NEON GAUGES
-   Globals: THEMES, applyTheme(name), themeCad(c), makeGauge(host, o) (replaces the template's makeGauge).
+   Globals: THEMES, applyTheme(name), themeCad(c), makeGauge(host, o) (replaces the template's makeGauge),
+   plus helpers nmDecor(on) / nmLogoSvg(prefix, tagline) used by applyTheme for the neon background + logo.
    Styling lives in parts/z1-theme.css (.ng* classes); colours that change at ride time go through
    one CSS custom property (--gc on the gauge card), so set() only touches a handful of attributes.
    ===================================================================== */
@@ -33,7 +34,86 @@ function applyTheme(name) {
   t.pz.forEach((c, i) => root.style.setProperty('--z' + (i + 1), c));
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', t.meta);
+  if (document.body) nmDecor(key === 'neon');
+  else document.addEventListener('DOMContentLoaded', () => nmDecor(document.documentElement.dataset.theme === 'neon'), { once: true });
   return key;
+}
+
+// Neon-only decoration: the animated sunset layers (#nmBg) and the cyberpunk logo in every .brand.
+// Idempotent: calling it again with the same state changes nothing (the sunset does not replay);
+// switching to classic removes the layers and restores the original brand markup.
+function nmDecor(on) {
+  let bg = document.getElementById('nmBg');
+  if (on && !bg) {
+    bg = document.createElement('div');
+    bg.id = 'nmBg';
+    bg.setAttribute('aria-hidden', 'true');
+    bg.innerHTML = '<span class="nm-stage"><span class="nm-sky0"></span><span class="nm-sky1"></span>'
+      + '<span class="nm-sun"><span class="nm-halo"></span><span class="nm-disc"></span></span>'
+      + '<span class="nm-ground"></span><span class="nm-floor"><span class="nm-hl"></span></span>'
+      + '<span class="nm-haze"></span><span class="nm-glow"></span></span>'
+      + '<span class="nm-palm nm-palm-l"></span><span class="nm-palm nm-palm-r"></span><span class="nm-shade"></span>';
+    document.body.prepend(bg);
+  } else if (!on && bg) bg.remove();
+  document.querySelectorAll('.brand').forEach(el => {
+    const swapped = !!el.querySelector('svg.nm-logo');
+    if (on && !swapped) {
+      if (!nmDecor.orig.has(el)) nmDecor.orig.set(el, el.innerHTML);
+      const id = () => 'nmL' + (nmDecor.seq = (nmDecor.seq || 0) + 1) + '-';
+      // gate: big logo with tagline; header: full logo + a wordmark-only variant that CSS shows on phones
+      el.innerHTML = el.closest('.gate') ? nmLogoSvg(id(), 'gate') : nmLogoSvg(id(), 'full') + nmLogoSvg(id(), 'compact');
+    } else if (!on && swapped && nmDecor.orig.has(el)) el.innerHTML = nmDecor.orig.get(el);
+  });
+}
+nmDecor.orig = new WeakMap();
+
+// Original cyberpunk wordmark: hexagon emblem with the power-wave line + angular slanted "ERGLAB"
+// letters drawn as polygons, cyan/magenta ghost copies (chromatic aberration), scanlines and two
+// glitch slices that the CSS flashes for a few frames every ~7 s. p = unique id prefix,
+// mode = 'full' (emblem + wordmark), 'compact' (wordmark only) or 'gate' (full + tagline).
+function nmLogoSvg(p, mode) {
+  const tagline = mode === 'gate', vb = mode === 'compact' ? '40 -3 204 46' : '-2 -3 246 ' + (tagline ? 64 : 46);
+  const G = {
+    E: [0, 'M5 0H26V9H9V15.5H22V24.5H9V31H26V40H0V5Z'],
+    R: [30, 'M0 0H22L28 6V17L23 22L29 40H19.5L14.5 25H9V40H0ZM9 8V17H19V8Z'],
+    G: [63, 'M6 0H28V9H10V31H18V26H14V18H28V40H6L0 34V6Z'],
+    L: [97, 'M0 0H9V31H24V40H4L0 36Z'],
+    A: [125, 'M6 0H24L30 6V40H21V30H9V40H0V6ZM9 9V21H21V9Z'],
+    B: [159, 'M0 0H22L28 6V15L25 20L28 25V34L22 40H0ZM9 8V16H19V8ZM9 24V32H19V24Z'],
+  };
+  const sh = c => G[c][1].replace(/([MHL])([\d. ]+)/g, (m, k, a) => {
+    const n = a.trim().split(/\s+/).map(Number);
+    return k + (k === 'H' ? n.map(x => x + G[c][0]) : n.map((v, i) => i % 2 ? v : v + G[c][0])).join(' ');
+  });
+  const wave = 'M6 44h10l6-20 8 30 8-38 6 28h14', u = id => `url(#${p}${id})`;
+  const emb = `<path d="M19 0L37 9.5V30.5L19 40L1 30.5V9.5Z" fill="${u('f')}" stroke="${u('h')}" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M19 5.5L32.2 12.5V27.5L19 34.5L5.8 27.5V12.5Z" fill="none" stroke="#ff2e88" stroke-opacity=".35" stroke-width=".8"/>
+<g transform="translate(3 3) scale(.5)" fill="none" stroke-linejoin="round" stroke-linecap="round">
+<path d="${wave}" stroke="#ff2e88" stroke-opacity=".6" stroke-width="10" filter="${u('b')}"/>
+<path d="${wave}" stroke="${u('w')}" stroke-width="5"/><path d="${wave}" stroke="#fff" stroke-opacity=".55" stroke-width="1.3"/></g>`;
+  const both = (a, b = a) => `<use href="#${p}erg" ${a}/><use href="#${p}lab" ${b}/>`;
+  return `<svg class="nm-logo nm-${mode}" viewBox="${vb}" role="img" aria-label="ERGlab"><defs>
+<linearGradient id="${p}e" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffffff"/><stop offset=".44" stop-color="#ffd3ec"/><stop offset=".47" stop-color="#ff3d9a"/><stop offset=".8" stop-color="#ff6a3d"/><stop offset="1" stop-color="#ffc23f"/></linearGradient>
+<linearGradient id="${p}l" x1="0" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2ffff"/><stop offset=".44" stop-color="#9cf7ff"/><stop offset=".47" stop-color="#1fc8ff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient>
+<linearGradient id="${p}h" x1="0" y1="0" x2="38" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff2e88"/><stop offset=".5" stop-color="#b03bff"/><stop offset="1" stop-color="#22e6ff"/></linearGradient>
+<linearGradient id="${p}w" x1="6" y1="0" x2="58" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb03a"/><stop offset=".45" stop-color="#ff2e88"/><stop offset="1" stop-color="#22e6ff"/></linearGradient>
+<radialGradient id="${p}f" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#3a1272"/><stop offset="1" stop-color="#0d0424"/></radialGradient>
+<pattern id="${p}p" width="4" height="2.2" patternUnits="userSpaceOnUse"><rect width="4" height=".8" fill="#0c0520" fill-opacity=".34"/></pattern>
+<path id="${p}erg" fill-rule="evenodd" d="${sh('E') + sh('R') + sh('G')}"/>
+<path id="${p}lab" fill-rule="evenodd" d="${sh('L') + sh('A') + sh('B')}"/>
+<clipPath id="${p}c"><use href="#${p}erg" clip-rule="evenodd"/><use href="#${p}lab" clip-rule="evenodd"/></clipPath>
+<clipPath id="${p}c1"><rect x="-20" y="10" width="240" height="6"/></clipPath>
+<clipPath id="${p}c2"><rect x="-20" y="26" width="240" height="5"/></clipPath>
+<filter id="${p}b" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>
+</defs>${mode === 'compact' ? '' : '<g class="nm-emb">' + emb + '</g>'}
+
+<g transform="translate(52 0) skewX(-12)">
+<g class="nm-ga">${both('x="-1.8" fill="#22e6ff" fill-opacity=".8"')}</g>
+<g class="nm-gb">${both('x="1.8" y=".5" fill="#ff2e88" fill-opacity=".85"')}</g>
+<g class="nm-wm">${both(`fill="${u('e')}"`, `fill="${u('l')}"`)}<rect x="-10" y="0" width="210" height="40" fill="${u('p')}" clip-path="${u('c')}"/></g>
+<g class="nm-s1" clip-path="${u('c1')}">${both('fill="#ffffff"', 'fill="#8ff6ff"')}</g>
+<g class="nm-s2" clip-path="${u('c2')}">${both('fill="#22e6ff"', 'fill="#ff4fb0"')}</g></g>
+${tagline ? '<text class="nm-tag" x="46" y="57" textLength="188" lengthAdjust="spacing"><tspan>//</tspan> INDOOR POWER LAB</text>' : ''}</svg>`;
 }
 
 // Cadence colour of the active theme (same bands as the template's cadColor).

@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="neon">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a0d13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Structured indoor cycling workouts with ERG control for FTMS smart trainers (Elite Direto X and others) over Web Bluetooth.">
+<meta name="description" content="Structured indoor cycling workouts with ERG control for Bluetooth smart trainers, live gauges, training plans and ride analytics.">
 <!--__CSP__-->
 <!--__PWA__-->
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -203,7 +203,7 @@ table.segs td .sw{display:inline-block;width:10px;height:10px;border-radius:3px;
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .field .hint{font-size:12px;color:var(--dim)}
-.zones{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:4px;margin-top:10px}
 .zones div{border-radius:8px;padding:7px 6px;font-size:12px;text-align:center;color:#0a0d13;font-weight:700}
 .zones div span{display:block;font-weight:600;opacity:.85;font-size:11px}
 .pad{padding:16px}
@@ -280,6 +280,7 @@ body.riding #btBanner{display:none}
   body.riding .chartbox, body.riding .statsrow{display:none}
   body.riding .controls .btn{min-height:42px}
 }
+body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
 /*__PARTS_CSS__*/
 </style>
 </head>
@@ -301,6 +302,7 @@ body.riding #btBanner{display:none}
 
 <main>
   <div id="btBanner" class="banner hidden"></div>
+  <div id="demoBar" class="banner hidden"><b>Demo data.</b> The simulator is on, so History and Progress add a made-up rider (18 weeks of rides marked DEMO, a weight log and a body profile) to explore every feature, next to your own rides. The demo data is never saved or synced. Turn <b>Sim</b> off to hide it.</div>
 
   <!-- WORKOUTS -->
   <section class="view" id="v-workouts">
@@ -428,11 +430,23 @@ body.riding #btBanner{display:none}
       <div class="form">
         <div class="field"><label>FTP (W)</label><input type="number" id="sFtp" min="50" max="600" step="1"><span class="hint">Functional Threshold Power. Unknown? Ride the Ramp Test or 20-min test.</span></div>
         <div class="field"><label>Weight (kg)</label><input type="number" id="sWeight" min="30" max="200" step="0.1"><span class="hint" id="sWkgHint"></span></div>
-        <div class="field"><label>Max heart rate (bpm)</label><input type="number" id="sMaxHr" min="120" max="230"><span class="hint">Used for heart-rate zones.</span></div>
+        <div class="field"><label>Max heart rate (bpm)</label><input type="number" id="sMaxHr" min="120" max="230"><span class="hint" id="sMaxHrHint">Used for heart-rate zones.</span></div>
         <div class="field"><label>Resting heart rate (bpm)</label><input type="number" id="sRestHr" min="30" max="100"><span class="hint">Used by the simulator.</span></div>
         <div class="field"><label>W′ anaerobic capacity (J)</label><input type="number" id="sWprime" min="5000" max="60000" step="500"><span class="hint">For the W′ balance chart. Typical 15 000–25 000 J; Progress shows an estimate from your rides.</span></div>
       </div>
       <div class="zones" id="zoneTable"></div>
+    </div>
+    <div class="card pad" style="margin-top:12px">
+      <h3 style="margin-bottom:4px">Body profile</h3>
+      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Optional. Used for calorie, BMR and VO2max estimates and your weight goal (Progress tab). Synced to your private cloud space when signed in.</p>
+      <div class="form">
+        <div class="field"><label>Sex (for formulas)</label><select id="sSex"><option value="">Not set</option><option value="f">Female</option><option value="m">Male</option></select></div>
+        <div class="field"><label>Birth year</label><input type="number" id="sBirth" min="1900" max="2030" step="1" placeholder="e.g. 1982"><span class="hint" id="sAgeHint"></span></div>
+        <div class="field"><label>Height (cm)</label><input type="number" id="sHeight" min="100" max="250" step="1" placeholder="e.g. 168"></div>
+        <div class="field"><label>Target weight (kg)</label><input type="number" id="sTargetW" min="25" max="250" step="0.1" placeholder="optional"></div>
+        <div class="field"><label>Target date</label><input type="date" id="sTargetD"></div>
+      </div>
+      <p class="dim" style="margin:10px 0 0;font-size:12.5px">Changing your weight above also adds today's entry to the weight log. All numbers derived from these are estimates, not medical advice.</p>
     </div>
     <div class="card pad" style="margin-top:12px">
       <h3 style="margin-bottom:12px">Ride behaviour</h3>
@@ -485,12 +499,12 @@ body.riding #btBanner{display:none}
     <div class="card pad" style="margin-top:12px">
       <h3>Connection notes</h3>
       <ul class="muted" style="font-size:14px;margin:8px 0 0;padding-left:18px">
-        <li>Uses the standard Bluetooth <b>FTMS</b> (Fitness Machine Service) protocol, supported by the Elite Direto X and most current smart trainers. Heart rate comes from a separate Bluetooth strap.</li>
-        <li>Close Zwift, MyWhoosh, Elite myETraining and similar apps first. The trainer accepts only one Bluetooth controller at a time.</li>
+        <li>Uses the standard Bluetooth <b>FTMS</b> (Fitness Machine Service) protocol, supported by almost every current smart trainer (Wahoo, Tacx, Elite, Saris, JetBlack, Zwift Hub and more). Heart rate comes from a separate Bluetooth strap or from the trainer if it relays one.</li>
+        <li>Close Zwift, MyWhoosh, the trainer maker's app and similar apps first. The trainer accepts only one Bluetooth controller at a time.</li>
         <li><b>Windows, macOS, Android, ChromeOS:</b> open in Chrome or Edge.</li>
         <li><b>iPhone / iPad:</b> Apple doesn't allow Web Bluetooth in Safari or Chrome. Open this page in the free <b>Bluefy</b> browser from the App Store.</li>
         <li>Bluetooth only works on a secure page: <b>https://</b> or <b>http://localhost</b>. To share the app, host this single file on GitHub Pages, Netlify Drop, Cloudflare Pages or any https web space and send the link.</li>
-        <li>ERG tips for the Direto X: start pedalling before the first target, and use the small chainring with a middle cog so low targets stay reachable. ERG takes a few seconds to settle after big steps.</li>
+        <li>ERG tips: start pedalling before the first target, and use the small chainring with a middle cog so low targets stay reachable. ERG takes a few seconds to settle after big steps.</li>
       </ul>
       <div class="row" style="margin-top:12px"><button class="btn sm" id="sExport">Back up data</button><label class="btn sm"><input type="file" id="sImport" accept=".json" style="display:none">Restore backup</label><button class="btn sm danger" id="sReset">Reset settings</button></div>
     </div>
@@ -568,8 +582,31 @@ const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^
 /* =====================================================================
    SETTINGS & ZONES
    ===================================================================== */
-const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon' };
+const DEFAULTS = { ftp: 250, weight: 75, maxHr: 185, restHr: 55, smooth: 3, autoPause: true, sound: true, sprintGrade: 2, softStart: 5, intensity: 100, wprime: 20000, theme: 'neon', sex: '', birthYear: 0, height: 0, targetWeight: 0, targetDate: '' };
 const S = Object.assign({}, DEFAULTS, load('erglab.settings', {}));
+// weight log [{ d: 'YYYY-MM-DD', kg, rhr? }], oldest first; part of the synced settings, capped to keep the profile small
+const WLOG_MAX = 1000;
+function cleanWlog(a) {
+  const byDay = new Map();
+  for (const e of Array.isArray(a) ? a : []) {
+    if (!e || !/^\d{4}-\d{2}-\d{2}$/.test(String(e.d)) || !(+e.kg >= 25 && +e.kg <= 250)) continue;
+    const x = { d: String(e.d), kg: Math.round(+e.kg * 10) / 10 }; if (+e.rhr >= 25 && +e.rhr <= 120) x.rhr = Math.round(+e.rhr);
+    byDay.set(x.d, x);
+  }
+  return [...byDay.values()].sort((x, y) => x.d.localeCompare(y.d)).slice(-WLOG_MAX);
+}
+S.wlog = cleanWlog(S.wlog);
+const todayKey = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
+function addWeightLog(d, kg, rhr) {
+  if (DEMO.active) { toast('Demo data is shown while the simulator is on: turn Sim off to log your own weight', 5000); return false; }
+  d = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? String(d) : todayKey();
+  if (!(+kg >= 25 && +kg <= 250)) { toast('Weight must be between 25 and 250 kg'); return false; }
+  S.wlog = cleanWlog(S.wlog.filter(e => e.d !== d).concat({ d, kg: +kg, rhr: rhr === '' || rhr == null ? undefined : +rhr }));
+  const last = S.wlog[S.wlog.length - 1]; if (last) S.weight = last.kg; // the newest entry is the current weight
+  saveSettings(); afterSettings(); return true;
+}
+function removeWeightLog(d) {
+  if (DEMO.active) { toast('Demo data: turn Sim off to edit your own weight log', 4000); return; } S.wlog = S.wlog.filter(e => e.d !== d); saveSettings(); afterSettings(); }
 const saveSettings = () => { const ok = store('erglab.settings', S); if (typeof cloud !== 'undefined') cloud.schedulePush(); return ok; };
 
 const PZ = [
@@ -879,7 +916,7 @@ class Trainer {
     try {
       // must be the first await in the click handler (user-gesture requirement)
       const dev = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [UUID.FTMS] }, { namePrefix: 'DIRETO' }, { namePrefix: 'Direto' }, { namePrefix: 'Elite' }, { services: [UUID.CPS] }],
+        filters: [{ services: [UUID.FTMS] }, { services: [UUID.CPS] }],
         optionalServices: [UUID.FTMS, UUID.CPS, UUID.HRS, 'device_information', 'battery_service'],
       });
       if (this.dev && this.dev !== dev) this.disconnect();
@@ -999,7 +1036,7 @@ class Trainer {
     const op = v.getUint8(0);
     if (op === 0x01 || op === 0xff) { // reset / control permission lost → re-request and resend
       this.applied = null; this.lostCount++;
-      if (op === 0xff && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, Elite app, head unit).', 7000); return; }
+      if (op === 0xff && this.lostCount > 3) { toast('Another app keeps taking control of the trainer. Close it (Zwift, the trainer brand app, a head unit).', 7000); return; }
       if (op === 0xff) toast('Another app took control of the trainer');
       setTimeout(() => this.requestControl().then(() => { this.applied = null; applyControl(); }), 1500);
     }
@@ -1140,9 +1177,9 @@ const sim = {
     this.on = true; this.p = 0; this.hr = S.restHr + 10;
     clearInterval(this.timer);
     this.timer = setInterval(() => this.step(), 1000);
-    updateConnUI(); toast('Simulator on: the app rides itself');
+    updateConnUI(); toast('Simulator on: the app rides itself. History and Progress show demo data.', 4500); demoChanged();
   },
-  stop() { this.on = false; clearInterval(this.timer); updateConnUI(); },
+  stop() { this.on = false; clearInterval(this.timer); updateConnUI(); demoChanged(); },
   step() {
     if (trainer.connected) { this.stop(); return; }
     const running = R.state === 'running' || (R.state === 'paused' && R.autoPaused) || R.state === 'ready';
@@ -1230,7 +1267,7 @@ function softScale(w) { // gentle ramp-in after (re)start so the flywheel isn't 
 }
 function currentControl() {
   if (!R.w || R.state === 'idle' || R.state === 'done') return null;
-  // ready / paused: easy ERG load so starting from 0 rpm is possible (the Direto X struggles at zero cadence)
+  // ready / paused: easy ERG load so starting from 0 rpm is possible (magnet-brake trainers struggle at zero cadence)
   if ((R.state === 'paused' || R.state === 'ready') && ergMode()) return { kind: 'power', w: Math.round(S.ftp * (R.state === 'ready' ? 0.5 : 0.45)) };
   if (R.freeRide) return R.freeMode === 'erg' ? { kind: 'power', w: softScale(R.freeWatts) } : { kind: 'sim', grade: R.freeGrade };
   const seg = R.segs[R.idx]; if (!seg) return null;
@@ -1377,12 +1414,12 @@ function finishRide(completed) {
   if (!R.w || R.state === 'idle' || R.state === 'done') return;
   const wasStarted = R.samples.length > 10;
   R.state = 'done';
-  releaseWake(); clearCheckpoint();
+  releaseWake();
   trainer.release();
   renderRide(true);
-  if (!wasStarted) { toast('Ride too short to save'); return; }
+  if (!wasStarted) { clearCheckpoint(); toast('Ride too short to save'); return; }
   const ride = buildRideRecord(completed);
-  saveRide(ride);
+  saveRide(ride).then(clearCheckpoint, e => { console.warn('save', e); toast('Could not save the ride: ' + e.message, 8000); });
   if (R.source && R.source.plan && ride.completed) {
     const d = load('erglab.plandone', {}); (d[R.source.plan] ||= {})[R.source.key] = ride.date;
     if (!store('erglab.plandone', d)) toast('Storage full: plan progress not saved', 5000);
@@ -1399,6 +1436,7 @@ function cleanRide(r) {
   for (const k of ['dur', 'avgP', 'np', 'maxP', 'kj', 'avgHr', 'maxHr', 'avgC', 'ftp', 'dist', 'IF', 'tss']) out[k] = n(r[k]);
   if (!out.ftp) out.ftp = S.ftp;
   if (n(r.wt) > 0) out.wt = n(r.wt);
+  if (Array.isArray(r.pv)) out.pv = r.pv.slice(0, 400).map(n);
   const an = cleanAn(r.an); if (an) out.an = an;
   for (const k of SKEYS) { const a = arr(r[k]); if (a) out[k] = a; }
   if (out.p && (!out.hr || !out.c)) { out.hr = out.hr || out.p.map(() => 0); out.c = out.c || out.p.map(() => 0); }
@@ -1513,62 +1551,18 @@ window.addEventListener('pagehide', () => { if (rideInProgress()) saveCheckpoint
 /* =====================================================================
    GAUGES (SVG)
    ===================================================================== */
-const A0 = 135, SWEEP = 270;
-function polar(cx, cy, r, deg) { const a = deg * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
-function arcPath(cx, cy, r, d0, d1) {
-  const [x0, y0] = polar(cx, cy, r, d0), [x1, y1] = polar(cx, cy, r, d1);
-  return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${d1 - d0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
-}
-function makeGauge(host, o) {
-  const cx = 100, cy = 100, r = 78;
-  const ang = v => A0 + SWEEP * clamp((v - o.min) / (o.max - o.min), 0, 1);
-  let bands = '';
-  for (const b of o.bands) {
-    const a0 = ang(b.from), a1 = ang(Math.min(b.to, o.max));
-    if (a1 - a0 > 0.2) bands += `<path d="${arcPath(cx, cy, r + 13, a0 + 0.6, a1 - 0.6)}" stroke="${b.col}" stroke-width="6" fill="none" stroke-linecap="butt" opacity=".9"/>`;
-  }
-  let ticks = '';
-  (o.ticks || []).forEach(v => {
-    const [x0, y0] = polar(cx, cy, r + 9, ang(v)), [x1, y1] = polar(cx, cy, r + 17, ang(v)), [tx, ty] = polar(cx, cy, r + 27, ang(v));
-    ticks += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#0a0d13" stroke-width="2"/><text x="${tx}" y="${ty + 3}" fill="#8c96ab" font-size="8.5" text-anchor="middle" font-weight="600">${v}</text>`;
-  });
-  host.innerHTML = `<div class="gl">${o.label}</div>
-  <svg viewBox="-12 -8 224 196">
-    <path d="${arcPath(cx, cy, r, A0, A0 + SWEEP)}" stroke="#1d2433" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <path class="g-arc" d="${arcPath(cx, cy, r, A0, A0 + SWEEP)}" pathLength="1000" stroke="#555" stroke-width="16" fill="none" stroke-linecap="round" stroke-dasharray="0 1000"/>
-    ${bands}${ticks}
-    <g class="g-tgt" style="transform-origin:${cx}px ${cy}px;opacity:0"><path d="M${cx + r - 14} ${cy} L${cx + r + 20} ${cy}" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="M${cx + r + 20} ${cy - 5} L${cx + r + 27} ${cy} L${cx + r + 20} ${cy + 5}Z" fill="#fff"/></g>
-    <text class="g-val num" x="${cx}" y="${cy + 12}" text-anchor="middle" fill="#fff" font-size="46" font-weight="850" letter-spacing="-1.5">–</text>
-    <text x="${cx}" y="${cy + 34}" text-anchor="middle" fill="#8c96ab" font-size="13" font-weight="700">${o.unit}</text>
-    <text class="g-zone" x="${cx}" y="${cy + 62}" text-anchor="middle" fill="#8c96ab" font-size="13" font-weight="800" letter-spacing=".5"></text>
-  </svg><div class="gs"></div>`;
-  const arc = host.querySelector('.g-arc'), val = host.querySelector('.g-val'), zone = host.querySelector('.g-zone'), tgt = host.querySelector('.g-tgt'), sub = host.querySelector('.gs');
-  return {
-    o,
-    set(v, { target = null, color = '#888', zoneText = '', subHtml = '', dec = 0 } = {}) {
-      if (v == null || !isFinite(v)) { arc.setAttribute('stroke-dasharray', '0 1000'); val.textContent = '–'; zone.textContent = ''; }
-      else {
-        const f = clamp((v - o.min) / (o.max - o.min), 0, 1);
-        arc.setAttribute('stroke-dasharray', `${(f * 1000).toFixed(1)} 1000`); arc.setAttribute('stroke', color);
-        val.textContent = dec ? v.toFixed(dec) : Math.round(v); zone.textContent = zoneText; zone.setAttribute('fill', color);
-      }
-      if (target != null && isFinite(target)) { tgt.style.opacity = 1; tgt.style.transform = `rotate(${ang(target)}deg)`; }
-      else tgt.style.opacity = 0;
-      sub.innerHTML = subHtml;
-    },
-  };
-}
+// makeGauge(host, o) lives in parts/z2-gauges.js (themed gauges)
 let G = {};
 function buildGauges() {
   const ftp = S.ftp, maxP = Math.ceil(ftp * 1.6 / 50) * 50;
   G.power = makeGauge($('#gPower'), { label: 'Power', unit: 'watts', min: 0, max: maxP, bands: PZ.map(z => ({ from: z.lo * ftp, to: Math.min(z.hi, 9) * ftp, col: z.col })), ticks: [0, Math.round(ftp * 0.55), Math.round(ftp * 0.9), ftp, Math.round(ftp * 1.2), maxP] });
   const wk = ftp / S.weight, maxW = Math.ceil(wk * 1.6 * 2) / 2;
   G.wkg = makeGauge($('#gWkg'), { label: 'W/kg', unit: 'W/kg', min: 0, max: maxW, bands: PZ.map(z => ({ from: z.lo * wk, to: Math.min(z.hi, 9) * wk, col: z.col })), ticks: [0, +(wk * 0.75).toFixed(1), +wk.toFixed(1), maxW] });
-  G.cad = makeGauge($('#gCad'), { label: 'Cadence', unit: 'rpm', min: 0, max: 140, bands: [{ from: 0, to: 60, col: '#ff3b3b' }, { from: 60, to: 75, col: '#ff8a1f' }, { from: 75, to: 100, col: '#2fbf71' }, { from: 100, to: 115, col: '#3d8bfd' }, { from: 115, to: 140, col: '#b04dff' }], ticks: [0, 60, 90, 120, 140] });
+  G.cad = makeGauge($('#gCad'), { label: 'Cadence', unit: 'rpm', min: 0, max: 140, bands: [[0, 60], [60, 75], [75, 100], [100, 115], [115, 140]].map(([from, to]) => ({ from, to, col: cadColor((from + to) / 2) })), ticks: [0, 60, 90, 120, 140] });
   const hrMin = 40, mx = S.maxHr;
   G.hr = makeGauge($('#gHr'), { label: 'Heart rate', unit: 'bpm', min: hrMin, max: mx + 5, bands: HZ.map(z => ({ from: Math.max(hrMin, z.lo * mx), to: Math.min(z.hi, 1.03) * mx, col: z.col })), ticks: [hrMin, Math.round(mx * 0.7), Math.round(mx * 0.9), mx] });
 }
-function cadColor(c) { return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
+function cadColor(c) { if (typeof themeCad === 'function') return themeCad(c); return c < 60 ? '#ff3b3b' : c < 75 ? '#ff8a1f' : c < 100 ? '#2fbf71' : c < 115 ? '#3d8bfd' : '#b04dff'; }
 
 /* =====================================================================
    RIDE VIEW RENDERING
@@ -1801,6 +1795,7 @@ function go(id) {
   if (id === 'plans') renderPlans();
   if (id === 'history') renderHistory();
   if (id === 'progress') renderProgress();
+  $('#demoBar').classList.toggle('hidden', !(DEMO.active && (id === 'history' || id === 'progress')));
   // keep an invitation/sign-in fragment intact until the auth library has read it
   if (!/(access_token|error_description|error_code)=/.test(location.hash)) { try { history.replaceState(null, '', '#' + id); } catch { } }
   window.scrollTo({ top: 0 });
@@ -1970,6 +1965,7 @@ const sdb = {
   put(id, st) { return this.run('readwrite', s => s.put(st, id)).then(() => true, () => false); },
   del(id) { return this.run('readwrite', s => s.delete(id)).catch(() => { }); },
   clear() { return this.run('readwrite', s => s.clear()).catch(() => { }); },
+  clearExcept(ids) { return this.run('readwrite', s => { const q = s.openCursor(); q.onsuccess = () => { const c = q.result; if (c) { if (!ids.has(c.key)) c.delete(); c.continue(); } }; return q; }).catch(() => { }); },
 };
 const pickStreams = r => r && Array.isArray(r.p) && r.p.length ? Object.fromEntries(SKEYS.filter(k => Array.isArray(r[k])).map(k => [k, r[k]])) : null;
 const stripStreams = r => { SKEYS.forEach(k => delete r[k]); return r; };
@@ -1979,14 +1975,15 @@ function normStreams(st) {
   return { p: st.p.map(v => +v || 0), hr: fix(st.hr) || new Array(n).fill(0), c: fix(st.c) || new Array(n).fill(0), dd: fix(st.dd), tg: fix(st.tg) };
 }
 // second-by-second data of a ride: inline (legacy), this device's IndexedDB, or the cloud (then cached on this device)
-async function rideStreams(r) {
+async function rideStreams(r, { cache = true } = {}) {
   if (!r) throw new Error('Ride not found');
+  if (r.demo) { const d = normStreams(DEMO.streams(r.id)); if (d) return d; throw new Error('Demo ride not available'); }
   let st = normStreams(r.p ? r : null) || normStreams(await sdb.get(r.id));
   if (st) return st;
   if (cloud.user && r.cloud) {
     st = normStreams(await cloud.fetchStreams(r.id));
     if (!st) throw new Error('No per-second data stored for this ride');
-    if (await sdb.put(r.id, st)) markRide(r.id, { hs: true });
+    if (cache && await sdb.put(r.id, st)) markRide(r.id, { hs: true });
     return st;
   }
   throw new Error('Only a summary is stored for this ride');
@@ -1997,13 +1994,14 @@ function analyse(st, r) {
   if (typeof AN === 'undefined' || !st || !st.p || !st.p.length) return undefined;
   try { return AN.analyzeRide(st, { ftp: r.ftp || S.ftp, maxHr: S.maxHr, weight: r.wt || S.weight, wprime: S.wprime }); } catch (e) { console.warn('analysis', e); return undefined; }
 }
-const AN_VER = 1;
+const anVer = () => (typeof AN !== 'undefined' && AN.VER) || 2; // AN is defined later in the script: read it at run time
 // stored analyses come from this device, the cloud or backup files: keep only well-formed numbers
 function cleanAn(a) {
   if (!a || typeof a !== 'object') return undefined;
   const num = v => (v == null || v === '' || !isFinite(+v)) ? null : +v;
   const arr = (x, len) => Array.isArray(x) && (!len || x.length === len) ? x.slice(0, 64).map(num) : null;
-  const out = { v: num(a.v) || 0, mmp: arr(a.mmp) || [], tiz: arr(a.tiz, 7), thz: arr(a.thz, 5), coast: num(a.coast) };
+  if (num(a.v) !== anVer() || !Array.isArray(a.mmp) || (typeof AN !== 'undefined' && a.mmp.length !== AN.MMP_DUR.length)) return undefined; // older layout: re-analysed later
+  const out = { v: anVer(), mmp: arr(a.mmp) || [], tiz: arr(a.tiz, 7), thz: arr(a.thz, 5), coast: num(a.coast) };
   for (const k of ['np', 'avgP', 'vi', 'ef', 'dec', 'wbalMin']) out[k] = num(a[k]);
   if (Array.isArray(a.ints)) out.ints = a.ints.slice(0, 60).filter(i => i && typeof i === 'object').map(i => { const o = { k: i.k === 'work' ? 'work' : 'rec' }; for (const k of ['s', 'd', 'p', 'np', 'tgt', 'hr', 'hrMax', 'c']) o[k] = num(i[k]); return o; });
   return out;
@@ -2018,19 +2016,35 @@ async function storageJobs() {
     for (const r of load('erglab.history', [])) if (r.p && r.p.length && await sdb.put(r.id, pickStreams(r))) { r.pv = r.pv || preview(r.p); stripStreams(r); r.hs = true; moved.set(r.id, r); }
     if (moved.size) storeHistory(load('erglab.history', []).map(x => x.p && moved.has(x.id) ? moved.get(x.id) : x));
     if (typeof AN === 'undefined') return;
-    let n = 0;
+    { const h = load('erglab.history', []); let stale = 0; h.forEach(x => { if (x.an && x.an.v !== anVer()) { delete x.an; stale++; } }); if (stale) storeHistory(h); }
+    const vis = id => $('#v-' + id).classList.contains('on');
+    let batch = new Map(), n = 0;
+    const flush = async () => {
+      if (!batch.size) return;
+      const h = load('erglab.history', []), ups = [];
+      for (const x of h) { const an = batch.get(x.id); if (an) { x.an = an; if (x.cloud) ups.push(x); } }
+      storeHistory(h); batch = new Map();
+      for (const x of ups) await cloud.updateSummary(x);
+      if (!DEMO.active) { if (vis('history')) renderHistory(); if (vis('progress')) renderProgress(); }
+    };
     for (const r of load('erglab.history', [])) {
-      if ((r.an && r.an.v === AN_VER) || r.noData) continue;
+      if ((r.an && r.an.v === anVer()) || r.noData) continue;
       if (!r.p && !r.hs && !(cloud.user && r.cloud)) continue;
-      let st; try { st = await rideStreams(r); } catch { markRide(r.id, { noData: true }); continue; }
+      while (rideInProgress()) await new Promise(f => setTimeout(f, 5000)); // keep the ride smooth
+      let st; try { st = await rideStreams(r, { cache: false }); } catch { markRide(r.id, { noData: true }); continue; }
       const an = analyse(st, r); if (!an) continue;
-      const x = markRide(r.id, { an });
-      if (x && x.cloud) await cloud.updateSummary(x);
-      if (++n % 10 === 0) { renderHistory(); if ($('#v-progress').classList.contains('on')) renderProgress(); }
-      await new Promise(f => setTimeout(f, cloud.user ? 150 : 20));
+      batch.set(r.id, an); n++;
+      if (batch.size >= 15) await flush();
+      await new Promise(f => setTimeout(f, cloud.user && !r.hs && !r.p ? 150 : 10));
     }
-    if (n && $('#v-progress').classList.contains('on')) renderProgress();
+    await flush();
   } finally { storageJobsRunning = false; }
+}
+
+// calorie estimate for a ride: power-based (≈ kJ at ~24 % efficiency), HR-based (Keytel) as a fallback
+function rideKcalText(r) {
+  if (typeof BODY !== 'undefined') { try { const k = BODY.rideKcal(r, S); if (k && k.best != null) return Math.round(k.best); } catch { } }
+  return r.kj;
 }
 
 /* ---- history ---- */
@@ -2042,17 +2056,25 @@ function rideSVG(r, W = 600, H = 40) {
   d += ` L${W} ${H} Z`;
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="var(--c-mini,rgba(255,138,31,.55))" stroke="var(--c-mini-line,#ff8a1f)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="0" x2="${W}" y1="${H - r.ftp / mx * H}" y2="${H - r.ftp / mx * H}" stroke="#fff" stroke-opacity=".4" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg>`;
 }
+// the simulator switches History/Progress between the user's data and the demo rider
+function demoChanged() {
+  const on = (id => $('#v-' + id).classList.contains('on'));
+  $('#demoBar').classList.toggle('hidden', !(DEMO.active && (on('history') || on('progress'))));
+  if (on('history')) renderHistory(); if (on('progress')) renderProgress();
+  if ($('#rideAn') && typeof ANUI !== 'undefined' && ANUI.closeRide) ANUI.closeRide();
+}
 function renderHistory() {
-  const h = load('erglab.history', []);
+  const h = viewHistory();
   if (!h.length) { $('#hist').innerHTML = '<div class="empty card">No rides yet. Your finished rides will appear here.</div>'; return; }
   $('#hist').innerHTML = h.map(r => `<div class="card hist">
-      <div><b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString()}</span>
-      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ ≈ kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
+      <div>${r.demo ? '<span class="badge" style="color:var(--warn);margin-right:6px">DEMO</span>' : ''}<b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString()}</span>
+      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ · ≈<b>${rideKcalText(r)}</b> kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
+        if (r.demo) return '';
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
         if (!stv.connected || !(r.p || r.hs || r.cloud || s.upload)) return '';
-        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">Analyse</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button></div>
-      <div class="mini" data-ana="${r.p || r.hs || r.cloud ? esc(r.id) : ''}">${rideSVG(r)}</div></div>`).join('');
+        return `<button class="btn sm" data-stv="${esc(r.id)}" style="color:#fc4c02"${stvBusy.has(r.id) ? ' disabled' : ''}>${stvBusy.has(r.id) ? 'Uploading…' : s.pending ? 'Check Strava' : '↑ Strava'}</button>`; })()}${r.demo || r.p || r.hs || r.cloud ? `<button class="btn sm primary" data-ana="${esc(r.id)}">Analyse</button><button class="btn sm" data-tcx="${esc(r.id)}">TCX</button>` : '<span class="dim" style="font-size:12px">summary only</span>'}${r.demo ? '' : `<button class="btn sm danger" data-hdel="${esc(r.id)}">✕</button>`}</div>
+      <div class="mini" data-ana="${r.demo || r.p || r.hs || r.cloud ? esc(r.id) : ''}">${rideSVG(r)}</div></div>`).join('');
   $$('[data-ana]').forEach(b => { if (b.dataset.ana) { b.style.cursor = 'pointer'; b.onclick = () => openRideAnalysis(b.dataset.ana); } });
   $$('[data-tcx]').forEach(b => b.onclick = async () => { try { const r = await rideFull(h.find(x => x.id === b.dataset.tcx)); download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml'); } catch (e) { toast('Could not load ride: ' + e.message); } });
   $$('[data-stv]').forEach(b => b.onclick = () => { const r = h.find(x => x.id === b.dataset.stv); if (!r) return; b.disabled = true; b.textContent = 'Uploading…'; uploadToStrava(r, null).catch(() => { }); });
@@ -2109,13 +2131,13 @@ function summaryModal(r) {
       <div class="card stat"><div class="k">Time</div><div class="v num">${fmtTime(r.dur)}</div></div>
       <div class="card stat"><div class="k">Avg / NP</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
       <div class="card stat"><div class="k">TSS · IF</div><div class="v num">${r.tss}<small>· ${r.IF}</small></div></div>
-      <div class="card stat"><div class="k">Energy</div><div class="v num">${r.kj}<small>kJ ≈ ${r.kj} kcal</small></div></div>
+      <div class="card stat"><div class="k">Energy (est.)</div><div class="v num">${rideKcalText(r)}<small>kcal · ${r.kj} kJ</small></div></div>
       <div class="card stat"><div class="k">Max power</div><div class="v num">${r.maxP}<small>W</small></div></div>
       <div class="card stat"><div class="k">Avg HR</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
       <div class="card stat"><div class="k">Avg cadence</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>
       <div class="card stat"><div class="k">Distance</div><div class="v num">${(r.dist / 1000).toFixed(1)}<small>km</small></div></div>
     </div>${ftpHtml}
-    <div class="row" style="margin-top:14px">${stv.connected ? '<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Upload to Strava</button>' : ''}<button class="btn ${stv.connected ? '' : 'primary'}" id="sumTcx">Download TCX</button><button class="btn" id="sumClose">Close</button></div>
+    <div class="row" style="margin-top:14px">${stv.connected ? '<button class="btn" id="sumStv" style="background:#fc4c02;border-color:#fc4c02;color:#fff">Upload to Strava</button>' : ''}<button class="btn primary" id="sumAna">Analyse ride</button><button class="btn" id="sumTcx">Download TCX</button><button class="btn" id="sumClose">Close</button></div>
     <p id="sumStvStatus" class="muted" style="font-size:13.5px;margin:10px 0 0">${stv.connected ? '' : 'Tip: connect Strava in Settings to upload rides automatically.'}</p>`, true);
   const sb = $('#sumStv', m), ss = $('#sumStvStatus', m);
   if (sb) {
@@ -2132,6 +2154,7 @@ function summaryModal(r) {
   }
   $('#sumTcx', m).onclick = () => download(`${r.date.slice(0, 10)}-${slug(r.name)}.tcx`, toTCX(r), 'application/vnd.garmin.tcx+xml');
   $('#sumClose', m).onclick = closeModal;
+  $('#sumAna', m).onclick = () => { closeModal(); openRideAnalysis(r.id, r); };
   const af = $('#applyFtp', m); if (af) af.onclick = () => { S.ftp = +af.dataset.v; saveSettings(); renderSettings(); refreshLibraries(); buildGauges(); toast(`FTP set to ${S.ftp} W`); af.disabled = true; };
 }
 
@@ -2388,6 +2411,12 @@ function applySettings(o) {
   for (const k of Object.keys(DEFAULTS)) { const v = o[k]; if (typeof v === typeof DEFAULTS[k] && (typeof v !== 'number' || isFinite(v))) S[k] = v; }
   S.ftp = clamp(S.ftp, 50, 700); S.weight = clamp(S.weight, 25, 250); S.maxHr = clamp(S.maxHr, 100, 240); S.restHr = clamp(S.restHr, 25, 120);
   S.wprime = clamp(S.wprime, 5000, 60000); if (!['neon', 'classic'].includes(S.theme)) S.theme = DEFAULTS.theme;
+  if (!['', 'f', 'm'].includes(S.sex)) S.sex = '';
+  const yr = new Date().getFullYear(); if (!(S.birthYear >= 1900 && S.birthYear <= yr - 5)) S.birthYear = 0; S.birthYear = Math.round(S.birthYear);
+  if (!(S.height >= 100 && S.height <= 250)) S.height = 0;
+  if (!(S.targetWeight >= 25 && S.targetWeight <= 250)) S.targetWeight = 0;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(S.targetDate)) S.targetDate = '';
+  if (Array.isArray(o.wlog)) S.wlog = cleanWlog(o.wlog);
   if (['VirtualRide', 'Ride'].includes(o.stravaSport)) S.stravaSport = o.stravaSport;
   if (typeof o.stravaAuto === 'boolean') S.stravaAuto = o.stravaAuto;
 }
@@ -2403,18 +2432,12 @@ function cleanPlanDone(o) {
   return out;
 }
 const preview = (arr, n = 300) => { if (!arr || !arr.length) return null; const step = Math.max(1, Math.ceil(arr.length / n)); const out = []; for (let i = 0; i < arr.length; i += step) { let s = 0, k = 0; for (let j = i; j < Math.min(arr.length, i + step); j++) { s += arr[j]; k++; } out.push(Math.round(s / k)); } return out; };
-async function rideFull(r) {
-  if (!r) throw new Error('Ride not found');
-  if (r.p) return r;
-  if (!cloud.user) throw new Error('Only a summary is stored for this ride');
-  const st = await cloud.fetchStreams(r.id);
-  if (!st || !Array.isArray(st.p)) throw new Error('No per-second data stored for this ride');
-  return { ...r, p: st.p, hr: st.hr || st.p.map(() => 0), c: st.c || st.p.map(() => 0), dd: st.dd };
-}
-function wipeLocal(all = false) {
+// ids of rides kept aside (with their streams in IndexedDB) for an account that isn't signed in right now
+function pendingIds() { const ids = new Set(); try { Object.keys(localStorage).filter(k => k.startsWith('erglab.pending.')).forEach(k => load(k, []).forEach(r => r && ids.add(r.id))); } catch { } return ids; }
+function wipeLocal(all = false, keepIds = null) {
   const keys = USER_KEYS.concat('erglab.profileDirty', all ? ['erglab.lastUser'] : []);
   keys.forEach(k => { try { localStorage.removeItem(k); } catch { } });
-  sdb.clear();
+  return keepIds && keepIds.size ? sdb.clearExcept(keepIds) : sdb.clear();
   if (all) { try { Object.keys(localStorage).filter(k => k.startsWith('erglab-auth') || /^sb-.*-auth-token/.test(k)).forEach(k => localStorage.removeItem(k)); } catch { } }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloud.user && cloud.pushT) { clearTimeout(cloud.pushT); cloud.pushProfile(); } });
@@ -2439,7 +2462,12 @@ const cloud = {
       const fromLink = frag.has('access_token') || !!linkErr;
       this.sb = window.supabase.createClient(CLOUD.url, CLOUD.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'erglab-auth' } });
       this.sb.auth.onAuthStateChange((ev, session) => {
-        if (ev === 'SIGNED_OUT' && this.user && !this._leaving) { this._leaving = true; wipeLocal(); sdb.clear().finally(() => location.replace(location.pathname)); return; }
+        if (ev === 'SIGNED_OUT' && this.user && !this._leaving) {
+          this._leaving = true;
+          const uns = load('erglab.history', []).filter(r => !r.cloud && (!r.owner || r.owner === this.user.id));
+          if (uns.length) store('erglab.pending.' + this.user.id, uns.concat(load('erglab.pending.' + this.user.id, []).filter(x => !uns.some(u => u.id === x.id))));
+          Promise.resolve(wipeLocal(false, pendingIds())).finally(() => location.replace(location.pathname)); return;
+        }
         if (session && session.user) this.user = session.user;
       });
       const { data } = await this.sb.auth.getSession();
@@ -2455,11 +2483,10 @@ const cloud = {
     if (last && last !== this.user.id) {
       // another account used this device: keep its not-yet-uploaded rides aside for that account, then start clean
       const keep = unsynced.filter(r => !r.owner || r.owner === last);
-      for (const r of keep) if (!r.p) Object.assign(r, (await sdb.get(r.id)) || {}); // their streams travel with them
-      if (keep.length) store('erglab.pending.' + last, keep);
-      wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
+      if (keep.length && !store('erglab.pending.' + last, keep.concat(load('erglab.pending.' + last, []).filter(x => !keep.some(k => k.id === x.id))))) toast('Storage full: some rides of the previous account could not be kept', 6000);
+      wipeLocal(false, pendingIds()); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
     } else if (!last && (localRides.length || CUSTOM.length) && !confirm(`This device has ${localRides.length} ride(s) and ${CUSTOM.length} custom workout(s) from before you signed in. Add them to ${this.user.email}?`)) {
-      wipeLocal(); Object.assign(S, DEFAULTS); CUSTOM = [];
+      wipeLocal(); Object.assign(S, DEFAULTS); S.wlog = []; CUSTOM = [];
     }
     store('erglab.lastUser', this.user.id);
     gate(null);
@@ -2483,13 +2510,12 @@ const cloud = {
     this._leaving = true;
     if (this.pushT) { clearTimeout(this.pushT); await this.pushProfile().catch(() => { }); }
     try { const { error } = await this.sb.auth.signOut(); if (error) await this.sb.auth.signOut({ scope: 'local' }); } catch { try { await this.sb.auth.signOut({ scope: 'local' }); } catch { } }
-    wipeLocal(true); // nothing personal stays on this device
-    await sdb.clear();
+    await wipeLocal(true); // nothing personal stays on this device
     location.replace(location.pathname);
   },
   async session() { const { data } = await this.sb.auth.getSession(); if (!data || !data.session) throw new Error('Signed out'); return data.session; },
   profile() {
-    const settings = {}; for (const k of Object.keys(DEFAULTS)) settings[k] = S[k];
+    const settings = {}; for (const k of Object.keys(DEFAULTS)) settings[k] = S[k]; settings.wlog = S.wlog;
     if (S.stravaSport) settings.stravaSport = S.stravaSport; if (typeof S.stravaAuto === 'boolean') settings.stravaAuto = S.stravaAuto;
     return { user_id: this.user.id, settings, custom_workouts: CUSTOM, plan_progress: cleanPlanDone(load('erglab.plandone', {})) };
   },
@@ -2557,7 +2583,12 @@ const cloud = {
     // left in byId: rides the server doesn't have. Never-synced ones (of this account) are uploaded;
     // ones that were already synced were deleted on another device, so they are dropped here too.
     const unsynced = [...byId.values()].filter(r => !r.cloud && (!r.owner || r.owner === uid));
-    for (const r of unsynced) { r.owner = uid; if (await this.pushRide(r)) r.cloud = true; merged.push(r); }
+    for (const r of unsynced) {
+      r.owner = uid;
+      const st = r.p ? null : await sdb.get(r.id); // streams live in IndexedDB: send them too
+      if (st || r.p || !r.hs) { if (await this.pushRide(st ? { ...r, ...st } : r)) r.cloud = true; }
+      merged.push(r);
+    }
     try { localStorage.removeItem('erglab.pending.' + uid); } catch { }
     merged.sort((a, b) => b.date.localeCompare(a.date));
     store('erglab.stravaIds', marks);
@@ -2619,6 +2650,10 @@ function bindCloud() {
 /* ---- settings ---- */
 function renderSettings() {
   $('#sFtp').value = S.ftp; $('#sWeight').value = S.weight; $('#sMaxHr').value = S.maxHr; $('#sRestHr').value = S.restHr; $('#sWprime').value = S.wprime; $('#sTheme').value = S.theme;
+  $('#sSex').value = S.sex; $('#sBirth').value = S.birthYear || ''; $('#sHeight').value = S.height || ''; $('#sTargetW').value = S.targetWeight || ''; $('#sTargetD').value = S.targetDate || '';
+  const age = S.birthYear ? new Date().getFullYear() - S.birthYear : 0;
+  $('#sAgeHint').textContent = age ? `Age ${age}` : '';
+  $('#sMaxHrHint').textContent = age ? `Used for heart-rate zones. Age-based estimate: ${Math.round(208 - 0.7 * age)} bpm (Tanaka); a measured max is better.` : 'Used for heart-rate zones.';
   $('#sSmooth').value = S.smooth; $('#sAutoPause').value = S.autoPause ? '1' : '0'; $('#sSound').value = S.sound ? '1' : '0';
   $('#sSprintGrade').value = S.sprintGrade; $('#sSoftStart').value = S.softStart;
   $('#sWkgHint').textContent = `FTP = ${(S.ftp / S.weight).toFixed(2)} W/kg`;
@@ -2629,10 +2664,17 @@ function bindSettings() {
   num('#sFtp', 'ftp', 50, 700); num('#sWeight', 'weight', 25, 250); num('#sMaxHr', 'maxHr', 100, 240); num('#sRestHr', 'restHr', 25, 120);
   num('#sSprintGrade', 'sprintGrade', 0, 15); num('#sSoftStart', 'softStart', 0, 60); num('#sWprime', 'wprime', 5000, 60000);
   $('#sTheme').onchange = e => { S.theme = e.target.value; saveSettings(); afterSettings(); renderHistory(); };
+  $('#sWeight').addEventListener('change', () => { if (+$('#sWeight').value === S.weight) { const t = todayKey(), e = S.wlog.find(x => x.d === t); if (!e || e.kg !== S.weight) addWeightLog(t, S.weight, e && e.rhr); } });
+  const opt = (id, key, ok, conv = v => v) => $(id).addEventListener('change', e => { const v = conv(e.target.value); if (ok(v)) { S[key] = v; saveSettings(); afterSettings(); } else renderSettings(); });
+  opt('#sSex', 'sex', v => ['', 'f', 'm'].includes(v));
+  opt('#sBirth', 'birthYear', v => v === 0 || (v >= 1900 && v <= new Date().getFullYear() - 5), v => Math.round(+v || 0));
+  opt('#sHeight', 'height', v => v === 0 || (v >= 100 && v <= 250), v => Math.round(+v || 0));
+  opt('#sTargetW', 'targetWeight', v => v === 0 || (v >= 25 && v <= 250), v => Math.round((+v || 0) * 10) / 10);
+  opt('#sTargetD', 'targetDate', v => v === '' || /^\d{4}-\d{2}-\d{2}$/.test(v));
   $('#sSmooth').onchange = e => { S.smooth = +e.target.value; saveSettings(); };
   $('#sAutoPause').onchange = e => { S.autoPause = e.target.value === '1'; saveSettings(); };
   $('#sSound').onchange = e => { S.sound = e.target.value === '1'; saveSettings(); };
-  $('#sReset').onclick = () => { if (confirm('Reset rider settings to defaults?')) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
+  $('#sReset').onclick = () => { if (confirm('Reset rider settings to defaults? (Your weight log is kept.)')) { Object.assign(S, DEFAULTS); saveSettings(); afterSettings(); } };
   $('#sExport').onclick = async () => {
     const history = [];
     for (const r of load('erglab.history', [])) { const st = r.p ? null : await sdb.get(r.id); const { hs, noData, ...x } = r; history.push(st ? { ...x, ...st } : x); }
@@ -2647,8 +2689,10 @@ function bindSettings() {
       if (Array.isArray(j.history)) {
         const hs = j.history.map(cleanRide).filter(Boolean);
         await sdb.clear();
-        for (const r of hs) { cloud.pushRide(r); const st = pickStreams(r); if (st && await sdb.put(r.id, st)) { r.pv = preview(st.p); stripStreams(r); r.hs = true; } }
-        storeHistory(hs); setTimeout(storageJobs, 300);
+        const ups = [];
+        for (const r of hs) { const st = pickStreams(r); if (st || r.pv) ups.push(cloud.pushRide({ ...r }).then(ok => ok && r.id)); if (st && await sdb.put(r.id, st)) { r.pv = preview(st.p); stripStreams(r); r.hs = true; } }
+        storeHistory(hs);
+        Promise.all(ups).then(ids => { const ok = new Set(ids.filter(Boolean)); if (ok.size) { const h = load('erglab.history', []); h.forEach(x => { if (ok.has(x.id)) x.cloud = true; }); storeHistory(h); } setTimeout(storageJobs, 300); });
       }
       if (j.plandone && typeof j.plandone === 'object') { store('erglab.plandone', cleanPlanDone(j.plandone)); cloud.schedulePush(); }
       afterSettings(); renderHistory(); toast('Backup restored');
