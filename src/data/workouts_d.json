@@ -1,0 +1,104 @@
+[
+ {
+  "id": "d-hiit-lunch-30",
+  "name": "Lunch-Break HIIT 30",
+  "cat": "VO2max",
+  "desc": "Thirty minutes that count: 8 x 30 seconds hard at 120% FTP with 90 seconds easy spinning. Short, time-efficient intervals raise fitness and calorie burn without long hours. Spin a light gear at 95+ rpm on the hard parts.",
+  "src": "Short-interval HIIT for time-crunched riders (Gibala-style low-volume HIIT)",
+  "seg": [
+   {"t": "r", "d": 360, "p0": 0.45, "p1": 0.65, "lbl": "Warm-up"},
+   {"t": "s", "d": 60, "p": 0.75, "c": 95, "lbl": "Build"},
+   {"t": "x", "n": 8, "s": [
+    {"t": "s", "d": 30, "p": 1.2, "c": 100, "lbl": "Hard"},
+    {"t": "s", "d": 90, "p": 0.5, "c": 85, "lbl": "Easy spin"}
+   ]},
+   {"t": "r", "d": 420, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ },
+ {
+  "id": "d-hiit-lunch-40",
+  "name": "Lunch-Break HIIT 40",
+  "cat": "VO2max",
+  "desc": "The step up from HIIT 30: 10 x 40 seconds at 115% FTP with 80 seconds easy. Keep each effort smooth and seated; the last three should feel hard but doable.",
+  "src": "Short-interval HIIT for time-crunched riders",
+  "seg": [
+   {"t": "r", "d": 480, "p0": 0.45, "p1": 0.65, "lbl": "Warm-up"},
+   {"t": "s", "d": 60, "p": 0.75, "c": 95, "lbl": "Build"},
+   {"t": "x", "n": 10, "s": [
+    {"t": "s", "d": 40, "p": 1.15, "c": 100, "lbl": "Hard"},
+    {"t": "s", "d": 80, "p": 0.5, "c": 85, "lbl": "Easy spin"}
+   ]},
+   {"t": "r", "d": 420, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ },
+ {
+  "id": "d-z2-tempo-touches-60",
+  "name": "Zone 2 with Tempo Touches",
+  "cat": "Endurance",
+  "desc": "An hour of steady Zone 2 (the fat-burning, conversational pace) with three 6-minute tempo blocks to keep it interesting and lift the energy cost a little. You should be able to talk in short sentences during the tempo parts.",
+  "src": "Endurance base with tempo inserts",
+  "seg": [
+   {"t": "r", "d": 600, "p0": 0.45, "p1": 0.65, "lbl": "Warm-up"},
+   {"t": "s", "d": 600, "p": 0.66, "c": 88, "lbl": "Zone 2"},
+   {"t": "x", "n": 3, "s": [
+    {"t": "s", "d": 360, "p": 0.82, "c": 90, "lbl": "Tempo touch"},
+    {"t": "s", "d": 420, "p": 0.65, "c": 88, "lbl": "Zone 2"}
+   ]},
+   {"t": "r", "d": 300, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ },
+ {
+  "id": "d-sweet-spot-pyramid-50",
+  "name": "Sweet Spot Pyramid 50",
+  "cat": "Sweet Spot",
+  "desc": "2-3-4-3-2 minutes at 88-92% FTP with 2 minutes easy between: a compact sweet-spot session that builds the engine and burns plenty of energy in under an hour.",
+  "src": "Sweet-spot pyramid",
+  "seg": [
+   {"t": "r", "d": 540, "p0": 0.45, "p1": 0.68, "lbl": "Warm-up"},
+   {"t": "s", "d": 120, "p": 0.88, "c": 90, "lbl": "Sweet spot 2'"},
+   {"t": "s", "d": 120, "p": 0.55, "lbl": "Easy"},
+   {"t": "s", "d": 180, "p": 0.9, "c": 90, "lbl": "Sweet spot 3'"},
+   {"t": "s", "d": 120, "p": 0.55, "lbl": "Easy"},
+   {"t": "s", "d": 240, "p": 0.92, "c": 90, "lbl": "Sweet spot 4'"},
+   {"t": "s", "d": 120, "p": 0.55, "lbl": "Easy"},
+   {"t": "s", "d": 180, "p": 0.9, "c": 90, "lbl": "Sweet spot 3'"},
+   {"t": "s", "d": 120, "p": 0.55, "lbl": "Easy"},
+   {"t": "s", "d": 120, "p": 0.88, "c": 92, "lbl": "Sweet spot 2'"},
+   {"t": "s", "d": 600, "p": 0.62, "lbl": "Zone 2"},
+   {"t": "r", "d": 300, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ },
+ {
+  "id": "d-4x4-intro",
+  "name": "Intro 4x4 (105%)",
+  "cat": "VO2max",
+  "desc": "A gentle first taste of the classic 4x4: four 4-minute efforts at 105% FTP with 3 minutes easy. Hard breathing by the end of each rep, but controlled. One of the most effective sessions for fitness and metabolic health.",
+  "src": "Norwegian 4x4 (Helgerud et al.), introductory intensity",
+  "seg": [
+   {"t": "r", "d": 600, "p0": 0.45, "p1": 0.68, "lbl": "Warm-up"},
+   {"t": "s", "d": 60, "p": 0.85, "c": 95, "lbl": "Opener"},
+   {"t": "s", "d": 120, "p": 0.55, "lbl": "Easy"},
+   {"t": "x", "n": 4, "s": [
+    {"t": "s", "d": 240, "p": 1.05, "c": 95, "lbl": "4x4 effort"},
+    {"t": "s", "d": 180, "p": 0.5, "lbl": "Easy spin"}
+   ]},
+   {"t": "r", "d": 420, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ },
+ {
+  "id": "d-long-z2-100",
+  "name": "Weekend Zone 2 (100 min)",
+  "cat": "Endurance",
+  "desc": "The weekly long ride: 100 minutes of easy Zone 2 with short cadence variations so the time passes. Long, easy rides are where most of the fat-burning adaptations happen. Bring a podcast and a bottle.",
+  "src": "Long steady distance, indoor",
+  "seg": [
+   {"t": "r", "d": 600, "p0": 0.45, "p1": 0.64, "lbl": "Warm-up"},
+   {"t": "x", "n": 4, "s": [
+    {"t": "s", "d": 960, "p": 0.66, "c": 88, "lbl": "Zone 2"},
+    {"t": "s", "d": 120, "p": 0.62, "c": 102, "lbl": "Quick legs 100+ rpm"},
+    {"t": "s", "d": 120, "p": 0.66, "c": 85, "lbl": "Zone 2"}
+   ]},
+   {"t": "r", "d": 480, "p0": 0.6, "p1": 0.4, "lbl": "Cool-down"}
+  ]
+ }
+]

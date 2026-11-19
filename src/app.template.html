@@ -386,7 +386,7 @@ body.riding #btBanner{display:none}
         <div class="card stat"><div class="k">Avg power</div><div class="v num" id="sAvg">–<small>W</small></div></div>
         <div class="card stat"><div class="k">Norm. power</div><div class="v num" id="sNp">–<small>W</small></div></div>
         <div class="card stat"><div class="k">TSS · IF</div><div class="v num" id="sTss">–</div></div>
-        <div class="card stat"><div class="k">Work</div><div class="v num" id="sKj">–<small>kJ</small></div></div>
+        <div class="card stat"><div class="k">Work ≈ kcal</div><div class="v num" id="sKj">–<small>kJ</small></div></div>
         <div class="card stat"><div class="k">Interval avg</div><div class="v num" id="sIavg">–<small>W</small></div></div>
         <div class="card stat"><div class="k">Avg HR</div><div class="v num" id="sHr">–<small>bpm</small></div></div>
         <div class="card stat"><div class="k">Avg cadence</div><div class="v num" id="sCad">–<small>rpm</small></div></div>
@@ -1927,7 +1927,7 @@ function renderHistory() {
   if (!h.length) { $('#hist').innerHTML = '<div class="empty card">No rides yet. Your finished rides will appear here.</div>'; return; }
   $('#hist').innerHTML = h.map(r => `<div class="card hist">
       <div><b>${esc(r.name)}</b> <span class="dim" style="font-size:13px">${new Date(r.date).toLocaleString()}</span>
-      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
+      <div class="kv num" style="margin-top:3px"><span><b>${fmtTime(r.dur)}</b></span><span>avg <b>${r.avgP} W</b></span><span>NP <b>${r.np} W</b></span><span>TSS <b>${r.tss}</b></span><span>IF <b>${r.IF}</b></span><span><b>${r.kj}</b> kJ ≈ kcal</span>${r.avgHr ? `<span>HR <b>${r.avgHr}</b></span>` : ''}${r.avgC ? `<span>cad <b>${r.avgC}</b></span>` : ''}<span><b>${(r.dist / 1000).toFixed(1)}</b> km</span></div></div>
       <div class="row">${(() => { const s = stvOf(r) || {};
         if (s.id) return `<a class="btn sm" href="${stvLink(s.id)}" target="_blank" rel="noopener" style="color:#fc4c02;text-decoration:none">Strava ✓</a>`;
         if (!stv.connected || !(r.p || r.cloud || s.upload)) return '';
@@ -1988,7 +1988,7 @@ function summaryModal(r) {
       <div class="card stat"><div class="k">Time</div><div class="v num">${fmtTime(r.dur)}</div></div>
       <div class="card stat"><div class="k">Avg / NP</div><div class="v num">${r.avgP}<small>/ ${r.np} W</small></div></div>
       <div class="card stat"><div class="k">TSS · IF</div><div class="v num">${r.tss}<small>· ${r.IF}</small></div></div>
-      <div class="card stat"><div class="k">Work</div><div class="v num">${r.kj}<small>kJ</small></div></div>
+      <div class="card stat"><div class="k">Energy</div><div class="v num">${r.kj}<small>kJ ≈ ${r.kj} kcal</small></div></div>
       <div class="card stat"><div class="k">Max power</div><div class="v num">${r.maxP}<small>W</small></div></div>
       <div class="card stat"><div class="k">Avg HR</div><div class="v num">${r.avgHr || '–'}<small>bpm</small></div></div>
       <div class="card stat"><div class="k">Avg cadence</div><div class="v num">${r.avgC || '–'}<small>rpm</small></div></div>

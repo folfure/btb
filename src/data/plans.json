@@ -1,5 +1,121 @@
 [
  {
+  "id": "lean-fit-12wk",
+  "name": "Lean & Fit: 12-Week Fat Loss",
+  "level": "Beginner",
+  "goal": "Lose fat, gain fitness",
+  "desc": "Four rides a week (three in easy weeks): one short interval session, one tempo/sweet-spot ride and two easy Zone 2 rides, with the hard days separated. Volume grows from about 3 to 5 hours per week with a lighter week every fourth week, and ramp tests in weeks 1, 5 and 12 keep the intensities right as you get fitter. Fat (including belly fat) comes off the whole body, not one spot: pair the rides with a modest calorie deficit, enough protein, fewer sugary drinks and snacks, good sleep and, ideally, two short strength sessions a week. Aim for about 0.3-0.5 kg per week. Ride the sessions in order and leave a rest or easy day between hard sessions.",
+  "src": "Polarized-leaning base (mostly Zone 2) + low-volume HIIT; 3:1 load/recovery",
+  "weeks": [
+   {
+    "focus": "Find your level",
+    "days": [
+     "b-test-ramp",
+     "a-endurance-45",
+     "c-tempo-intro-45",
+     "a-endurance-60"
+    ]
+   },
+   {
+    "focus": "Get rolling",
+    "days": [
+     "d-hiit-lunch-30",
+     "a-endurance-60",
+     "c-tempo-intro-45",
+     "a-endurance-progressive-75"
+    ]
+   },
+   {
+    "focus": "Build the habit",
+    "days": [
+     "d-hiit-lunch-30",
+     "a-endurance-60",
+     "c-sweet-spot-intro-45",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Easy week",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-45",
+     "d-hiit-lunch-30"
+    ]
+   },
+   {
+    "focus": "Re-test & build",
+    "days": [
+     "b-test-ramp",
+     "a-endurance-60",
+     "d-z2-tempo-touches-60",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "More engine",
+    "days": [
+     "d-hiit-lunch-40",
+     "a-endurance-60",
+     "d-sweet-spot-pyramid-50",
+     "a-endurance-90"
+    ]
+   },
+   {
+    "focus": "Longer weekend",
+    "days": [
+     "b-vo2-30-30-intro",
+     "a-endurance-60",
+     "a-sweet-spot-4x8",
+     "d-long-z2-100"
+    ]
+   },
+   {
+    "focus": "Easy week",
+    "days": [
+     "a-recovery-spin-45",
+     "a-endurance-60",
+     "d-hiit-lunch-30"
+    ]
+   },
+   {
+    "focus": "Strong block 1",
+    "days": [
+     "d-4x4-intro",
+     "a-endurance-60",
+     "d-z2-tempo-touches-60",
+     "d-long-z2-100"
+    ]
+   },
+   {
+    "focus": "Strong block 2",
+    "days": [
+     "d-hiit-lunch-40",
+     "a-endurance-60",
+     "a-sweet-spot-3x10",
+     "d-long-z2-100"
+    ]
+   },
+   {
+    "focus": "Peak week",
+    "days": [
+     "d-4x4-intro",
+     "a-endurance-60",
+     "d-sweet-spot-pyramid-50",
+     "a-endurance-120"
+    ]
+   },
+   {
+    "focus": "Easy week + final test",
+    "days": [
+     "a-recovery-spin-30",
+     "a-endurance-45",
+     "b-test-ramp",
+     "a-endurance-60"
+    ]
+   }
+  ]
+ },
+ {
   "id": "ftp-builder-6wk",
   "name": "FTP Builder",
   "level": "Intermediate",
