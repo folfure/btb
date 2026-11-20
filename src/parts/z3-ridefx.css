@@ -7,12 +7,12 @@
 /* cadence: a small dial in the corner of the power gauge, the target mark (90 rpm) standing straight up */
 .ride .gmain .gcad{position:absolute;right:8px;bottom:8px;width:84px;width:clamp(58px,min(21cqw,40cqh),136px);z-index:2;pointer-events:none}
 .ride .gmain.nocad .gcad{display:none}
-.ride .gmain .gcad svg{display:block;flex:none;width:100%;height:auto;max-width:none}
+.ride .gmain .gcad svg{display:block;flex:none;width:100%;height:auto;max-width:none;overflow:visible}
 .gcad .gc-tr{fill:none;stroke:rgba(255,255,255,.13);stroke-width:7;stroke-linecap:round}
 .gcad .gc-v{fill:none;stroke:var(--cc,#555);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .4s ease,stroke .3s;filter:drop-shadow(0 0 3px var(--cc,#555))}
 .gcad .gc-tg{transition:transform .4s ease}
 .gcad .gc-tg path{stroke:#fff;stroke-width:2.8;stroke-linecap:round;filter:drop-shadow(0 0 2px #000)}
-.gcad .gc-tg text{fill:var(--muted);font-size:10px;font-weight:800}
+.gcad .gc-tt{fill:var(--muted);font-size:10px;font-weight:800} /* the target label stays upright, outside the rotating mark */
 .gcad .gc-n{fill:var(--cc,#fff);font-size:25px;font-weight:850}
 .gcad .gc-u{fill:var(--muted);font-size:9.5px;font-weight:700;letter-spacing:.08em}
 /* narrow or square gauge card: the power dial shrinks a little and leaves the bottom-right corner to the cadence dial */

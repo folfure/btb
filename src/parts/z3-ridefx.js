@@ -128,6 +128,48 @@ function rfxFrame(now) {
   else { cx.clearRect(0, 0, box.width, box.height); if (gp && RFX.shook) { gp.style.transform = ''; RFX.shook = false; } }
 }
 
+// ---------- the Neon Miami background speeds up with the power ----------
+// While a ride runs, the grid floor rushes towards you faster the harder you push (0.35× coasting, ~2.75× at FTP,
+// up to 6× at sprint power) and the palms sway and the horizon glow pulses a little faster too. Outside a ride
+// everything runs at its normal speed. Only playbackRate changes, so the scene keeps its place (no jump) and stays
+// on the GPU. With the switch off (Customize, per layout) the ride screen keeps the old battery saver: the scene
+// stands still (body.riding:not(.bgmove) pauses it). Called from tick() every 250 ms; reduced motion has no
+// animations, so this does nothing then.
+const RBG = { bg: null, anims: [], rate: 1, applied: 1, scanned: 0 };
+const RBG_ANIMS = { 'nm-grid': 1, 'nm-sway': 0.5, 'nm-pulse': 0.5, 'nm-shimmer': 0.5 }; // name → how strongly it follows (exponent)
+function rideBgTarget(on) {
+  if (!R.w || !on || (R.state !== 'running' && R.state !== 'paused')) return 1;
+  const p = R.state === 'running' ? smoothedPower() : 0, r = Math.max(0, (p || 0) / S.ftp);
+  return Math.min(6, 0.35 + 2.4 * Math.pow(r, 1.3));
+}
+function rideBgAnims() {
+  const bg = document.getElementById('nmBg');
+  const now = performance.now();
+  // rescan on a new scene (theme switch), when animations were cancelled, or every 5 s while none were found
+  // (Reduce Motion turned off again brings new animations on the same element)
+  if (bg !== RBG.bg || RBG.anims.some(x => x.a.playState === 'idle') || (bg && !RBG.anims.length && now - RBG.scanned > 5000)) {
+    RBG.bg = bg; RBG.anims = []; RBG.applied = 1; RBG.scanned = now;
+    if (bg && bg.getAnimations) for (const el of bg.querySelectorAll('.nm-hl,.nm-palm,.nm-glow,.nm-halo'))
+      for (const a of el.getAnimations()) if (RBG_ANIMS[a.animationName]) RBG.anims.push({ a, k: RBG_ANIMS[a.animationName] });
+  }
+  return RBG.anims;
+}
+function rideBgTick() {
+  const cfg = S.rideFx[rideLayout()], on = !!(cfg && cfg.bg);
+  if (document.body.classList.contains('bgmove') !== on) document.body.classList.toggle('bgmove', on);
+  const want = rideBgTarget(on);
+  RBG.rate += (want - RBG.rate) * 0.22; // eases over ~1 s, so power spikes don't make the floor stutter
+  if (Math.abs(RBG.rate - want) < 0.01) RBG.rate = want;
+  const anims = rideBgAnims(); if (!anims.length) return;
+  if (Math.abs(RBG.rate - RBG.applied) < 0.02 * RBG.applied && RBG.rate !== want) return;
+  if (RBG.rate === RBG.applied) return;
+  RBG.applied = RBG.rate;
+  for (const { a, k } of anims) {
+    const x = Math.pow(RBG.rate, k);
+    try { if (a.updatePlaybackRate) a.updatePlaybackRate(x); else a.playbackRate = x; } catch { /* animation gone */ }
+  }
+}
+
 // ---------- cadence mini gauge (in the corner of the power gauge) ----------
 const CAD = { min: 40, max: 140, A0: 150, SW: 240, cx: 50, cy: 54, r: 36, el: null, last: '', tk: null };
 function cadGaugeHtml() {

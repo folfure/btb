@@ -407,7 +407,7 @@ body.riding #btBanner{display:none}
   .ride .ivl .kv,.ride .ivl .next{display:none}
   .gmain{padding:18px 4px 2px} .gmain .gs{display:none}
 }
-body.riding #nmBg *{animation-play-state:paused} /* save battery while riding */
+body.riding:not(.bgmove) #nmBg *{animation-play-state:paused} /* ride screen: the scene stands still unless "Moving background" is on (z3-ridefx.js speeds it up with the power) */
 /*__PARTS_CSS__*/
 </style>
 </head>
@@ -718,13 +718,13 @@ const RIDE_VIEW_DEF = {
   phone: { tiles: ['hr', 'cad', 'iavg', 'el', 'avg', 'rem'], steps: true, chart: false },
   wide: { tiles: ['hr', 'cad', 'wkg', 'iavg', 'avg', 'np', 'tss', 'kj', 'el', 'rem'], steps: true, chart: true },
 };
-// cadence dial, flames and countdowns/coach per layout: a key of its own, which older app versions leave alone when they sync
-const RIDE_FX_DEF = { phone: { cad: true, fx: true, coach: true }, wide: { cad: true, fx: true, coach: true } };
+// cadence dial, flames, countdowns/coach and the background speed per layout (a tab still on an older build drops keys it doesn't know when it syncs: they fall back to their defaults)
+const RIDE_FX_DEF = { phone: { cad: true, fx: true, coach: true, bg: true }, wide: { cad: true, fx: true, coach: true, bg: true } };
 function cleanRideFx(o) {
   const out = {};
   for (const L of ['phone', 'wide']) {
     const x = o && typeof o === 'object' && o[L] && typeof o[L] === 'object' ? o[L] : {};
-    out[L] = {}; for (const k of ['cad', 'fx', 'coach']) out[L][k] = typeof x[k] === 'boolean' ? x[k] : RIDE_FX_DEF[L][k];
+    out[L] = {}; for (const k of ['cad', 'fx', 'coach', 'bg']) out[L][k] = typeof x[k] === 'boolean' ? x[k] : RIDE_FX_DEF[L][k];
   }
   return out;
 }
@@ -1710,6 +1710,7 @@ function nudgeTick() { const n = performance.now(); if (n - lastNudge > 450) { l
 function tick() {
   const now = performance.now();
   const gap = R.last ? (now - R.last) / 1000 : 0; R.last = now;
+  rideBgTick();
   if (!R.w || R.state === 'idle' || R.state === 'done') return;
   const pwr = liveFresh('Power') ? live.power : 0, cad = liveFresh('Cad') ? live.cadence : 0;
   const hasData = trainer.connected || sim.on || liveFresh('Power');
@@ -2106,7 +2107,8 @@ function openRideCustom() {
       }).join('')}</ul>
       <div class="rvopts"><label><input type="checkbox" id="rvSteps" ${cfg.steps ? 'checked' : ''}> ${t('Workout steps list')}</label><label><input type="checkbox" id="rvChart" ${cfg.chart ? 'checked' : ''}> ${t('Workout chart')}</label>
         <label><input type="checkbox" id="rvCad" ${fx.cad ? 'checked' : ''}> ${t('Cadence gauge')}</label><label><input type="checkbox" id="rvFx" ${fx.fx ? 'checked' : ''}> ${t('Flames and shaking on hard efforts')}</label>
-        <label><input type="checkbox" id="rvCoach" ${fx.coach ? 'checked' : ''}> ${t('Countdowns and coach messages')}</label></div>
+        <label><input type="checkbox" id="rvCoach" ${fx.coach ? 'checked' : ''}> ${t('Countdowns and coach messages')}</label>
+        <label><input type="checkbox" id="rvBg" ${fx.bg ? 'checked' : ''}> ${t('Moving background, faster with your power')}</label></div>
       <div class="row" style="gap:8px;margin-top:12px;align-items:center"><span>${t('Text size')}</span><span class="spacer"></span>
         <button class="btn sm ghost" id="rvFontDn" aria-label="${t('Smaller text')}" ${S.rideFont <= RIDE_FONTS[0] ? 'disabled' : ''}>A−</button><b class="num" style="min-width:3.2em;text-align:center">${Math.round(S.rideFont * 100)}%</b>
         <button class="btn sm ghost" id="rvFontUp" aria-label="${t('Larger text')}" ${S.rideFont >= RIDE_FONTS.at(-1) ? 'disabled' : ''}>A+</button></div>
@@ -2131,7 +2133,7 @@ function openRideCustom() {
     if (x.dataset.id) save({ ...cfg, tiles: x.checked ? cfg.tiles.concat(x.dataset.id) : cfg.tiles.filter(id => id !== x.dataset.id) });
     else if (x.id === 'rvSteps') save({ ...cfg, steps: x.checked });
     else if (x.id === 'rvChart') save({ ...cfg, chart: x.checked });
-    else if (x.id === 'rvCad' || x.id === 'rvFx' || x.id === 'rvCoach') {
+    else if (x.id === 'rvCad' || x.id === 'rvFx' || x.id === 'rvCoach' || x.id === 'rvBg') {
       S.rideFx = cleanRideFx({ ...S.rideFx, [L]: { ...S.rideFx[L], [x.id.slice(2).toLowerCase()]: x.checked } }); save(cfg);
     }
   });

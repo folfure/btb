@@ -34,8 +34,9 @@ Bluetooth only works on a secure page: `https://…` or `http://localhost`.
   - **Step list and stats table:** you choose which tiles appear.
   - **Countdowns:** 10 → GO before a harder step, and 15 → 0 at the end of a hard step.
   - **Coach messages:** during and before efforts.
+  - **Background:** the Neon Miami grid floor moves faster as your power rises, from about 1.3× its normal speed at 60 % FTP to 2.5× at FTP and 6× in a sprint. It slows down when paused.
   - The screen always fits the window.
-- **Customize ⚙ on the ride screen:** tiles, steps, chart, cadence dial, flames, and countdowns/coach, each saved separately for the phone and computer layouts. The **Aa** button (computer and tablet) cycles the text size.
+- **Customize ⚙ on the ride screen:** tiles, steps, chart, cadence dial, flames, countdowns/coach, and the moving background (off = a still background, which saves battery), each saved separately for the phone and computer layouts. The **Aa** button (computer and tablet) cycles the text size.
 - **Progress tab:**
   - per-ride analysis
   - fitness and fatigue trends
