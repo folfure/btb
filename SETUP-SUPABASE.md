@@ -22,12 +22,10 @@ In **Authentication**:
 - **Sign In / Providers**: turn **off** "Allow new users to sign up" and "Allow anonymous sign-ins" and "Allow manual linking". Keep only **Email** enabled (no phone/Google/…), with "Confirm email" on. Set *Email OTP length* = **8** and *Email OTP expiration* = **600** seconds.
 - **Rate Limits**: keep "Token verifications" and "Emails sent" low (defaults are fine; don't raise them).
 - **Sessions / JWT**: access-token expiry 1800 s or less; keep refresh-token reuse detection on.
-- **Emails › Templates › Magic Link** *and* **Confirm signup**: replace the body with
-  ```html
-  <h2>Your BTB sign-in code</h2>
-  <p>Enter this code in BTB: <strong style="font-size:22px">{{ .Token }}</strong></p>
-  <p>It expires in 10 minutes. If you didn't ask for it, ignore this email.</p>
-  ```
+- **Emails › Templates › Magic Link** *and* **Confirm signup**:
+  - Subject: `Ton code BTB / Your BTB code`.
+  - Body: paste the whole of [`supabase/templates/sign-in-code.html`](supabase/templates/sign-in-code.html). It is the Neon Miami card with the logo, the code in big type, and French and English text.
+  - The logo is loaded from `https://folfure.github.io/btb/icon-192.png`. If your mail app blocks images, it shows "BTB · Bouge Ton Body" instead.
 - **Emails › Templates › Invite user**: keep the link, e.g. `<p>You have been invited to BTB.</p><p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p><p>After that, sign in at https://folfure.github.io/btb/ with a code sent to this address.</p>`. Accepting confirms the account (until then, code sign-in is refused because sign-ups are off) and signs the rider straight in.
 - **Emails › SMTP settings**: Supabase's built-in mailer only delivers to members of your Supabase team and only a few emails per hour. To invite other riders, plug in an SMTP provider (Resend, Brevo, Postmark…; all have free tiers).
 - **URL Configuration**: *Site URL* = `https://folfure.github.io/btb/`; *Redirect URLs* add `https://folfure.github.io/btb/` and `http://localhost:8765/`.
