@@ -24,9 +24,11 @@ In **Authentication**:
 - **Sessions / JWT**: access-token expiry 1800 s or less; keep refresh-token reuse detection on.
 - **Emails › Templates › Magic Link** *and* **Confirm signup**:
   - Subject: `Ton code BTB / Your BTB code`.
-  - Body: paste the whole of [`supabase/templates/sign-in-code.html`](supabase/templates/sign-in-code.html). It is the Neon Miami card with the logo, the code in big type, and French and English text.
-  - The logo is loaded from `https://folfure.github.io/btb/icon-192.png`. If your mail app blocks images, it shows "BTB · Bouge Ton Body" instead.
-- **Emails › Templates › Invite user**: keep the link, e.g. `<p>You have been invited to BTB.</p><p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p><p>After that, sign in at https://folfure.github.io/btb/ with a code sent to this address.</p>`. Accepting confirms the account (until then, code sign-in is refused because sign-ups are off) and signs the rider straight in.
+  - Body: paste the whole of [`supabase/templates/sign-in-code.html`](supabase/templates/sign-in-code.html). It is the Neon Miami card with the code in big type and French and English text. The logo is styled HTML text, not an image, so it still shows in mail apps that block pictures.
+- **Emails › Templates › Invite user**:
+  - Subject: `Bienvenue sur BTB / You've been invited to BTB`.
+  - Body: paste the whole of [`supabase/templates/invite.html`](supabase/templates/invite.html). It has the same look, with an *Accept invitation* button and the plain link under it.
+  - Accepting confirms the account and signs the rider straight in. Until then, code sign-in is refused because sign-ups are off.
 - **Emails › SMTP settings**: Supabase's built-in mailer only delivers to members of your Supabase team and only a few emails per hour. To invite other riders, plug in an SMTP provider (Resend, Brevo, Postmark…; all have free tiers).
 - **URL Configuration**: *Site URL* = `https://folfure.github.io/btb/`; *Redirect URLs* add `https://folfure.github.io/btb/` and `http://localhost:8765/`.
 

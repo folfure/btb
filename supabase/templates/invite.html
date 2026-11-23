@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+<title>BTB</title>
+<style>
+  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;font:inherit!important}
+  @media (max-width:520px){ .card{border-radius:0!important} .pad{padding-left:20px!important;padding-right:20px!important} .btn a{padding:15px 22px!important;font-size:16px!important} }
+</style>
+</head>
+<body id="body" style="margin:0;padding:0;background:#160532">
+<!-- Neon Miami invitation email for Supabase (Authentication › Emails › Templates › Invite user).
+     Email-safe: tables, inline styles, solid colours behind every gradient (Outlook shows the solid ones). -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#0c0520">Bienvenue sur BTB : accepte ton invitation · You've been invited to BTB</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0c0520" style="background:#0c0520;background-image:linear-gradient(180deg,#07021a 0%,#160532 100%)">
+  <tr><td align="center" style="padding:28px 10px">
+    <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a0b3d"
+      style="max-width:480px;background:#1a0b3d;background-image:linear-gradient(165deg,#2c165c 0%,#1a0c3a 55%,#110728 100%);border:2px solid #ff2e88;border-radius:20px;box-shadow:0 0 28px rgba(255,46,136,.45)">
+      <!-- sunset stripe -->
+      <tr><td style="padding:0 36px;font-size:0;line-height:0">
+        <div style="height:4px;line-height:4px;font-size:0;background:#ff3d8b;background-image:linear-gradient(90deg,#3df5ff 0%,#ff2e88 40%,#ff8a3d 75%,#ffd23f 100%);border-radius:0 0 4px 4px;box-shadow:0 0 10px rgba(255,61,139,.8)">&nbsp;</div>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:26px 32px 6px">
+        <!-- logo in plain HTML text (no image, so mail apps that block pictures still show it) -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td align="center" valign="middle" width="150" height="104" bgcolor="#3a0d6e"
+            style="width:150px;height:104px;border-radius:22px;border:1px solid #ff3dae;background-color:#3a0d6e;background-image:linear-gradient(180deg,#14053a 0%,#3a0d6e 42%,#b02a8a 66%,#ff7a52 74%,#2a0848 76%,#12052e 100%)">
+            <div style="font-family:'Arial Black',Arial,Helvetica,sans-serif;font-size:50px;line-height:1;font-weight:900;font-style:italic;letter-spacing:-1px;color:#ffffff;text-shadow:-2px 0 0 #3df5ff,2px 0 0 #ff2e88,0 0 16px #ff3dae">BTB</div>
+            <div style="padding-top:8px;font-family:'Arial Black',Arial,Helvetica,sans-serif;font-size:10px;line-height:1;font-weight:900;font-style:italic;letter-spacing:2px;color:#ffffff">BOUGE TON BODY</div>
+          </td></tr></table>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:14px 32px 0;font-family:'Arial Black',Arial,Helvetica,sans-serif">
+        <div style="font-size:22px;line-height:1.25;font-weight:900;font-style:italic;letter-spacing:1px;text-transform:uppercase;color:#ff3dae;text-shadow:0 0 12px rgba(255,61,174,.75)">Bienvenue sur BTB&nbsp;!</div>
+        <div style="padding-top:4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8fe9ff">You've been invited</div>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:16px 32px 4px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#efe6ff">
+        On t'invite à rejoindre BTB, tes séances sur home trainer. Accepte l'invitation pour créer ton compte.<br>
+        <span style="font-size:13px;color:#b9a6e6">You've been invited to BTB, indoor-cycling workouts on your smart trainer. Accept to create your account.</span>
+      </td></tr>
+      <!-- button: a padded link inside a coloured cell, so it stays clickable everywhere -->
+      <tr><td align="center" class="pad" style="padding:22px 32px 8px">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+          <tr><td align="center" bgcolor="#ff2e88" class="btn"
+            style="background:#ff2e88;background-image:linear-gradient(90deg,#ff2e88 0%,#ff5a6e 60%,#ff8a3d 100%);border-radius:999px;box-shadow:0 0 22px rgba(255,46,136,.6)">
+            <a href="{{ .ConfirmationURL }}" target="_blank"
+              style="display:inline-block;padding:15px 34px;font-family:'Arial Black',Arial,Helvetica,sans-serif;font-size:17px;line-height:1.2;font-weight:900;font-style:italic;letter-spacing:1px;text-transform:uppercase;color:#ffffff;text-decoration:none;border-radius:999px">Accepter l'invitation</a>
+          </td></tr>
+        </table>
+        <div style="padding-top:8px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8fe9ff">Accept invitation</div>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:18px 32px 4px;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:#d9ccf5">
+        Le bouton te connecte directement. Ensuite, ouvre
+        <a href="https://folfure.github.io/btb/" style="color:#3df5ff;text-decoration:none;font-weight:700">folfure.github.io/btb</a>
+        et demande un code de connexion avec cette adresse e-mail.<br>
+        <span style="font-size:12.5px;color:#b9a6e6">The button signs you straight in. Next time, open the same address and ask for a sign-in code with this email.</span>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:14px 32px 4px;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:#d9ccf5">
+        Sur iPhone ou iPad, roule dans l'app gratuite <b style="color:#ffffff">Bluefy</b>&nbsp;: c'est elle qui parle au home trainer en Bluetooth.<br>
+        <span style="font-size:12.5px;color:#b9a6e6">On iPhone or iPad, ride in the free <b style="color:#ffffff">Bluefy</b> app: it talks to your trainer over Bluetooth.</span>
+      </td></tr>
+      <tr><td align="center" class="pad" style="padding:18px 32px 24px;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.55;color:#9d8cc8">
+        Le bouton ne marche pas&nbsp;? Copie ce lien dans ton navigateur · Button not working? Copy this link into your browser:<br>
+        <a href="{{ .ConfirmationURL }}" style="color:#8fe9ff;text-decoration:underline;word-break:break-all">{{ .ConfirmationURL }}</a><br><br>
+        Lien expiré&nbsp;? Demande une nouvelle invitation. Si tu ne connais pas BTB, ignore cet e-mail.<br>
+        Link expired? Ask for a new invitation. If you don't know BTB, ignore this email.
+      </td></tr>
+      <tr><td align="center" style="padding:0 32px 22px;font-family:'Arial Black',Arial,Helvetica,sans-serif;font-size:11px;font-weight:900;font-style:italic;letter-spacing:3px;color:#ff8ad0">BOUGE TON BODY</td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
